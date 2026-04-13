@@ -50,14 +50,16 @@ export default function Home() {
                   <span className="mono-label">{turn.steps.length} STEPS</span>
                 </summary>
                 <div className="mt-2 rounded-lg border bg-card">
-                  <TrajectoryView steps={turn.steps} />
+                  <TrajectoryView steps={turn.steps} className="max-h-[300px]" />
                 </div>
               </details>
             )}
 
-            {/* Past result */}
+            {/* Past result — clear separation from trajectory */}
             {turn.result && (
-              <ResultView result={turn.result} steps={turn.steps} userMessage={turn.userMessage} />
+              <div className="mt-2">
+                <ResultView result={turn.result} steps={turn.steps} userMessage={turn.userMessage} />
+              </div>
             )}
 
             {turn.error && (
@@ -87,7 +89,7 @@ export default function Home() {
                   <span className="mono-label text-agent">RUNNING</span>
                 </span>
               </div>
-              <TrajectoryView steps={steps} />
+              <TrajectoryView steps={steps} className="max-h-[400px]" />
             </div>
           </div>
         )}
