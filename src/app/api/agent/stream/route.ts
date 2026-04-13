@@ -22,11 +22,12 @@ Always think step by step. Output the final prompt in markdown format.`
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { message, locale = "zh", provider, model } = body as {
+  const { message, locale = "zh", provider, model, history } = body as {
     message: string
     locale?: "zh" | "en"
     provider?: string
     model?: string
+    history?: { role: "user" | "assistant"; content: string }[]
   }
 
   if (!message?.trim()) {
@@ -49,6 +50,7 @@ export async function POST(request: NextRequest) {
         const result = await runAgent({
           systemPrompt: SYSTEM_PROMPT,
           userMessage: message,
+          history,
           tools: getAnalysisTools(),
           locale,
           provider: provider as any,

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Search, Plus, Clock, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search, Clock, ChevronLeft, ChevronRight } from "lucide-react"
 import { getPromptsPaginated } from "@/app/actions/prompt.actions"
 import type { PromptWithTags } from "@/app/actions/prompt.actions"
 
@@ -67,16 +67,9 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">提示词库</h1>
-          <p className="text-sm text-muted-foreground">{total} 条提示词</p>
-        </div>
-        <Link href="/" className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:bg-primary/90">
-          <Plus className="h-4 w-4" />
-          生成新提示词
-        </Link>
+      {/* Count */}
+      <div className="mb-6">
+        <p className="text-sm text-muted-foreground">{total} 条提示词</p>
       </div>
 
       {/* Search */}

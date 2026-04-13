@@ -26,9 +26,15 @@ export interface AgentToolDefinition {
   execute: (args: Record<string, unknown>, locale: NarrationLocale) => Promise<string>
 }
 
+export interface ChatMessage {
+  role: "user" | "assistant"
+  content: string
+}
+
 export interface AgentRunOptions {
   systemPrompt: string
   userMessage: string
+  history?: ChatMessage[]
   tools?: AgentToolDefinition[]
   provider?: ProviderName
   model?: string
@@ -157,8 +163,14 @@ async function runAgentInternal(options: AgentRunOptions): Promise<AgentRunResul
     }
   }
 
+  const historyMessages: ChatCompletionMessageParam[] = (options.history ?? []).map((m) => ({
+    role: m.role,
+    content: m.content,
+  }))
+
   const messages: ChatCompletionMessageParam[] = [
     { role: "system", content: systemPrompt },
+    ...historyMessages,
     { role: "user", content: userMessage },
   ]
 

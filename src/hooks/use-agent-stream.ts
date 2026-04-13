@@ -20,6 +20,18 @@ export interface AgentResult {
   trajectoryCount: number
 }
 
+export interface ChatMessage {
+  role: "user" | "assistant"
+  content: string
+}
+
+export interface ConversationTurn {
+  userMessage: string
+  steps: TrajectoryStep[]
+  result: AgentResult | null
+  error: string | null
+}
+
 export type AgentStatus = "idle" | "running" | "complete" | "error"
 
 export function useAgentStream() {
@@ -27,6 +39,8 @@ export function useAgentStream() {
   const [steps, setSteps] = useState<TrajectoryStep[]>([])
   const [result, setResult] = useState<AgentResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [history, setHistory] = useState<ChatMessage[]>([])
+  const [turns, setTurns] = useState<ConversationTurn[]>([])
   const abortRef = useRef<AbortController | null>(null)
 
   const run = useCallback(async (message: string, options?: {
@@ -34,16 +48,18 @@ export function useAgentStream() {
     provider?: string
     model?: string
   }) => {
-    // Reset state
     setStatus("running")
     setSteps([])
     setResult(null)
     setError(null)
 
-    // Abort previous request if any
     abortRef.current?.abort()
     const controller = new AbortController()
     abortRef.current = controller
+
+    const currentSteps: TrajectoryStep[] = []
+    let currentResult: AgentResult | null = null
+    let currentError: string | null = null
 
     try {
       const response = await fetch("/api/agent/stream", {
@@ -54,13 +70,12 @@ export function useAgentStream() {
           locale: options?.locale ?? "zh",
           provider: options?.provider,
           model: options?.model,
+          history,
         }),
         signal: controller.signal,
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`)
-      }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
       const reader = response.body?.getReader()
       if (!reader) throw new Error("No response body")
@@ -82,16 +97,18 @@ export function useAgentStream() {
             eventType = line.slice(7).trim()
           } else if (line.startsWith("data: ") && eventType) {
             const data = JSON.parse(line.slice(6))
-
             switch (eventType) {
               case "step":
+                currentSteps.push(data as TrajectoryStep)
                 setSteps((prev) => [...prev, data as TrajectoryStep])
                 break
               case "result":
-                setResult(data as AgentResult)
+                currentResult = data as AgentResult
+                setResult(currentResult)
                 break
               case "error":
-                setError(data.message)
+                currentError = data.message
+                setError(currentError)
                 setStatus("error")
                 break
               case "done":
@@ -103,15 +120,30 @@ export function useAgentStream() {
         }
       }
 
-      // If we finished reading without explicit done/error
       setStatus((prev) => (prev === "running" ? "complete" : prev))
     } catch (err) {
       if ((err as Error).name !== "AbortError") {
-        setError((err as Error).message)
+        currentError = (err as Error).message
+        setError(currentError)
         setStatus("error")
       }
     }
-  }, [])
+
+    // Update conversation history
+    if (currentResult) {
+      setHistory((prev) => [
+        ...prev,
+        { role: "user", content: message },
+        { role: "assistant", content: currentResult!.text },
+      ])
+    }
+
+    // Record this turn
+    setTurns((prev) => [
+      ...prev,
+      { userMessage: message, steps: currentSteps, result: currentResult, error: currentError },
+    ])
+  }, [history])
 
   const stop = useCallback(() => {
     abortRef.current?.abort()
@@ -124,7 +156,9 @@ export function useAgentStream() {
     setSteps([])
     setResult(null)
     setError(null)
+    setHistory([])
+    setTurns([])
   }, [])
 
-  return { status, steps, result, error, run, stop, reset }
+  return { status, steps, result, error, turns, run, stop, reset }
 }
