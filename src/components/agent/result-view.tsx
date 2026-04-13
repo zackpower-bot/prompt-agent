@@ -3,9 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Copy, Check, Save, Loader2 } from "lucide-react"
+import { Copy, Check, Save, Loader2, ThumbsUp, ThumbsDown } from "lucide-react"
 import { useState, useCallback } from "react"
 import type { AgentResult, TrajectoryStep } from "@/hooks/use-agent-stream"
+import { submitFeedback } from "@/app/actions/feedback.actions"
 
 interface ResultViewProps {
   result: AgentResult
@@ -18,6 +19,8 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
   const [copied, setCopied] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [savedPromptId, setSavedPromptId] = useState<string | null>(null)
+  const [feedbackGiven, setFeedbackGiven] = useState<"positive" | "negative" | null>(null)
 
   const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(result.text)
@@ -66,6 +69,7 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
       if (response.ok) {
         const data = await response.json()
         setSaved(true)
+        setSavedPromptId(data.promptId)
         onSaved?.(data.promptId)
       }
     } catch {
@@ -105,6 +109,34 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
                 <Save className="mr-1 h-3 w-3" />
               )}
               {saved ? "已保存" : "保存"}
+            </Button>
+            <Button
+              variant={feedbackGiven === "positive" ? "default" : "ghost"}
+              size="icon"
+              className="h-7 w-7"
+              onClick={async () => {
+                setFeedbackGiven("positive")
+                if (savedPromptId) {
+                  await submitFeedback(savedPromptId, "positive")
+                }
+              }}
+              disabled={feedbackGiven !== null}
+            >
+              <ThumbsUp className="h-3 w-3" />
+            </Button>
+            <Button
+              variant={feedbackGiven === "negative" ? "destructive" : "ghost"}
+              size="icon"
+              className="h-7 w-7"
+              onClick={async () => {
+                setFeedbackGiven("negative")
+                if (savedPromptId) {
+                  await submitFeedback(savedPromptId, "negative")
+                }
+              }}
+              disabled={feedbackGiven !== null}
+            >
+              <ThumbsDown className="h-3 w-3" />
             </Button>
           </div>
         </div>

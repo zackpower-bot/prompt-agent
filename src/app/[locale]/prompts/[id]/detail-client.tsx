@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, Copy, Check, Clock, Tag, Pencil, Trash2, Archive, Save, X } from "lucide-react"
+import { ArrowLeft, Copy, Check, Clock, Tag, Pencil, Trash2, Archive, Save, X, ThumbsUp, ThumbsDown } from "lucide-react"
 import { updatePrompt, deletePrompt } from "@/app/actions/prompt.actions"
 import type { PromptWithTags } from "@/app/actions/prompt.actions"
 import { createVersion } from "@/app/actions/version.actions"
 import { VersionList } from "@/components/prompts/version-list"
+import { submitFeedback } from "@/app/actions/feedback.actions"
 
 interface Props {
   prompt: PromptWithTags
@@ -26,6 +27,7 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
   const [copied, setCopied] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [feedbackGiven, setFeedbackGiven] = useState<"positive" | "negative" | null>(null)
 
   // Edit form state
   const [title, setTitle] = useState(prompt.title)
@@ -162,6 +164,24 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
             <Button size="sm" variant="outline" onClick={handleCopy}>
               {copied ? <Check className="mr-1 h-3.5 w-3.5" /> : <Copy className="mr-1 h-3.5 w-3.5" />}
               {copied ? "已复制" : "复制"}
+            </Button>
+            <Button
+              size="sm"
+              variant={feedbackGiven === "positive" ? "default" : "outline"}
+              onClick={() => { setFeedbackGiven("positive"); void submitFeedback(prompt.id, "positive") }}
+              disabled={feedbackGiven !== null || isPending}
+            >
+              <ThumbsUp className="mr-1 h-3.5 w-3.5" />
+              {feedbackGiven === "positive" ? "已评" : "👍"}
+            </Button>
+            <Button
+              size="sm"
+              variant={feedbackGiven === "negative" ? "destructive" : "outline"}
+              onClick={() => { setFeedbackGiven("negative"); void submitFeedback(prompt.id, "negative") }}
+              disabled={feedbackGiven !== null || isPending}
+            >
+              <ThumbsDown className="mr-1 h-3.5 w-3.5" />
+              {feedbackGiven === "negative" ? "已评" : "👎"}
             </Button>
             {prompt.status !== "archived" && (
               <Button size="sm" variant="outline" onClick={handleArchive} disabled={isPending}>
