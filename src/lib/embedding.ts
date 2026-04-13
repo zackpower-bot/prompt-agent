@@ -10,6 +10,12 @@
 import OpenAI from "openai"
 
 export const EMBEDDING_CONFIGS = {
+  minimax: {
+    model: "embo-01",
+    dimensions: 1536,
+    baseURL: "https://api.minimax.io/v1",
+    envKey: "MINIMAX_API_KEY",
+  },
   openai: {
     model: "text-embedding-3-small",
     dimensions: 1536,
@@ -27,6 +33,7 @@ export const EMBEDDING_CONFIGS = {
 export type EmbeddingProvider = keyof typeof EMBEDDING_CONFIGS
 
 function resolveProvider(): EmbeddingProvider | null {
+  if (process.env.MINIMAX_API_KEY) return "minimax"
   if (process.env.OPENAI_API_KEY) return "openai"
   if (process.env.GEMINI_API_KEY) return "gemini"
   return null
@@ -68,11 +75,16 @@ export async function embed(text: string): Promise<Float32Array | null> {
 
   const config = EMBEDDING_CONFIGS[resolved.provider]
 
-  const response = await resolved.client.embeddings.create({
+  // MiniMax embo-01 may not support the dimensions parameter
+  const params: { model: string; input: string; dimensions?: number } = {
     model: config.model,
     input: text.slice(0, 8000), // safety truncation
-    dimensions: config.dimensions,
-  })
+  }
+  if (resolved.provider !== "minimax") {
+    params.dimensions = config.dimensions
+  }
+
+  const response = await resolved.client.embeddings.create(params)
 
   const data = response.data[0]?.embedding
   if (!data) return null
