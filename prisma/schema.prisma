@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Prompt {
+  id          String    @id @default(cuid())
+  title       String
+  description String    @default("")
+  content     String
+  category    String    @default("general")
+  model       String    @default("universal")
+  status      String    @default("inbox")
+  isFavorite  Boolean   @default(false)
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tags     PromptTag[]
+  versions PromptVersion[]
+  history  AgentHistory[]
+}
+
+model Tag {
+  id      String      @id @default(cuid())
+  name    String      @unique
+  prompts PromptTag[]
+}
+
+model PromptTag {
+  promptId String
+  tagId    String
+  prompt   Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([promptId, tagId])
+}
+
+model Module {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  type      String   @default("role")
+  tags      String   @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PromptVersion {
+  id            String   @id @default(cuid())
+  promptId      String
+  versionNumber Int
+  title         String
+  content       String
+  snapshot      String   @default("{}")
+  createdAt     DateTime @default(now())
+  prompt        Prompt   @relation(fields: [promptId], references: [id], onDelete: Cascade)
+}
+
+model AgentHistory {
+  id         String   @id @default(cuid())
+  promptId   String
+  type       String   @default("react_trajectory")
+  input      String   @default("")
+  output     String   @default("{}")
+  trajectory String   @default("[]")
+  provider   String   @default("minimax")
+  model      String   @default("MiniMax-M2.7")
+  createdAt  DateTime @default(now())
+  prompt     Prompt   @relation(fields: [promptId], references: [id], onDelete: Cascade)
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

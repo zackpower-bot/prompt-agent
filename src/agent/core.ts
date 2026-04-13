@@ -1,0 +1,243 @@
+import OpenAI from "openai"
+import type {
+  ChatCompletionMessageParam,
+  ChatCompletionTool,
+  ChatCompletionToolMessageParam,
+} from "openai/resources/chat/completions"
+import { createClient, getDefaultProvider, PROVIDER_CONFIGS } from "@/lib/providers"
+import type { ProviderName } from "@/lib/providers"
+
+export type NarrationLocale = "zh" | "en"
+
+export interface AgentTrajectoryStep {
+  step: number
+  phase: "thought" | "action" | "observation"
+  content: string
+  tool: string | null
+  input: Record<string, unknown> | null
+  data: Record<string, unknown> | null
+  timestamp: string
+}
+
+export interface AgentToolDefinition {
+  name: string
+  description: string
+  parameters: Record<string, unknown>
+  execute: (args: Record<string, unknown>, locale: NarrationLocale) => Promise<string>
+}
+
+export interface AgentRunOptions {
+  systemPrompt: string
+  userMessage: string
+  tools?: AgentToolDefinition[]
+  provider?: ProviderName
+  model?: string
+  locale?: NarrationLocale
+  maxIterations?: number
+  temperature?: number
+  onStep?: (step: AgentTrajectoryStep) => void
+}
+
+export interface AgentRunResult {
+  text: string
+  trajectory: AgentTrajectoryStep[]
+  provider: ProviderName
+  model: string
+  usage: { inputTokens: number; outputTokens: number }
+}
+
+const MAX_ITERATIONS = 8
+
+function pushStep(
+  trajectory: AgentTrajectoryStep[],
+  phase: AgentTrajectoryStep["phase"],
+  content: string,
+  tool: string | null = null,
+  input: Record<string, unknown> | null = null,
+  data: Record<string, unknown> | null = null,
+  onStep?: (step: AgentTrajectoryStep) => void
+): void {
+  const step: AgentTrajectoryStep = {
+    step: trajectory.length + 1,
+    phase,
+    content,
+    tool,
+    input,
+    data,
+    timestamp: new Date().toISOString(),
+  }
+  trajectory.push(step)
+  onStep?.(step)
+}
+
+function buildOpenAITools(tools: AgentToolDefinition[]): ChatCompletionTool[] {
+  return tools.map((t) => ({
+    type: "function" as const,
+    function: {
+      name: t.name,
+      description: t.description,
+      parameters: t.parameters,
+    },
+  }))
+}
+
+function safeJsonParse<T>(raw: string, fallback: T): T {
+  try {
+    return JSON.parse(raw) as T
+  } catch {
+    return fallback
+  }
+}
+
+/**
+ * Strip MiniMax <think>...</think> tags from content.
+ * Returns { thinking, output } where thinking is the content inside <think> tags.
+ */
+export function parseThinkingContent(text: string): { thinking: string; output: string } {
+  const thinkMatch = text.match(/<think>([\s\S]*?)<\/think>/)
+  const thinking = thinkMatch ? thinkMatch[1].trim() : ""
+  const output = text.replace(/<think>[\s\S]*?<\/think>/g, "").trim()
+  return { thinking, output }
+}
+
+export async function runAgent(options: AgentRunOptions): Promise<AgentRunResult> {
+  const {
+    systemPrompt,
+    userMessage,
+    tools = [],
+    locale = "zh",
+    maxIterations = MAX_ITERATIONS,
+    temperature = 0.2,
+    onStep,
+  } = options
+
+  const providerName = options.provider ?? getDefaultProvider()
+  const config = PROVIDER_CONFIGS[providerName]
+  const modelName = options.model ?? config.defaultModel
+  const client = createClient(providerName)
+
+  if (!client) {
+    return {
+      text: locale === "zh" ? `未配置 ${config.label} API 密钥。` : `${config.label} API key not configured.`,
+      trajectory: [],
+      provider: providerName,
+      model: modelName,
+      usage: { inputTokens: 0, outputTokens: 0 },
+    }
+  }
+
+  const messages: ChatCompletionMessageParam[] = [
+    { role: "system", content: systemPrompt },
+    { role: "user", content: userMessage },
+  ]
+
+  const openaiTools = tools.length > 0 ? buildOpenAITools(tools) : undefined
+  const trajectory: AgentTrajectoryStep[] = []
+  let totalInput = 0
+  let totalOutput = 0
+
+  for (let iteration = 0; iteration < maxIterations; iteration++) {
+    const completion = await client.chat.completions.create({
+      model: modelName,
+      temperature,
+      messages,
+      tools: openaiTools,
+      tool_choice: openaiTools ? "auto" : undefined,
+    })
+
+    const message = completion.choices[0]?.message
+    if (!message) break
+
+    totalInput += completion.usage?.prompt_tokens ?? 0
+    totalOutput += completion.usage?.completion_tokens ?? 0
+
+    // Parse thinking content from MiniMax-style <think> tags
+    const rawContent = message.content ?? ""
+    if (rawContent) {
+      const { thinking, output } = parseThinkingContent(rawContent)
+      if (thinking) {
+        pushStep(trajectory, "thought", thinking, null, null, null, onStep)
+      }
+      if (output && !message.tool_calls?.length) {
+        // Final text response
+        return {
+          text: output,
+          trajectory,
+          provider: providerName,
+          model: modelName,
+          usage: { inputTokens: totalInput, outputTokens: totalOutput },
+        }
+      }
+    }
+
+    // Handle tool calls
+    const toolCalls = message.tool_calls ?? []
+    if (toolCalls.length === 0 && rawContent) {
+      return {
+        text: parseThinkingContent(rawContent).output || rawContent,
+        trajectory,
+        provider: providerName,
+        model: modelName,
+        usage: { inputTokens: totalInput, outputTokens: totalOutput },
+      }
+    }
+
+    if (toolCalls.length > 0) {
+      messages.push({
+        role: "assistant",
+        content: message.content ?? null,
+        tool_calls: toolCalls,
+      })
+
+      for (const toolCall of toolCalls) {
+        if (toolCall.type !== "function") continue
+        const toolName = toolCall.function.name
+        const toolDef = tools.find((t) => t.name === toolName)
+
+        const args = safeJsonParse<Record<string, unknown>>(toolCall.function.arguments, {})
+
+        pushStep(
+          trajectory,
+          "action",
+          locale === "zh"
+            ? `调用工具 ${toolName}(${JSON.stringify(args)})`
+            : `Calling tool ${toolName}(${JSON.stringify(args)})`,
+          toolName,
+          args,
+          null,
+          onStep
+        )
+
+        let result: string
+        if (toolDef) {
+          try {
+            result = await toolDef.execute(args, locale)
+          } catch (error) {
+            const msg = error instanceof Error ? error.message : "Unknown error"
+            result = locale === "zh" ? `工具 ${toolName} 执行失败：${msg}` : `Tool ${toolName} failed: ${msg}`
+          }
+        } else {
+          result = locale === "zh" ? `未知工具：${toolName}` : `Unknown tool: ${toolName}`
+        }
+
+        pushStep(trajectory, "observation", result, toolName, null, { toolName, args }, onStep)
+
+        const toolMessage: ChatCompletionToolMessageParam = {
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: result,
+        }
+        messages.push(toolMessage)
+      }
+    }
+  }
+
+  // Iteration limit reached
+  return {
+    text: locale === "zh" ? "Agent 达到最大迭代次数。" : "Agent reached maximum iterations.",
+    trajectory,
+    provider: providerName,
+    model: modelName,
+    usage: { inputTokens: totalInput, outputTokens: totalOutput },
+  }
+}
