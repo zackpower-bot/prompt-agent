@@ -2,14 +2,16 @@
 
 import { usePathname } from "next/navigation"
 import { Link } from "@/i18n/navigation"
-import { Bot, Library, Sparkles, Wrench, LogOut } from "lucide-react"
+import { Bot, Library, Sparkles, Wrench, Blocks, BarChart3, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ThemeToggle } from "./theme-toggle"
 
 const navItems = [
   { href: "/", label: "生成", icon: Sparkles },
   { href: "/prompts", label: "提示词库", icon: Library },
+  { href: "/modules", label: "模块", icon: Blocks },
   { href: "/cleanup", label: "清洗", icon: Wrench },
+  { href: "/stats", label: "统计", icon: BarChart3 },
 ]
 
 export function AppNav() {

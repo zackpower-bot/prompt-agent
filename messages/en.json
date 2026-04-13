@@ -10,11 +10,97 @@
     "reset": "Reset",
     "noResults": "No results"
   },
+  "nav": {
+    "generate": "Generate",
+    "prompts": "Library",
+    "modules": "Modules",
+    "cleanup": "Cleanup",
+    "stats": "Stats"
+  },
   "agent": {
     "thinking": "Thinking...",
     "searching": "Searching...",
     "analyzing": "Analyzing...",
     "generating": "Generating...",
-    "complete": "Complete"
+    "complete": "Complete",
+    "trajectory": "Agent Trajectory",
+    "running": "Running",
+    "result": "Generated Result",
+    "saved": "Saved",
+    "subtitle": "Describe your idea, Agent generates, classifies, and tags prompts",
+    "continueHint": "Continue to iterate · Click ↻ for new conversation",
+    "sendHint": "Enter to send · Shift+Enter for newline"
+  },
+  "prompts": {
+    "title": "Prompt Library",
+    "count": "{count} prompts",
+    "search": "Search prompts...",
+    "allTags": "All tags",
+    "allStatus": "All",
+    "inbox": "Inbox",
+    "production": "Production",
+    "archived": "Archived",
+    "export": "Export",
+    "import": "Import",
+    "noResults": "No matching prompts"
+  },
+  "detail": {
+    "edit": "Edit",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirmDelete": "Confirm Delete",
+    "archive": "Archive",
+    "copy": "Copy",
+    "copied": "Copied",
+    "back": "Back to list",
+    "content": "Prompt Content",
+    "versions": "Version History",
+    "noVersions": "No versions yet"
+  },
+  "modules": {
+    "title": "Module Management",
+    "count": "{count} modules",
+    "create": "New Module",
+    "search": "Search modules...",
+    "allTypes": "All",
+    "noModules": "No modules yet",
+    "types": {
+      "role": "Role",
+      "goal": "Goal",
+      "constraint": "Constraint",
+      "output_format": "Output Format",
+      "style": "Style",
+      "self_check": "Self Check"
+    }
+  },
+  "stats": {
+    "title": "Usage Statistics",
+    "totalPrompts": "Total Prompts",
+    "agentRuns": "Agent Runs",
+    "totalTokens": "Token Usage",
+    "tagCount": "Tags",
+    "byStatus": "By Status",
+    "byCategory": "By Category",
+    "topTags": "Top Tags",
+    "byProvider": "By Provider",
+    "recentActivity": "Recent Activity",
+    "loadFailed": "Failed to load"
+  },
+  "cleanup": {
+    "title": "Batch Cleanup",
+    "description": "Agent auto-analyzes prompts and suggests titles, descriptions, tags, categories",
+    "start": "Start Analysis",
+    "analyzing": "Analyzing",
+    "apply": "Apply",
+    "applied": "Applied",
+    "failed": "Failed",
+    "steps": "steps"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
   }
 }

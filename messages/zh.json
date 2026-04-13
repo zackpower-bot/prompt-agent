@@ -10,11 +10,97 @@
     "reset": "重置",
     "noResults": "无结果"
   },
+  "nav": {
+    "generate": "生成",
+    "prompts": "提示词库",
+    "modules": "模块",
+    "cleanup": "清洗",
+    "stats": "统计"
+  },
   "agent": {
     "thinking": "思考中...",
     "searching": "搜索中...",
     "analyzing": "分析中...",
     "generating": "生成中...",
-    "complete": "完成"
+    "complete": "完成",
+    "trajectory": "Agent 推理轨迹",
+    "running": "运行中",
+    "result": "生成结果",
+    "saved": "已保存",
+    "subtitle": "描述你的想法，Agent 自动生成、分类、标签提示词",
+    "continueHint": "继续对话以迭代优化 · 点击 ↻ 开始新对话",
+    "sendHint": "Enter 发送 · Shift+Enter 换行"
+  },
+  "prompts": {
+    "title": "提示词库",
+    "count": "{count} 条提示词",
+    "search": "搜索提示词...",
+    "allTags": "全部标签",
+    "allStatus": "全部",
+    "inbox": "收件箱",
+    "production": "生产",
+    "archived": "归档",
+    "export": "导出",
+    "import": "导入",
+    "noResults": "无匹配的提示词"
+  },
+  "detail": {
+    "edit": "编辑",
+    "save": "保存",
+    "saving": "保存中...",
+    "cancel": "取消",
+    "delete": "删除",
+    "confirmDelete": "确认删除",
+    "archive": "归档",
+    "copy": "复制",
+    "copied": "已复制",
+    "back": "返回列表",
+    "content": "提示词内容",
+    "versions": "版本历史",
+    "noVersions": "暂无版本记录"
+  },
+  "modules": {
+    "title": "模块管理",
+    "count": "{count} 个模块",
+    "create": "新建模块",
+    "search": "搜索模块...",
+    "allTypes": "全部",
+    "noModules": "暂无模块",
+    "types": {
+      "role": "角色",
+      "goal": "目标",
+      "constraint": "约束",
+      "output_format": "输出格式",
+      "style": "风格",
+      "self_check": "自检"
+    }
+  },
+  "stats": {
+    "title": "使用统计",
+    "totalPrompts": "提示词总数",
+    "agentRuns": "Agent 运行",
+    "totalTokens": "Token 消耗",
+    "tagCount": "标签数",
+    "byStatus": "按状态分布",
+    "byCategory": "按分类",
+    "topTags": "热门标签",
+    "byProvider": "Provider 分布",
+    "recentActivity": "最近活动",
+    "loadFailed": "加载失败"
+  },
+  "cleanup": {
+    "title": "批量清洗",
+    "description": "Agent 自动分析提示词，建议标题、描述、标签、分类",
+    "start": "开始分析",
+    "analyzing": "分析中",
+    "apply": "应用",
+    "applied": "已应用",
+    "failed": "失败",
+    "steps": "步骤"
+  },
+  "theme": {
+    "light": "浅色",
+    "dark": "深色",
+    "system": "系统"
   }
 }

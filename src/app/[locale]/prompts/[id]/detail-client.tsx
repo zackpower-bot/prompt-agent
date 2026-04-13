@@ -12,6 +12,8 @@ import { Separator } from "@/components/ui/separator"
 import { ArrowLeft, Copy, Check, Clock, Tag, Pencil, Trash2, Archive, Save, X } from "lucide-react"
 import { updatePrompt, deletePrompt } from "@/app/actions/prompt.actions"
 import type { PromptWithTags } from "@/app/actions/prompt.actions"
+import { createVersion } from "@/app/actions/version.actions"
+import { VersionList } from "@/components/prompts/version-list"
 
 interface Props {
   prompt: PromptWithTags
@@ -46,6 +48,7 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
         title, description, content, category, tags, status,
       })
       if (result.success) {
+        await createVersion(prompt.id)
         setPrompt(result.data)
         setEditing(false)
       }
@@ -195,6 +198,11 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
           )}
         </CardContent>
       </Card>
+
+      <div className="mt-6">
+        <h3 className="mb-3 text-sm font-medium">版本历史</h3>
+        <VersionList promptId={prompt.id} currentContent={prompt.content} />
+      </div>
     </div>
   )
 }
