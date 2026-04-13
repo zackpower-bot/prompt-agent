@@ -1,8 +1,41 @@
 import createMiddleware from "next-intl/middleware"
 import { routing } from "@/i18n/routing"
+import { NextRequest, NextResponse } from "next/server"
 
-export default createMiddleware(routing)
+const intlMiddleware = createMiddleware(routing)
+
+const PUBLIC_PATHS = ["/login", "/api/health"]
+
+function isPublic(pathname: string): boolean {
+  return PUBLIC_PATHS.some((p) => pathname === p || pathname.endsWith(p))
+}
+
+export default function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // Skip auth for API routes (except those needing protection)
+  if (pathname.startsWith("/api/")) {
+    if (isPublic(pathname)) return NextResponse.next()
+    // API auth check
+    const token = request.cookies.get("pa_auth")?.value
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+    return NextResponse.next()
+  }
+
+  // Check auth for non-public pages
+  if (!isPublic(pathname)) {
+    const token = request.cookies.get("pa_auth")?.value
+    if (!token) {
+      const loginUrl = new URL("/zh/login", request.url)
+      return NextResponse.redirect(loginUrl)
+    }
+  }
+
+  return intlMiddleware(request)
+}
 
 export const config = {
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  matcher: ["/((?!_next|_vercel|.*\\..*).*)"],
 }

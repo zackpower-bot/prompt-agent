@@ -159,6 +159,19 @@ export async function getAllTags(): Promise<
   }
 }
 
+export async function getPromptById(id: string): Promise<{ success: true; data: PromptWithTags } | { success: false; error: string }> {
+  try {
+    const row = await prisma.prompt.findUnique({
+      where: { id },
+      include: { tags: { include: { tag: true } } },
+    })
+    if (!row) return { success: false, error: "Prompt not found" }
+    return { success: true, data: serializePrompt(row) }
+  } catch (e) {
+    return { success: false, error: (e as Error).message }
+  }
+}
+
 export async function saveAgentHistory(data: {
   promptId: string
   type?: string
