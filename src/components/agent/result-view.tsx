@@ -23,6 +23,8 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
   const [feedbackGiven, setFeedbackGiven] = useState<"positive" | "negative" | null>(null)
   const [qualityCheck, setQualityCheck] = useState<{ score: number; warning: string; suggestions: string[] } | null>(null)
   const [qualityChecking, setQualityChecking] = useState(false)
+  const [dedupWarning, setDedupWarning] = useState<{ id: string; title: string; similarity: number }[] | null>(null)
+  const [dedupChecking, setDedupChecking] = useState(false)
 
   const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(result.text)
@@ -81,12 +83,44 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
     }
   }, [result, steps, userMessage, saving, saved, onSaved])
 
+  const checkDedupThenSave = useCallback(async () => {
+    setDedupChecking(true)
+    try {
+      // Extract title from classification steps for a better match
+      let title = ""
+      for (const step of steps) {
+        if (step.phase === "observation" && step.tool === "classify_prompt") {
+          try {
+            const parsed = JSON.parse(step.content)
+            if (typeof parsed.title === "string") { title = parsed.title; break }
+          } catch { /* skip */ }
+        }
+      }
+      const res = await fetch("/api/agent/dedup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content: result.text }),
+      })
+      const data = await res.json()
+      if (data.hasDuplicates) {
+        setDedupWarning(data.duplicates)
+      } else {
+        await doSave()
+      }
+    } catch {
+      // If dedup check fails, allow save anyway
+      await doSave()
+    } finally {
+      setDedupChecking(false)
+    }
+  }, [steps, result.text, doSave])
+
   const handleSave = useCallback(async () => {
     if (saving || saved) return
 
-    // If quality already checked and user chose to force save, skip check
+    // If quality already checked and user chose to force save, run dedup next
     if (qualityCheck) {
-      await doSave()
+      await checkDedupThenSave()
       return
     }
 
@@ -101,7 +135,7 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
       const assessment = await res.json()
 
       if (assessment.passed) {
-        await doSave()
+        await checkDedupThenSave()
       } else {
         setQualityCheck({
           score: assessment.score,
@@ -111,11 +145,11 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
       }
     } catch {
       // If quality check fails, allow save anyway
-      await doSave()
+      await checkDedupThenSave()
     } finally {
       setQualityChecking(false)
     }
-  }, [saving, saved, qualityCheck, result.text, doSave])
+  }, [saving, saved, qualityCheck, result.text, checkDedupThenSave])
 
   return (
     <Card>
@@ -137,16 +171,16 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
               size="sm"
               className="h-7 text-xs"
               onClick={handleSave}
-              disabled={saving || saved || qualityChecking}
+              disabled={saving || saved || qualityChecking || dedupChecking}
             >
-              {saving || qualityChecking ? (
+              {saving || qualityChecking || dedupChecking ? (
                 <Loader2 className="mr-1 h-3 w-3 animate-spin" />
               ) : saved ? (
                 <Check className="mr-1 h-3 w-3" />
               ) : (
                 <Save className="mr-1 h-3 w-3" />
               )}
-              {saved ? "已保存" : qualityChecking ? "检查中..." : "保存"}
+              {saved ? "已保存" : qualityChecking || dedupChecking ? "检查中..." : "保存"}
             </Button>
             <Button
               variant={feedbackGiven === "positive" ? "default" : "ghost"}
@@ -199,7 +233,32 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
                 <Button size="sm" variant="outline" onClick={() => { setQualityCheck(null) }}>
                   返回修改
                 </Button>
-                <Button size="sm" onClick={async () => { await doSave() }}>
+                <Button size="sm" onClick={handleSave}>
+                  仍然保存
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {dedupWarning && dedupWarning.length > 0 && !saved && (
+        <div className="border-t px-6 py-4 bg-blue-50 dark:bg-blue-950/20">
+          <div className="flex items-start gap-3">
+            <Copy className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-blue-800 dark:text-blue-200">发现相似提示词</p>
+              <ul className="mt-2 space-y-1">
+                {dedupWarning.map((d) => (
+                  <li key={d.id} className="text-xs text-blue-700 dark:text-blue-300">
+                    · {d.title} ({(d.similarity * 100).toFixed(0)}% 相似)
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-3 flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => setDedupWarning(null)}>
+                  取消保存
+                </Button>
+                <Button size="sm" onClick={async () => { setDedupWarning(null); await doSave() }}>
                   仍然保存
                 </Button>
               </div>

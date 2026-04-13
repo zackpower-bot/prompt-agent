@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { findDuplicates } from "@/lib/dedup"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -22,8 +23,15 @@ export async function POST(request: NextRequest) {
     }
 
     let imported = 0
+    let skipped = 0
     for (const item of data) {
       if (!item.title || !item.content) continue
+
+      const duplicates = await findDuplicates(item.title, item.content)
+      if (duplicates.length > 0) {
+        skipped++
+        continue
+      }
 
       const tagNames = (item.tags ?? []).map((t) => t.trim().toLowerCase()).filter(Boolean)
       const tagRecords = await Promise.all(
@@ -50,7 +58,7 @@ export async function POST(request: NextRequest) {
       imported++
     }
 
-    return NextResponse.json({ imported, total: data.length })
+    return NextResponse.json({ imported, skipped, total: data.length })
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 500 })
   }
