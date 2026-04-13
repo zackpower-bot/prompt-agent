@@ -14,6 +14,7 @@ import { updatePrompt, deletePrompt } from "@/app/actions/prompt.actions"
 import type { PromptWithTags } from "@/app/actions/prompt.actions"
 import { createVersion } from "@/app/actions/version.actions"
 import { VersionList } from "@/components/prompts/version-list"
+import { ModuleSuggestions } from "@/components/prompts/module-suggestions"
 import { submitFeedback } from "@/app/actions/feedback.actions"
 
 interface Props {
@@ -223,6 +224,8 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
         <h3 className="mb-3 text-sm font-medium">版本历史</h3>
         <VersionList promptId={prompt.id} currentContent={prompt.content} />
       </div>
+
+      <ModuleSuggestions promptId={prompt.id} promptContent={prompt.content} />
     </div>
   )
 }
