@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation"
 import { Link } from "@/i18n/navigation"
 import { Bot, Library, Sparkles, Wrench, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ThemeToggle } from "./theme-toggle"
 
 const navItems = [
   { href: "/", label: "生成", icon: Sparkles },
@@ -51,7 +52,8 @@ export function AppNav() {
         </nav>
 
         {/* Right side */}
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-1">
+          <ThemeToggle />
           <form action="/api/auth/logout" method="POST">
             <button
               type="submit"

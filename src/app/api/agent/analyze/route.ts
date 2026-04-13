@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { runAgent } from "@/agent/core"
 import { getAnalysisTools } from "@/agent/tools"
+import { ANALYSIS_SYSTEM_PROMPT } from "@/agent/prompts"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
-const ANALYSIS_PROMPT = `You are a Prompt Quality Analyst. Analyze the following prompt and use the classify_prompt tool to output your classification.
-
-Evaluate:
-- Is the title clear and descriptive?
-- Does it have a good description?
-- Are the tags comprehensive?
-- What category fits best?
-- Rate quality 0-1 (consider: structure, clarity, specificity, reusability)
+const ANALYSIS_PROMPT = `Analyze the following prompt and use the classify_prompt tool to output your classification.
 
 Prompt to analyze:
 Title: {title}
@@ -43,7 +37,7 @@ export async function POST(request: NextRequest) {
       .replace("{content}", content.slice(0, 2000))
 
     const result = await runAgent({
-      systemPrompt: "You are a Prompt Quality Analyst. Use the classify_prompt tool to output your analysis. Be concise.",
+      systemPrompt: ANALYSIS_SYSTEM_PROMPT,
       userMessage,
       tools: getAnalysisTools(),
       locale: "zh",

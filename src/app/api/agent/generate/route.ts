@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { runAgent } from "@/agent/core"
 import { getAnalysisTools } from "@/agent/tools"
+import { GENERATION_SYSTEM_PROMPT } from "@/agent/prompts"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
-
-const SYSTEM_PROMPT = `You are a Prompt Engineering Agent. When the user provides an idea or topic, generate a complete, well-structured prompt. Think step by step, search for existing modules, and classify the result.`
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
@@ -22,7 +21,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const result = await runAgent({
-      systemPrompt: SYSTEM_PROMPT,
+      systemPrompt: GENERATION_SYSTEM_PROMPT,
       userMessage: message,
       tools: getAnalysisTools(),
       locale,

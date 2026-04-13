@@ -67,9 +67,40 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      {/* Count */}
-      <div className="mb-6">
+      {/* Count + Export/Import */}
+      <div className="mb-6 flex items-center justify-between">
         <p className="text-sm text-muted-foreground">{total} 条提示词</p>
+        <div className="flex items-center gap-2">
+          <button
+            className="tag-chip hover:bg-accent"
+            onClick={() => window.open("/api/prompts/export")}
+          >
+            导出
+          </button>
+          <label className="tag-chip hover:bg-accent cursor-pointer">
+            导入
+            <input
+              type="file"
+              accept=".json"
+              className="sr-only"
+              onChange={async (e) => {
+                const file = e.target.files?.[0]
+                if (!file) return
+                const text = await file.text()
+                const res = await fetch("/api/prompts/import", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: text,
+                })
+                const data = await res.json()
+                if (data.imported) {
+                  fetchPrompts(1)
+                }
+                e.target.value = ""
+              }}
+            />
+          </label>
+        </div>
       </div>
 
       {/* Search */}
