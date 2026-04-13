@@ -20,7 +20,7 @@ export default function Home() {
   const hasConversation = turns.length > 0 || steps.length > 0
 
   return (
-    <main className="mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-3xl flex-col px-4 py-8">
+    <main className="mx-auto flex min-h-screen max-w-3xl flex-col px-4 py-8">
       {/* Subtitle */}
       {!hasConversation && (
         <div className="mb-8 text-center">
