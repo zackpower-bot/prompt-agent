@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { runAgent } from "@/agent/core"
 import { getAnalysisTools } from "@/agent/tools"
-import { ANALYSIS_SYSTEM_PROMPT } from "@/agent/prompts"
+import { buildSystemPrompt } from "@/agent/prompt-builder"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -36,8 +36,10 @@ export async function POST(request: NextRequest) {
       .replace("{category}", category)
       .replace("{content}", content.slice(0, 2000))
 
+    const systemPrompt = await buildSystemPrompt("analysis", userMessage, { excludePromptId: id })
+
     const result = await runAgent({
-      systemPrompt: ANALYSIS_SYSTEM_PROMPT,
+      systemPrompt,
       userMessage,
       tools: getAnalysisTools(),
       locale: "zh",

@@ -2,7 +2,7 @@ import { NextRequest } from "next/server"
 import { runAgent } from "@/agent/core"
 import type { AgentTrajectoryStep } from "@/agent/core"
 import { getAnalysisTools } from "@/agent/tools"
-import { GENERATION_SYSTEM_PROMPT } from "@/agent/prompts"
+import { buildSystemPrompt } from "@/agent/prompt-builder"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -34,8 +34,10 @@ export async function POST(request: NextRequest) {
       try {
         send("status", { status: "running" })
 
+        const systemPrompt = await buildSystemPrompt("generation", message)
+
         const result = await runAgent({
-          systemPrompt: GENERATION_SYSTEM_PROMPT,
+          systemPrompt,
           userMessage: message,
           history,
           tools: getAnalysisTools(),

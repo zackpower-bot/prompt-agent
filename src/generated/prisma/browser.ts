@@ -52,3 +52,18 @@ export type AgentHistory = Prisma.AgentHistoryModel
  * 
  */
 export type Setting = Prisma.SettingModel
+/**
+ * Model AgentProfile
+ * 
+ */
+export type AgentProfile = Prisma.AgentProfileModel
+/**
+ * Model MemoryEvent
+ * 
+ */
+export type MemoryEvent = Prisma.MemoryEventModel
+/**
+ * Model SemanticMemory
+ * 
+ */
+export type SemanticMemory = Prisma.SemanticMemoryModel

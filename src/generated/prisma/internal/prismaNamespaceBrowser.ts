@@ -57,7 +57,10 @@ export const ModelName = {
   Module: 'Module',
   PromptVersion: 'PromptVersion',
   AgentHistory: 'AgentHistory',
-  Setting: 'Setting'
+  Setting: 'Setting',
+  AgentProfile: 'AgentProfile',
+  MemoryEvent: 'MemoryEvent',
+  SemanticMemory: 'SemanticMemory'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -154,6 +157,61 @@ export const SettingScalarFieldEnum = {
 } as const
 
 export type SettingScalarFieldEnum = (typeof SettingScalarFieldEnum)[keyof typeof SettingScalarFieldEnum]
+
+
+export const AgentProfileScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  content: 'content',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgentProfileScalarFieldEnum = (typeof AgentProfileScalarFieldEnum)[keyof typeof AgentProfileScalarFieldEnum]
+
+
+export const MemoryEventScalarFieldEnum = {
+  id: 'id',
+  eventType: 'eventType',
+  triggerType: 'triggerType',
+  sourcePromptId: 'sourcePromptId',
+  content: 'content',
+  extractedMemory: 'extractedMemory',
+  metadata: 'metadata',
+  status: 'status',
+  contentHash: 'contentHash',
+  processedAt: 'processedAt',
+  retryCount: 'retryCount',
+  errorMessage: 'errorMessage',
+  createdAt: 'createdAt'
+} as const
+
+export type MemoryEventScalarFieldEnum = (typeof MemoryEventScalarFieldEnum)[keyof typeof MemoryEventScalarFieldEnum]
+
+
+export const SemanticMemoryScalarFieldEnum = {
+  id: 'id',
+  content: 'content',
+  embedding: 'embedding',
+  embeddingModel: 'embeddingModel',
+  dimensions: 'dimensions',
+  type: 'type',
+  source: 'source',
+  confidence: 'confidence',
+  sourcePromptId: 'sourcePromptId',
+  triggerType: 'triggerType',
+  lastValidatedAt: 'lastValidatedAt',
+  supersedesId: 'supersedesId',
+  supersededById: 'supersededById',
+  reason: 'reason',
+  eventId: 'eventId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  decayAt: 'decayAt'
+} as const
+
+export type SemanticMemoryScalarFieldEnum = (typeof SemanticMemoryScalarFieldEnum)[keyof typeof SemanticMemoryScalarFieldEnum]
 
 
 export const SortOrder = {

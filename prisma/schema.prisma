@@ -79,3 +79,61 @@ model Setting {
   value     String
   updatedAt DateTime @updatedAt
 }
+
+model AgentProfile {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  content   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+model MemoryEvent {
+  id              String    @id @default(cuid())
+  eventType       String
+  triggerType     String
+  sourcePromptId  String?
+  content         String
+  extractedMemory String?
+  metadata        String    @default("{}")
+  status          String    @default("pending")
+  contentHash     String    @unique
+  processedAt     DateTime?
+  retryCount      Int       @default(0)
+  errorMessage    String?
+  createdAt       DateTime  @default(now())
+
+  @@index([status, createdAt])
+  @@index([sourcePromptId])
+  @@index([eventType, triggerType])
+}
+
+model SemanticMemory {
+  id              String    @id @default(cuid())
+  content         String
+  embedding       Bytes
+  embeddingModel  String
+  dimensions      Int
+  type            String
+  source          String    @default("learned")
+  confidence      Float     @default(0.8)
+  sourcePromptId  String?
+  triggerType     String?
+  lastValidatedAt DateTime?
+  supersedesId    String?
+  supersededById  String?
+  reason          String?
+  eventId         String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  decayAt         DateTime?
+
+  @@index([type, confidence])
+  @@index([sourcePromptId])
+  @@index([eventId])
+  @@index([supersededById])
+  @@index([decayAt])
+}
