@@ -4,7 +4,7 @@ import type {
   ChatCompletionTool,
   ChatCompletionToolMessageParam,
 } from "openai/resources/chat/completions"
-import { createClient, getDefaultProvider, PROVIDER_CONFIGS } from "@/lib/providers"
+import { createClient, getDefaultProvider, getAvailableProviders, PROVIDER_CONFIGS } from "@/lib/providers"
 import type { ProviderName } from "@/lib/providers"
 
 export type NarrationLocale = "zh" | "en"
@@ -100,7 +100,38 @@ export function parseThinkingContent(text: string): { thinking: string; output: 
   return { thinking, output }
 }
 
+function isRetryableError(error: unknown): boolean {
+  if (error instanceof Error) {
+    const msg = error.message
+    return msg.includes("529") || msg.includes("429") || msg.includes("overloaded") || msg.includes("rate limit")
+  }
+  return false
+}
+
 export async function runAgent(options: AgentRunOptions): Promise<AgentRunResult> {
+  try {
+    return await runAgentInternal(options)
+  } catch (error) {
+    // On retryable error, try fallback providers
+    if (isRetryableError(error) && !options.provider) {
+      const available = getAvailableProviders()
+      const defaultProvider = getDefaultProvider()
+      const fallbacks = available.filter((p) => p !== defaultProvider)
+
+      for (const fallback of fallbacks) {
+        try {
+          const result = await runAgentInternal({ ...options, provider: fallback })
+          return result
+        } catch (fallbackError) {
+          if (!isRetryableError(fallbackError)) throw fallbackError
+        }
+      }
+    }
+    throw error
+  }
+}
+
+async function runAgentInternal(options: AgentRunOptions): Promise<AgentRunResult> {
   const {
     systemPrompt,
     userMessage,
