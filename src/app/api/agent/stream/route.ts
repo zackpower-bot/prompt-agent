@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server"
 import { runAgent } from "@/agent/core"
 import type { AgentTrajectoryStep } from "@/agent/core"
-import { getAnalysisTools } from "@/agent/tools"
+import { getGenerationTools } from "@/agent/tools"
 import { buildSystemPrompt } from "@/agent/prompt-builder"
 
 export const runtime = "nodejs"
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
           systemPrompt,
           userMessage: message,
           history,
-          tools: getAnalysisTools(),
+          tools: getGenerationTools(),
           locale,
           provider: provider as any,
           model,

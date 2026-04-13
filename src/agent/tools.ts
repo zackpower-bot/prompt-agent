@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { summarizeText } from "@/lib/utils"
 import type { AgentToolDefinition, NarrationLocale } from "./core"
+import { getTemplateById, getTemplateList, type PromptTemplate } from "./templates"
 
 export const searchModulesTool: AgentToolDefinition = {
   name: "search_modules",
@@ -112,6 +113,69 @@ export const classifyPromptTool: AgentToolDefinition = {
   execute: async (args) => {
     return JSON.stringify(args)
   },
+}
+
+export const selectTemplateTool: AgentToolDefinition = {
+  name: "select_template",
+  description: `Select the best scenario template for generating a prompt. Available templates: ${getTemplateList().map((t) => `${t.id}(${t.name})`).join(", ")}. Call this FIRST before generating any prompt.`,
+  parameters: {
+    type: "object",
+    properties: {
+      template_id: {
+        type: "string",
+        description: `Template ID. One of: ${getTemplateList().map((t) => t.id).join(", ")}`,
+      },
+      reason: {
+        type: "string",
+        description: "Brief reason for choosing this template",
+      },
+    },
+    required: ["template_id"],
+  },
+  execute: async (args, locale) => {
+    const id = args.template_id as string
+    const template = getTemplateById(id)
+
+    if (!template) {
+      const list = getTemplateList()
+        .map((t) => `- ${t.id}: ${t.name} — ${t.description}`)
+        .join("\n")
+      return locale === "zh"
+        ? `未找到模板 "${id}"。可用模板：\n${list}`
+        : `Template "${id}" not found. Available:\n${list}`
+    }
+
+    return formatTemplateForAgent(template, locale)
+  },
+}
+
+function formatTemplateForAgent(t: PromptTemplate, locale: NarrationLocale): string {
+  const label = locale === "zh" ? t.name : t.nameEn
+  return `## 模板: ${label}
+
+### 骨架结构
+${t.skeleton}
+
+### 填写指南
+${t.guidance}
+
+### 质量要求
+${t.qualityNotes}
+
+### 建议变量
+${t.defaultVariables.map((v) => `{{${v}}}`).join(", ")}
+
+### 建议标签
+${t.suggestedTags.join(", ")}
+
+### 建议分类
+${t.suggestedCategory}
+
+请基于以上模板骨架和填写指南，为用户生成一个完整的、高质量的定制化提示词。`
+}
+
+export function getGenerationTools(): AgentToolDefinition[] {
+  return [selectTemplateTool, searchModulesTool, webSearchTool, classifyPromptTool]
 }
 
 export function getAnalysisTools(): AgentToolDefinition[] {
