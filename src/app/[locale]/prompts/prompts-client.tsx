@@ -93,44 +93,40 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
       {/* Status filter */}
       <div className="mb-3 flex gap-2">
         {["all", "inbox", "production", "archived"].map((s) => (
-          <Badge
+          <button
             key={s}
-            variant={selectedStatus === s ? "default" : "outline"}
-            className="cursor-pointer"
+            className={`tag-chip cursor-pointer transition-colors ${selectedStatus === s ? "border-foreground bg-foreground text-background" : "bg-background text-foreground hover:bg-accent"}`}
             onClick={() => setSelectedStatus(s)}
           >
             {s === "all" ? "全部" : s === "inbox" ? "收件箱" : s === "production" ? "生产" : "归档"}
-          </Badge>
+          </button>
         ))}
       </div>
 
       {/* Tags */}
       <div className="mb-6 flex flex-wrap gap-1.5">
-        <Badge
-          variant={selectedTag === "all" ? "default" : "outline"}
-          className="cursor-pointer text-xs"
+        <button
+          className={`tag-chip cursor-pointer transition-colors ${selectedTag === "all" ? "border-foreground bg-foreground text-background" : "bg-background text-foreground hover:bg-accent"}`}
           onClick={() => setSelectedTag("all")}
         >
           全部标签
-        </Badge>
+        </button>
         {visibleTags.map((tag) => (
-          <Badge
+          <button
             key={tag}
-            variant={selectedTag === tag ? "default" : "outline"}
-            className="cursor-pointer text-xs"
+            className={`tag-chip cursor-pointer transition-colors ${selectedTag === tag ? "border-foreground bg-foreground text-background" : "bg-background text-foreground hover:bg-accent"}`}
             onClick={() => setSelectedTag(tag)}
           >
             {tag}
-          </Badge>
+          </button>
         ))}
         {allTags.length > TAG_LIMIT && (
-          <Badge
-            variant="outline"
-            className="cursor-pointer border-dashed text-xs text-muted-foreground"
+          <button
+            className="tag-chip cursor-pointer border-dashed text-muted-foreground hover:text-foreground"
             onClick={() => setTagsExpanded(!tagsExpanded)}
           >
             {tagsExpanded ? "−" : `+${allTags.length - TAG_LIMIT}`}
-          </Badge>
+          </button>
         )}
       </div>
 

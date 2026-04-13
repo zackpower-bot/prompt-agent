@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { TrajectoryStep } from "@/hooks/use-agent-stream"
 import { cn } from "@/lib/utils"
@@ -12,9 +11,9 @@ interface TrajectoryViewProps {
 }
 
 const phaseConfig = {
-  thought: { label: "思考", color: "bg-blue-500/10 text-blue-700 border-blue-200" },
-  action: { label: "行动", color: "bg-green-500/10 text-green-700 border-green-200" },
-  observation: { label: "观察", color: "bg-amber-500/10 text-amber-700 border-amber-200" },
+  thought: { label: "THINK", dotClass: "bg-blue-500", badgeClass: "phase-thought" },
+  action: { label: "ACT", dotClass: "bg-agent", badgeClass: "phase-action" },
+  observation: { label: "OBS", dotClass: "bg-amber-500", badgeClass: "phase-observation" },
 } as const
 
 export function TrajectoryView({ steps, className }: TrajectoryViewProps) {
@@ -34,28 +33,24 @@ export function TrajectoryView({ steps, className }: TrajectoryViewProps) {
           return (
             <div key={step.step} className="flex gap-3">
               <div className="flex flex-col items-center">
-                <div className={cn("h-2 w-2 rounded-full mt-2", {
-                  "bg-blue-500": step.phase === "thought",
-                  "bg-green-500": step.phase === "action",
-                  "bg-amber-500": step.phase === "observation",
-                })} />
+                <div className={cn("h-2 w-2 rounded-full mt-2", config.dotClass)} />
                 <div className="flex-1 w-px bg-border" />
               </div>
               <div className="flex-1 min-w-0 pb-3">
                 <div className="flex items-center gap-2 mb-1">
-                  <Badge variant="outline" className={cn("text-[10px] font-mono", config.color)}>
+                  <span className={cn("mono-label inline-flex items-center rounded-sm border px-1.5 py-0.5", config.badgeClass)}>
                     {config.label}
-                  </Badge>
+                  </span>
                   {step.tool && (
-                    <Badge variant="secondary" className="text-[10px] font-mono">
+                    <span className="tag-chip bg-secondary text-secondary-foreground">
                       {step.tool}
-                    </Badge>
+                    </span>
                   )}
-                  <span className="text-[10px] text-muted-foreground">
+                  <span className="mono-label text-muted-foreground">
                     #{step.step}
                   </span>
                 </div>
-                <p className="text-sm text-foreground/80 whitespace-pre-wrap break-words">
+                <p className="text-sm text-foreground/80 whitespace-pre-wrap break-words leading-relaxed">
                   {step.content}
                 </p>
               </div>
