@@ -27,11 +27,11 @@ function BarItem({ label, count, max }: { label: string; count: number; max: num
   const pct = max > 0 ? (count / max) * 100 : 0
   return (
     <div className="flex items-center gap-3 text-sm">
-      <span className="w-24 truncate text-xs text-muted-foreground">{label}</span>
+      <span className="w-16 sm:w-24 truncate text-xs text-muted-foreground">{label}</span>
       <div className="flex-1 h-5 rounded-sm bg-muted overflow-hidden">
         <div className="h-full rounded-sm bg-agent transition-all" style={{ width: `${pct}%` }} />
       </div>
-      <span className="w-8 text-right mono-label">{count}</span>
+      <span className="w-6 sm:w-8 text-right mono-label">{count}</span>
     </div>
   )
 }

@@ -117,8 +117,8 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
         ) : null}
 
         {editing ? (
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="分类" className="w-32" />
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="分类" className="w-full sm:w-32" />
             <select value={status} onChange={e => setStatus(e.target.value)} className="rounded-md border px-3 py-2 text-sm">
               <option value="inbox">收件箱</option>
               <option value="production">生产</option>
@@ -148,7 +148,7 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
       </div>
 
       {/* Action buttons */}
-      <div className="mb-6 flex items-center gap-2">
+      <div className="mb-6 flex flex-wrap items-center gap-2">
         {editing ? (
           <>
             <Button size="sm" onClick={handleSave} disabled={isPending}>
@@ -210,7 +210,7 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
         </CardHeader>
         <CardContent>
           {editing ? (
-            <Textarea value={content} onChange={e => setContent(e.target.value)} className="min-h-[300px] font-mono text-sm" />
+            <Textarea value={content} onChange={e => setContent(e.target.value)} className="min-h-[200px] sm:min-h-[300px] font-mono text-sm" />
           ) : (
             <div className="whitespace-pre-wrap rounded-md bg-muted/50 p-4 font-mono text-sm leading-relaxed">
               {prompt.content}

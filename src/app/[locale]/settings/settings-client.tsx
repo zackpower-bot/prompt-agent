@@ -129,7 +129,7 @@ export function SettingsClient({ initialProfiles }: { initialProfiles: ProfileEn
                   value={draft}
                   onChange={(e) => setDrafts((prev) => ({ ...prev, [config.key]: e.target.value }))}
                   placeholder={config.placeholder}
-                  className="min-h-[120px] font-mono text-sm"
+                  className="min-h-[100px] sm:min-h-[120px] font-mono text-sm"
                 />
                 <div className="mt-3 flex justify-end">
                   <Button

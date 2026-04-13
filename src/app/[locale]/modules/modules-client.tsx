@@ -95,7 +95,7 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
   })
 
   return (
-    <div className="px-4 py-8">
+    <div className="max-w-5xl mx-auto px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">模块管理</h1>
@@ -159,12 +159,12 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
                 <div className="flex items-center gap-1">
                   {editingId === m.id ? (
                     <>
-                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={handleUpdate} disabled={isPending}><Check className="h-3 w-3" /></Button>
-                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => setEditingId(null)}><X className="h-3 w-3" /></Button>
+                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={handleUpdate} disabled={isPending}><Check className="h-3 w-3" /></Button>
+                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => setEditingId(null)}><X className="h-3 w-3" /></Button>
                     </>
                   ) : (
                     <>
-                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => startEdit(m)}><Pencil className="h-3 w-3" /></Button>
+                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => startEdit(m)}><Pencil className="h-3 w-3" /></Button>
                       <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDelete(m.id)}><Trash2 className="h-3 w-3" /></Button>
                     </>
                   )}

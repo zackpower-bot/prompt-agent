@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation"
 import { Bot, Library, Sparkles, Wrench, Blocks, BarChart3, LogOut, PanelLeftClose, PanelLeft, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ThemeToggle } from "./theme-toggle"
+import { SidebarPrompts } from "./sidebar-prompts"
 import { logoutAction } from "@/app/actions/auth.actions"
 
 const navItems = [
@@ -68,6 +69,13 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
           )
         })}
       </nav>
+
+      {/* Favorites & Recent (expanded only) */}
+      {!collapsed && (
+        <div className="border-t py-2">
+          <SidebarPrompts onNavigate={onNavigate} />
+        </div>
+      )}
 
       {/* Bottom: settings + theme + logout */}
       <div className="border-t p-2 space-y-1">

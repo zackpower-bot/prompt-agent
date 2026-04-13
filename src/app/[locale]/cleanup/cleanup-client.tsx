@@ -122,7 +122,7 @@ export function CleanupClient({ prompts }: { prompts: PromptWithTags[] }) {
         <ArrowLeft className="h-4 w-4" />返回列表
       </Link>
 
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">批量清洗</h1>
           <p className="text-sm text-muted-foreground">

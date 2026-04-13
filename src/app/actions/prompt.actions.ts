@@ -245,6 +245,37 @@ export async function getPromptsForCleanup(
   }
 }
 
+export async function getSidebarPrompts(): Promise<{
+  success: true
+  data: { favorites: PromptWithTags[]; recent: PromptWithTags[] }
+} | { success: false; error: string }> {
+  try {
+    const [favorites, recent] = await Promise.all([
+      prisma.prompt.findMany({
+        where: { isFavorite: true },
+        include: { tags: { include: { tag: true } } },
+        orderBy: { updatedAt: "desc" },
+        take: 5,
+      }),
+      prisma.prompt.findMany({
+        where: { lastUsedAt: { not: null } },
+        include: { tags: { include: { tag: true } } },
+        orderBy: { lastUsedAt: "desc" },
+        take: 5,
+      }),
+    ])
+    return {
+      success: true,
+      data: {
+        favorites: favorites.map(serializePrompt),
+        recent: recent.map(serializePrompt),
+      },
+    }
+  } catch (e) {
+    return { success: false, error: (e as Error).message }
+  }
+}
+
 export async function saveAgentHistory(data: {
   promptId: string
   type?: string
