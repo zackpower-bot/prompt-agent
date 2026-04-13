@@ -9,7 +9,7 @@ import { Sparkles, RotateCcw, MessageSquare } from "lucide-react"
 import { useState, useCallback } from "react"
 
 export default function Home() {
-  const { status, steps, result, error, turns, run, stop, reset } = useAgentStream()
+  const { status, steps, result, error, streamingText, turns, run, stop, reset } = useAgentStream()
   const [lastMessage, setLastMessage] = useState("")
 
   const handleSubmit = useCallback((msg: string) => {
@@ -91,6 +91,13 @@ export default function Home() {
               </div>
               <TrajectoryView steps={steps} className="max-h-[400px]" />
             </div>
+            {/* Real-time streaming text */}
+            {streamingText && (
+              <div className="rounded-lg border bg-card p-4">
+                <p className="text-sm text-foreground/70 whitespace-pre-wrap">{streamingText}</p>
+                <span className="inline-block h-4 w-1 animate-pulse bg-agent ml-0.5" />
+              </div>
+            )}
           </div>
         )}
 

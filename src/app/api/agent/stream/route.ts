@@ -47,6 +47,9 @@ export async function POST(request: NextRequest) {
           onStep: (step: AgentTrajectoryStep) => {
             send("step", step)
           },
+          onToken: (token: string) => {
+            send("token", { token })
+          },
         })
 
         send("result", {

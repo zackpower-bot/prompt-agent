@@ -42,6 +42,7 @@ export interface AgentRunOptions {
   maxIterations?: number
   temperature?: number
   onStep?: (step: AgentTrajectoryStep) => void
+  onToken?: (token: string) => void
 }
 
 export interface AgentRunResult {
@@ -180,29 +181,74 @@ async function runAgentInternal(options: AgentRunOptions): Promise<AgentRunResul
   let totalOutput = 0
 
   for (let iteration = 0; iteration < maxIterations; iteration++) {
-    const completion = await client.chat.completions.create({
+    // Use streaming to provide real-time token updates
+    const stream = await client.chat.completions.create({
       model: modelName,
       temperature,
       messages,
       tools: openaiTools,
       tool_choice: openaiTools ? "auto" : undefined,
+      stream: true,
+      stream_options: { include_usage: true },
     })
 
-    const message = completion.choices?.[0]?.message
-    if (!message) break
+    let rawContent = ""
+    const toolCallsMap = new Map<number, { id: string; name: string; arguments: string }>()
+    let lastStreamedThinking = ""
 
-    totalInput += completion.usage?.prompt_tokens ?? 0
-    totalOutput += completion.usage?.completion_tokens ?? 0
+    for await (const chunk of stream) {
+      const delta = chunk.choices?.[0]?.delta
 
-    // Parse thinking content from MiniMax-style <think> tags
-    const rawContent = message.content ?? ""
+      // Accumulate content
+      if (delta?.content) {
+        rawContent += delta.content
+        options.onToken?.(delta.content)
+
+        // Stream thinking content in real-time
+        const { thinking } = parseThinkingContent(rawContent)
+        if (thinking && thinking !== lastStreamedThinking) {
+          lastStreamedThinking = thinking
+        }
+      }
+
+      // Accumulate tool calls
+      if (delta?.tool_calls) {
+        for (const tc of delta.tool_calls) {
+          const existing = toolCallsMap.get(tc.index) ?? { id: "", name: "", arguments: "" }
+          if (tc.id) existing.id = tc.id
+          if (tc.function?.name) existing.name = tc.function.name
+          if (tc.function?.arguments) existing.arguments += tc.function.arguments
+          toolCallsMap.set(tc.index, existing)
+        }
+      }
+
+      // Usage from final chunk
+      if (chunk.usage) {
+        totalInput += chunk.usage.prompt_tokens ?? 0
+        totalOutput += chunk.usage.completion_tokens ?? 0
+      }
+    }
+
+    // Build message from streamed data
+    const toolCalls = toolCallsMap.size > 0
+      ? [...toolCallsMap.entries()]
+          .sort((a, b) => a[0] - b[0])
+          .map(([, tc]) => ({
+            id: tc.id,
+            type: "function" as const,
+            function: { name: tc.name, arguments: tc.arguments },
+          }))
+      : undefined
+
+    if (!rawContent && !toolCalls) break
+
+    // Parse thinking content
     if (rawContent) {
       const { thinking, output } = parseThinkingContent(rawContent)
       if (thinking) {
         pushStep(trajectory, "thought", thinking, null, null, null, onStep)
       }
-      if (output && !message.tool_calls?.length) {
-        // Final text response
+      if (output && !toolCalls?.length) {
         return {
           text: output,
           trajectory,
@@ -213,9 +259,9 @@ async function runAgentInternal(options: AgentRunOptions): Promise<AgentRunResul
       }
     }
 
-    // Handle tool calls
-    const toolCalls = message.tool_calls ?? []
-    if (toolCalls.length === 0 && rawContent) {
+    // Handle tool calls (from streamed accumulation)
+    const accumulatedToolCalls = toolCalls ?? []
+    if (accumulatedToolCalls.length === 0 && rawContent) {
       return {
         text: parseThinkingContent(rawContent).output || rawContent,
         trajectory,
@@ -225,14 +271,14 @@ async function runAgentInternal(options: AgentRunOptions): Promise<AgentRunResul
       }
     }
 
-    if (toolCalls.length > 0) {
+    if (accumulatedToolCalls.length > 0) {
       messages.push({
         role: "assistant",
-        content: message.content ?? null,
-        tool_calls: toolCalls,
+        content: rawContent || null,
+        tool_calls: accumulatedToolCalls,
       })
 
-      for (const toolCall of toolCalls) {
+      for (const toolCall of accumulatedToolCalls) {
         if (toolCall.type !== "function") continue
         const toolName = toolCall.function.name
         const toolDef = tools.find((t) => t.name === toolName)

@@ -39,6 +39,7 @@ export function useAgentStream() {
   const [steps, setSteps] = useState<TrajectoryStep[]>([])
   const [result, setResult] = useState<AgentResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [streamingText, setStreamingText] = useState("")
   const [history, setHistory] = useState<ChatMessage[]>([])
   const [turns, setTurns] = useState<ConversationTurn[]>([])
   const abortRef = useRef<AbortController | null>(null)
@@ -52,6 +53,7 @@ export function useAgentStream() {
     setSteps([])
     setResult(null)
     setError(null)
+    setStreamingText("")
 
     abortRef.current?.abort()
     const controller = new AbortController()
@@ -98,9 +100,13 @@ export function useAgentStream() {
           } else if (line.startsWith("data: ") && eventType) {
             const data = JSON.parse(line.slice(6))
             switch (eventType) {
+              case "token":
+                setStreamingText((prev) => prev + (data as { token: string }).token)
+                break
               case "step":
                 currentSteps.push(data as TrajectoryStep)
                 setSteps((prev) => [...prev, data as TrajectoryStep])
+                setStreamingText("") // Reset streaming text when a step completes
                 break
               case "result":
                 currentResult = data as AgentResult
@@ -160,5 +166,5 @@ export function useAgentStream() {
     setTurns([])
   }, [])
 
-  return { status, steps, result, error, turns, run, stop, reset }
+  return { status, steps, result, error, streamingText, turns, run, stop, reset }
 }
