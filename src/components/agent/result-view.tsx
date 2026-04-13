@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Copy, Check, Save, Loader2, ThumbsUp, ThumbsDown } from "lucide-react"
+import { Copy, Check, Save, Loader2, ThumbsUp, ThumbsDown, AlertTriangle } from "lucide-react"
 import { useState, useCallback } from "react"
 import type { AgentResult, TrajectoryStep } from "@/hooks/use-agent-stream"
 import { submitFeedback } from "@/app/actions/feedback.actions"
@@ -21,6 +21,8 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
   const [saved, setSaved] = useState(false)
   const [savedPromptId, setSavedPromptId] = useState<string | null>(null)
   const [feedbackGiven, setFeedbackGiven] = useState<"positive" | "negative" | null>(null)
+  const [qualityCheck, setQualityCheck] = useState<{ score: number; warning: string; suggestions: string[] } | null>(null)
+  const [qualityChecking, setQualityChecking] = useState(false)
 
   const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(result.text)
@@ -28,7 +30,7 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
     setTimeout(() => setCopied(false), 2000)
   }, [result.text])
 
-  const handleSave = useCallback(async () => {
+  const doSave = useCallback(async () => {
     if (saving || saved) return
     setSaving(true)
 
@@ -79,6 +81,42 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
     }
   }, [result, steps, userMessage, saving, saved, onSaved])
 
+  const handleSave = useCallback(async () => {
+    if (saving || saved) return
+
+    // If quality already checked and user chose to force save, skip check
+    if (qualityCheck) {
+      await doSave()
+      return
+    }
+
+    // Check quality first
+    setQualityChecking(true)
+    try {
+      const res = await fetch("/api/agent/quality", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: result.text }),
+      })
+      const assessment = await res.json()
+
+      if (assessment.passed) {
+        await doSave()
+      } else {
+        setQualityCheck({
+          score: assessment.score,
+          warning: assessment.warning,
+          suggestions: assessment.suggestions,
+        })
+      }
+    } catch {
+      // If quality check fails, allow save anyway
+      await doSave()
+    } finally {
+      setQualityChecking(false)
+    }
+  }, [saving, saved, qualityCheck, result.text, doSave])
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -99,16 +137,16 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
               size="sm"
               className="h-7 text-xs"
               onClick={handleSave}
-              disabled={saving || saved}
+              disabled={saving || saved || qualityChecking}
             >
-              {saving ? (
+              {saving || qualityChecking ? (
                 <Loader2 className="mr-1 h-3 w-3 animate-spin" />
               ) : saved ? (
                 <Check className="mr-1 h-3 w-3" />
               ) : (
                 <Save className="mr-1 h-3 w-3" />
               )}
-              {saved ? "已保存" : "保存"}
+              {saved ? "已保存" : qualityChecking ? "检查中..." : "保存"}
             </Button>
             <Button
               variant={feedbackGiven === "positive" ? "default" : "ghost"}
@@ -146,6 +184,29 @@ export function ResultView({ result, steps, userMessage, onSaved }: ResultViewPr
           {result.text}
         </div>
       </CardContent>
+      {qualityCheck && !saved && (
+        <div className="border-t px-6 py-4 bg-amber-50 dark:bg-amber-950/20">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">{qualityCheck.warning}</p>
+              {qualityCheck.suggestions.length > 0 && (
+                <ul className="mt-2 space-y-1 text-xs text-amber-700 dark:text-amber-300">
+                  {qualityCheck.suggestions.map((s, i) => <li key={i}>· {s}</li>)}
+                </ul>
+              )}
+              <div className="mt-3 flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => { setQualityCheck(null) }}>
+                  返回修改
+                </Button>
+                <Button size="sm" onClick={async () => { await doSave() }}>
+                  仍然保存
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   )
 }
