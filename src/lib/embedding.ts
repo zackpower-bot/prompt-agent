@@ -20,8 +20,8 @@ export const EMBEDDING_CONFIGS = {
     envKey: "OPENAI_API_KEY",
   },
   gemini: {
-    model: "text-embedding-004",
-    dimensions: 768,
+    model: "gemini-embedding-001",
+    dimensions: 3072,
     baseURL: "https://generativelanguage.googleapis.com/v1beta/openai",
     envKey: "GEMINI_API_KEY",
   },
