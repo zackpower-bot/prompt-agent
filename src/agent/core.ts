@@ -188,7 +188,7 @@ async function runAgentInternal(options: AgentRunOptions): Promise<AgentRunResul
       tool_choice: openaiTools ? "auto" : undefined,
     })
 
-    const message = completion.choices[0]?.message
+    const message = completion.choices?.[0]?.message
     if (!message) break
 
     totalInput += completion.usage?.prompt_tokens ?? 0
