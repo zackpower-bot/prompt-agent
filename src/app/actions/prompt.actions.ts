@@ -172,6 +172,79 @@ export async function getPromptById(id: string): Promise<{ success: true; data: 
   }
 }
 
+export async function updatePrompt(
+  id: string,
+  input: Partial<CreatePromptInput> & { status?: string }
+): Promise<{ success: true; data: PromptWithTags } | { success: false; error: string }> {
+  try {
+    const existing = await prisma.prompt.findUnique({ where: { id } })
+    if (!existing) return { success: false, error: "Prompt not found" }
+
+    // Handle tag updates if provided
+    if (input.tags) {
+      // Remove existing tags
+      await prisma.promptTag.deleteMany({ where: { promptId: id } })
+      // Upsert and connect new tags
+      const tagRecords = await Promise.all(
+        input.tags.map(name => prisma.tag.upsert({
+          where: { name: name.trim().toLowerCase() },
+          update: {},
+          create: { name: name.trim().toLowerCase() },
+        }))
+      )
+      await prisma.promptTag.createMany({
+        data: tagRecords.map(tag => ({ promptId: id, tagId: tag.id })),
+      })
+    }
+
+    const row = await prisma.prompt.update({
+      where: { id },
+      data: {
+        ...(input.title !== undefined && { title: input.title }),
+        ...(input.description !== undefined && { description: input.description }),
+        ...(input.content !== undefined && { content: input.content }),
+        ...(input.category !== undefined && { category: input.category }),
+        ...(input.model !== undefined && { model: input.model }),
+        ...(input.status !== undefined && { status: input.status }),
+      },
+      include: { tags: { include: { tag: true } } },
+    })
+
+    return { success: true, data: serializePrompt(row) }
+  } catch (e) {
+    return { success: false, error: (e as Error).message }
+  }
+}
+
+export async function deletePrompt(id: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    await prisma.prompt.delete({ where: { id } })
+    return { success: true }
+  } catch (e) {
+    return { success: false, error: (e as Error).message }
+  }
+}
+
+export async function archivePrompt(id: string): Promise<{ success: true; data: PromptWithTags } | { success: false; error: string }> {
+  return updatePrompt(id, { status: "archived" })
+}
+
+export async function getPromptsForCleanup(
+  limit: number = 50
+): Promise<{ success: true; data: PromptWithTags[] } | { success: false; error: string }> {
+  try {
+    // Get prompts that likely need cleanup: single tag, no description, or status "inbox"
+    const rows = await prisma.prompt.findMany({
+      include: { tags: { include: { tag: true } } },
+      orderBy: { updatedAt: "asc" }, // oldest first
+      take: limit,
+    })
+    return { success: true, data: rows.map(serializePrompt) }
+  } catch (e) {
+    return { success: false, error: (e as Error).message }
+  }
+}
+
 export async function saveAgentHistory(data: {
   promptId: string
   type?: string

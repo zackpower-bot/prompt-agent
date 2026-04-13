@@ -1,20 +1,37 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import { Link } from "@/i18n/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, Copy, Check, Clock, Tag } from "lucide-react"
+import { ArrowLeft, Copy, Check, Clock, Tag, Pencil, Trash2, Archive, Save, X } from "lucide-react"
+import { updatePrompt, deletePrompt } from "@/app/actions/prompt.actions"
 import type { PromptWithTags } from "@/app/actions/prompt.actions"
 
 interface Props {
   prompt: PromptWithTags
 }
 
-export function PromptDetailClient({ prompt }: Props) {
+export function PromptDetailClient({ prompt: initialPrompt }: Props) {
+  const router = useRouter()
+  const [prompt, setPrompt] = useState(initialPrompt)
+  const [editing, setEditing] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [isPending, startTransition] = useTransition()
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
+  // Edit form state
+  const [title, setTitle] = useState(prompt.title)
+  const [description, setDescription] = useState(prompt.description)
+  const [content, setContent] = useState(prompt.content)
+  const [category, setCategory] = useState(prompt.category)
+  const [status, setStatus] = useState(prompt.status)
+  const [tagsInput, setTagsInput] = useState(prompt.tags.join(", "))
 
   const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(prompt.content)
@@ -22,18 +39,56 @@ export function PromptDetailClient({ prompt }: Props) {
     setTimeout(() => setCopied(false), 2000)
   }, [prompt.content])
 
+  const handleSave = useCallback(() => {
+    startTransition(async () => {
+      const tags = tagsInput.split(",").map(t => t.trim()).filter(Boolean)
+      const result = await updatePrompt(prompt.id, {
+        title, description, content, category, tags, status,
+      })
+      if (result.success) {
+        setPrompt(result.data)
+        setEditing(false)
+      }
+    })
+  }, [prompt.id, title, description, content, category, status, tagsInput])
+
+  const handleDelete = useCallback(() => {
+    if (!confirmDelete) { setConfirmDelete(true); return }
+    startTransition(async () => {
+      const result = await deletePrompt(prompt.id)
+      if (result.success) router.push("/prompts")
+    })
+  }, [prompt.id, confirmDelete, router])
+
+  const handleArchive = useCallback(() => {
+    startTransition(async () => {
+      const result = await updatePrompt(prompt.id, { status: "archived" })
+      if (result.success) {
+        setPrompt(result.data)
+        setStatus("archived")
+      }
+    })
+  }, [prompt.id])
+
+  const cancelEdit = () => {
+    setEditing(false)
+    setTitle(prompt.title)
+    setDescription(prompt.description)
+    setContent(prompt.content)
+    setCategory(prompt.category)
+    setStatus(prompt.status)
+    setTagsInput(prompt.tags.join(", "))
+    setConfirmDelete(false)
+  }
+
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("zh-CN", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+      year: "numeric", month: "long", day: "numeric",
+      hour: "2-digit", minute: "2-digit",
     })
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      {/* Back link */}
       <Link
         href="/prompts"
         className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -44,47 +99,100 @@ export function PromptDetailClient({ prompt }: Props) {
 
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">{prompt.title}</h1>
-        {prompt.description && (
-          <p className="mt-2 text-muted-foreground">{prompt.description}</p>
+        {editing ? (
+          <Input value={title} onChange={e => setTitle(e.target.value)} className="mb-2 text-xl font-bold" />
+        ) : (
+          <h1 className="text-2xl font-bold">{prompt.title}</h1>
         )}
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <Badge variant="secondary">
-            {prompt.status === "inbox" ? "收件箱" : prompt.status === "production" ? "生产" : prompt.status}
-          </Badge>
-          <Badge variant="outline">{prompt.category}</Badge>
-          <Badge variant="outline">{prompt.model}</Badge>
-          {prompt.tags.map((tag) => (
-            <Badge key={tag} variant="outline" className="text-xs">
-              <Tag className="mr-1 h-2.5 w-2.5" />
-              {tag}
+
+        {editing ? (
+          <Input value={description} onChange={e => setDescription(e.target.value)} placeholder="描述..." className="mt-2" />
+        ) : prompt.description ? (
+          <p className="mt-2 text-muted-foreground">{prompt.description}</p>
+        ) : null}
+
+        {editing ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="分类" className="w-32" />
+            <select value={status} onChange={e => setStatus(e.target.value)} className="rounded-md border px-3 py-2 text-sm">
+              <option value="inbox">收件箱</option>
+              <option value="production">生产</option>
+              <option value="archived">归档</option>
+            </select>
+            <Input value={tagsInput} onChange={e => setTagsInput(e.target.value)} placeholder="标签（逗号分隔）" className="flex-1" />
+          </div>
+        ) : (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <Badge variant="secondary">
+              {prompt.status === "inbox" ? "收件箱" : prompt.status === "production" ? "生产" : prompt.status}
             </Badge>
-          ))}
-        </div>
+            <Badge variant="outline">{prompt.category}</Badge>
+            <Badge variant="outline">{prompt.model}</Badge>
+            {prompt.tags.map(tag => (
+              <Badge key={tag} variant="outline" className="text-xs">
+                <Tag className="mr-1 h-2.5 w-2.5" />{tag}
+              </Badge>
+            ))}
+          </div>
+        )}
+
         <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            创建于 {formatDate(prompt.createdAt)}
-          </span>
+          <span className="flex items-center gap-1"><Clock className="h-3 w-3" />创建于 {formatDate(prompt.createdAt)}</span>
           <span>更新于 {formatDate(prompt.updatedAt)}</span>
         </div>
+      </div>
+
+      {/* Action buttons */}
+      <div className="mb-6 flex items-center gap-2">
+        {editing ? (
+          <>
+            <Button size="sm" onClick={handleSave} disabled={isPending}>
+              <Save className="mr-1 h-3.5 w-3.5" />{isPending ? "保存中..." : "保存"}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={cancelEdit}><X className="mr-1 h-3.5 w-3.5" />取消</Button>
+          </>
+        ) : (
+          <>
+            <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
+              <Pencil className="mr-1 h-3.5 w-3.5" />编辑
+            </Button>
+            <Button size="sm" variant="outline" onClick={handleCopy}>
+              {copied ? <Check className="mr-1 h-3.5 w-3.5" /> : <Copy className="mr-1 h-3.5 w-3.5" />}
+              {copied ? "已复制" : "复制"}
+            </Button>
+            {prompt.status !== "archived" && (
+              <Button size="sm" variant="outline" onClick={handleArchive} disabled={isPending}>
+                <Archive className="mr-1 h-3.5 w-3.5" />归档
+              </Button>
+            )}
+            <Button
+              size="sm"
+              variant={confirmDelete ? "destructive" : "outline"}
+              onClick={handleDelete}
+              disabled={isPending}
+            >
+              <Trash2 className="mr-1 h-3.5 w-3.5" />
+              {confirmDelete ? "确认删除" : "删除"}
+            </Button>
+          </>
+        )}
       </div>
 
       <Separator className="mb-6" />
 
       {/* Content */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-3">
+        <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium">提示词内容</CardTitle>
-          <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 text-xs">
-            {copied ? <Check className="mr-1 h-3 w-3" /> : <Copy className="mr-1 h-3 w-3" />}
-            {copied ? "已复制" : "复制"}
-          </Button>
         </CardHeader>
         <CardContent>
-          <div className="whitespace-pre-wrap rounded-md bg-muted/50 p-4 font-mono text-sm leading-relaxed">
-            {prompt.content}
-          </div>
+          {editing ? (
+            <Textarea value={content} onChange={e => setContent(e.target.value)} className="min-h-[300px] font-mono text-sm" />
+          ) : (
+            <div className="whitespace-pre-wrap rounded-md bg-muted/50 p-4 font-mono text-sm leading-relaxed">
+              {prompt.content}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
