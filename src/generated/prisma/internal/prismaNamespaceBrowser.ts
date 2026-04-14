@@ -56,6 +56,10 @@ export const ModelName = {
   PromptTag: 'PromptTag',
   Module: 'Module',
   ModuleTag: 'ModuleTag',
+  Scenario: 'Scenario',
+  Recipe: 'Recipe',
+  RecipeStep: 'RecipeStep',
+  PromptModuleUse: 'PromptModuleUse',
   PromptVersion: 'PromptVersion',
   AgentHistory: 'AgentHistory',
   Setting: 'Setting',
@@ -118,6 +122,9 @@ export const ModuleScalarFieldEnum = {
   title: 'title',
   content: 'content',
   type: 'type',
+  embedding: 'embedding',
+  embeddingModel: 'embeddingModel',
+  embeddingUpdatedAt: 'embeddingUpdatedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -131,6 +138,56 @@ export const ModuleTagScalarFieldEnum = {
 } as const
 
 export type ModuleTagScalarFieldEnum = (typeof ModuleTagScalarFieldEnum)[keyof typeof ModuleTagScalarFieldEnum]
+
+
+export const ScenarioScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  embedding: 'embedding',
+  embeddingModel: 'embeddingModel',
+  embeddingUpdatedAt: 'embeddingUpdatedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ScenarioScalarFieldEnum = (typeof ScenarioScalarFieldEnum)[keyof typeof ScenarioScalarFieldEnum]
+
+
+export const RecipeScalarFieldEnum = {
+  id: 'id',
+  scenarioId: 'scenarioId',
+  name: 'name',
+  description: 'description',
+  assembled: 'assembled',
+  quality: 'quality',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RecipeScalarFieldEnum = (typeof RecipeScalarFieldEnum)[keyof typeof RecipeScalarFieldEnum]
+
+
+export const RecipeStepScalarFieldEnum = {
+  id: 'id',
+  recipeId: 'recipeId',
+  order: 'order',
+  moduleId: 'moduleId',
+  inline: 'inline',
+  createdAt: 'createdAt'
+} as const
+
+export type RecipeStepScalarFieldEnum = (typeof RecipeStepScalarFieldEnum)[keyof typeof RecipeStepScalarFieldEnum]
+
+
+export const PromptModuleUseScalarFieldEnum = {
+  promptId: 'promptId',
+  moduleId: 'moduleId',
+  order: 'order',
+  createdAt: 'createdAt'
+} as const
+
+export type PromptModuleUseScalarFieldEnum = (typeof PromptModuleUseScalarFieldEnum)[keyof typeof PromptModuleUseScalarFieldEnum]
 
 
 export const PromptVersionScalarFieldEnum = {

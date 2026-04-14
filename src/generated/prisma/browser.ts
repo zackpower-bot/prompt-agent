@@ -43,6 +43,26 @@ export type Module = Prisma.ModuleModel
  */
 export type ModuleTag = Prisma.ModuleTagModel
 /**
+ * Model Scenario
+ * 
+ */
+export type Scenario = Prisma.ScenarioModel
+/**
+ * Model Recipe
+ * 
+ */
+export type Recipe = Prisma.RecipeModel
+/**
+ * Model RecipeStep
+ * 
+ */
+export type RecipeStep = Prisma.RecipeStepModel
+/**
+ * Model PromptModuleUse
+ * 
+ */
+export type PromptModuleUse = Prisma.PromptModuleUseModel
+/**
  * Model PromptVersion
  * 
  */

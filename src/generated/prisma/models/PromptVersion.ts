@@ -447,14 +447,6 @@ export type PromptVersionUncheckedUpdateManyWithoutPromptNestedInput = {
   deleteMany?: Prisma.PromptVersionScalarWhereInput | Prisma.PromptVersionScalarWhereInput[]
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type PromptVersionCreateWithoutPromptInput = {
   id?: string
   versionNumber: number

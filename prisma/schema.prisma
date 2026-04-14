@@ -24,6 +24,7 @@ model Prompt {
   tags     PromptTag[]
   versions PromptVersion[]
   history  AgentHistory[]
+  moduleUses PromptModuleUse[]
 }
 
 model Tag {
@@ -47,10 +48,15 @@ model Module {
   title     String
   content   String
   type      String      @default("role")
+  embedding Bytes?
+  embeddingModel String?
+  embeddingUpdatedAt DateTime?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
   tags ModuleTag[]
+  steps RecipeStep[]
+  uses PromptModuleUse[]
 }
 
 model ModuleTag {
@@ -60,6 +66,65 @@ model ModuleTag {
   tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([moduleId, tagId])
+}
+
+model Scenario {
+  id                  String   @id @default(cuid())
+  name                String
+  description         String   @default("")
+  embedding           Bytes?
+  embeddingModel      String?
+  embeddingUpdatedAt  DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  recipes Recipe[]
+
+  @@index([name])
+}
+
+model Recipe {
+  id          String   @id @default(cuid())
+  scenarioId  String
+  name        String
+  description String   @default("")
+  assembled   String?
+  quality     Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  scenario Scenario     @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  steps    RecipeStep[]
+
+  @@index([scenarioId])
+}
+
+model RecipeStep {
+  id        String   @id @default(cuid())
+  recipeId  String
+  order     Int
+  moduleId  String?
+  inline    String?
+  createdAt DateTime @default(now())
+
+  recipe Recipe  @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  module Module? @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+
+  @@index([recipeId, order])
+  @@index([moduleId])
+}
+
+model PromptModuleUse {
+  promptId  String
+  moduleId  String
+  order     Int?
+  createdAt DateTime @default(now())
+
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@id([promptId, moduleId])
+  @@index([moduleId])
 }
 
 model PromptVersion {

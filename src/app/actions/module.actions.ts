@@ -2,6 +2,7 @@
 
 import type { Prisma } from "@/generated/prisma/client"
 import { prisma } from "@/lib/prisma"
+import { embedModuleAsync } from "@/lib/embedding"
 
 export interface ModuleWithMeta {
   id: string
@@ -107,6 +108,7 @@ export async function createModule(input: {
         include: moduleWithTagsInclude,
       })
     })
+    void embedModuleAsync(row.id)
     return { success: true, data: serializeModule(row) }
   } catch (e) {
     return { success: false, error: (e as Error).message }
@@ -118,7 +120,17 @@ export async function updateModule(
   input: Partial<{ title: string; content: string; type: string; tags: string[] }>
 ): Promise<{ success: true; data: ModuleWithMeta } | { success: false; error: string }> {
   try {
-    const row = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
+      const existing = await tx.module.findUnique({
+        where: { id },
+        select: { id: true, title: true, content: true },
+      })
+      if (!existing) throw new Error("Module not found")
+
+      let shouldEmbed = false
+      if (input.title !== undefined && input.title !== existing.title) shouldEmbed = true
+      if (input.content !== undefined && input.content !== existing.content) shouldEmbed = true
+
       const data: Prisma.ModuleUpdateInput = {}
       if (input.title !== undefined) data.title = input.title
       if (input.content !== undefined) data.content = input.content
@@ -144,9 +156,12 @@ export async function updateModule(
         include: moduleWithTagsInclude,
       })
       if (!module) throw new Error("Module not found")
-      return module
+      return { module, shouldEmbed }
     })
-    return { success: true, data: serializeModule(row) }
+    if (result.shouldEmbed) {
+      void embedModuleAsync(result.module.id)
+    }
+    return { success: true, data: serializeModule(result.module) }
   } catch (e) {
     return { success: false, error: (e as Error).message }
   }

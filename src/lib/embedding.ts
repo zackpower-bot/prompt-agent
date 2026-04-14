@@ -8,6 +8,7 @@
  */
 
 import OpenAI from "openai"
+import { prisma } from "@/lib/prisma"
 
 // MiniMax embo-01 uses non-OpenAI-compatible format (texts[] instead of input),
 // so it's excluded from the embedding provider list.
@@ -113,4 +114,67 @@ export function float32ToBytes(arr: Float32Array): Uint8Array<ArrayBuffer> {
 export function bytesToFloat32(buf: Buffer | Uint8Array): Float32Array {
   const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf)
   return new Float32Array(bytes.buffer, bytes.byteOffset, bytes.byteLength / 4)
+}
+
+async function writeEmbedding(
+  text: string,
+  update: (data: { embedding: Uint8Array<ArrayBuffer>; embeddingModel: string | null; embeddingUpdatedAt: Date }) => Promise<unknown>
+): Promise<void> {
+  const trimmed = text.trim()
+  if (!trimmed) return
+
+  const vector = await embed(trimmed)
+  if (!vector) return
+
+  const bytes = float32ToBytes(vector)
+  const meta = getEmbeddingMeta()
+  await update({
+    embedding: bytes,
+    embeddingModel: meta?.model ?? null,
+    embeddingUpdatedAt: new Date(),
+  })
+}
+
+export async function embedModuleAsync(moduleId: string): Promise<void> {
+  try {
+    const module = await prisma.module.findUnique({
+      where: { id: moduleId },
+      select: { id: true, title: true, content: true },
+    })
+    if (!module) return
+    const payload = [module.title, module.content ?? ""].join("\n\n")
+    await writeEmbedding(payload, (data) =>
+      prisma.module.update({
+        where: { id: moduleId },
+        data,
+      })
+    )
+  } catch (error) {
+    if ((error as any)?.code === "P2025") return
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("embedModuleAsync failed", error)
+    }
+  }
+}
+
+export async function embedScenarioAsync(scenarioId: string): Promise<void> {
+  try {
+    const scenario = await prisma.scenario.findUnique({
+      where: { id: scenarioId },
+      select: { id: true, name: true, description: true },
+    })
+    if (!scenario) return
+    const payload = [scenario.name, scenario.description ?? ""].join("\n\n")
+    await writeEmbedding(payload, (data) =>
+      prisma.scenario.update({
+        where: { id: scenarioId },
+        data,
+      })
+    )
+  } catch (error) {
+    if ((error as any)?.code === "P2025") return
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("embedScenarioAsync failed", error)
+    }
+  }
 }

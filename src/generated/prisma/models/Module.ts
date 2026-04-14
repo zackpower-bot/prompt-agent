@@ -29,6 +29,9 @@ export type ModuleMinAggregateOutputType = {
   title: string | null
   content: string | null
   type: string | null
+  embedding: runtime.Bytes | null
+  embeddingModel: string | null
+  embeddingUpdatedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -38,6 +41,9 @@ export type ModuleMaxAggregateOutputType = {
   title: string | null
   content: string | null
   type: string | null
+  embedding: runtime.Bytes | null
+  embeddingModel: string | null
+  embeddingUpdatedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -47,6 +53,9 @@ export type ModuleCountAggregateOutputType = {
   title: number
   content: number
   type: number
+  embedding: number
+  embeddingModel: number
+  embeddingUpdatedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -58,6 +67,9 @@ export type ModuleMinAggregateInputType = {
   title?: true
   content?: true
   type?: true
+  embedding?: true
+  embeddingModel?: true
+  embeddingUpdatedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -67,6 +79,9 @@ export type ModuleMaxAggregateInputType = {
   title?: true
   content?: true
   type?: true
+  embedding?: true
+  embeddingModel?: true
+  embeddingUpdatedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -76,6 +91,9 @@ export type ModuleCountAggregateInputType = {
   title?: true
   content?: true
   type?: true
+  embedding?: true
+  embeddingModel?: true
+  embeddingUpdatedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -158,6 +176,9 @@ export type ModuleGroupByOutputType = {
   title: string
   content: string
   type: string
+  embedding: runtime.Bytes | null
+  embeddingModel: string | null
+  embeddingUpdatedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: ModuleCountAggregateOutputType | null
@@ -188,9 +209,14 @@ export type ModuleWhereInput = {
   title?: Prisma.StringFilter<"Module"> | string
   content?: Prisma.StringFilter<"Module"> | string
   type?: Prisma.StringFilter<"Module"> | string
+  embedding?: Prisma.BytesNullableFilter<"Module"> | runtime.Bytes | null
+  embeddingModel?: Prisma.StringNullableFilter<"Module"> | string | null
+  embeddingUpdatedAt?: Prisma.DateTimeNullableFilter<"Module"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Module"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Module"> | Date | string
   tags?: Prisma.ModuleTagListRelationFilter
+  steps?: Prisma.RecipeStepListRelationFilter
+  uses?: Prisma.PromptModuleUseListRelationFilter
 }
 
 export type ModuleOrderByWithRelationInput = {
@@ -198,9 +224,14 @@ export type ModuleOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  embedding?: Prisma.SortOrderInput | Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  embeddingUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tags?: Prisma.ModuleTagOrderByRelationAggregateInput
+  steps?: Prisma.RecipeStepOrderByRelationAggregateInput
+  uses?: Prisma.PromptModuleUseOrderByRelationAggregateInput
 }
 
 export type ModuleWhereUniqueInput = Prisma.AtLeast<{
@@ -211,9 +242,14 @@ export type ModuleWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Module"> | string
   content?: Prisma.StringFilter<"Module"> | string
   type?: Prisma.StringFilter<"Module"> | string
+  embedding?: Prisma.BytesNullableFilter<"Module"> | runtime.Bytes | null
+  embeddingModel?: Prisma.StringNullableFilter<"Module"> | string | null
+  embeddingUpdatedAt?: Prisma.DateTimeNullableFilter<"Module"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Module"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Module"> | Date | string
   tags?: Prisma.ModuleTagListRelationFilter
+  steps?: Prisma.RecipeStepListRelationFilter
+  uses?: Prisma.PromptModuleUseListRelationFilter
 }, "id">
 
 export type ModuleOrderByWithAggregationInput = {
@@ -221,6 +257,9 @@ export type ModuleOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  embedding?: Prisma.SortOrderInput | Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrderInput | Prisma.SortOrder
+  embeddingUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ModuleCountOrderByAggregateInput
@@ -236,6 +275,9 @@ export type ModuleScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"Module"> | string
   content?: Prisma.StringWithAggregatesFilter<"Module"> | string
   type?: Prisma.StringWithAggregatesFilter<"Module"> | string
+  embedding?: Prisma.BytesNullableWithAggregatesFilter<"Module"> | runtime.Bytes | null
+  embeddingModel?: Prisma.StringNullableWithAggregatesFilter<"Module"> | string | null
+  embeddingUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Module"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Module"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Module"> | Date | string
 }
@@ -245,9 +287,14 @@ export type ModuleCreateInput = {
   title: string
   content: string
   type?: string
+  embedding?: runtime.Bytes | null
+  embeddingModel?: string | null
+  embeddingUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.ModuleTagCreateNestedManyWithoutModuleInput
+  steps?: Prisma.RecipeStepCreateNestedManyWithoutModuleInput
+  uses?: Prisma.PromptModuleUseCreateNestedManyWithoutModuleInput
 }
 
 export type ModuleUncheckedCreateInput = {
@@ -255,9 +302,14 @@ export type ModuleUncheckedCreateInput = {
   title: string
   content: string
   type?: string
+  embedding?: runtime.Bytes | null
+  embeddingModel?: string | null
+  embeddingUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.ModuleTagUncheckedCreateNestedManyWithoutModuleInput
+  steps?: Prisma.RecipeStepUncheckedCreateNestedManyWithoutModuleInput
+  uses?: Prisma.PromptModuleUseUncheckedCreateNestedManyWithoutModuleInput
 }
 
 export type ModuleUpdateInput = {
@@ -265,9 +317,14 @@ export type ModuleUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
+  embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.ModuleTagUpdateManyWithoutModuleNestedInput
+  steps?: Prisma.RecipeStepUpdateManyWithoutModuleNestedInput
+  uses?: Prisma.PromptModuleUseUpdateManyWithoutModuleNestedInput
 }
 
 export type ModuleUncheckedUpdateInput = {
@@ -275,9 +332,14 @@ export type ModuleUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
+  embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.ModuleTagUncheckedUpdateManyWithoutModuleNestedInput
+  steps?: Prisma.RecipeStepUncheckedUpdateManyWithoutModuleNestedInput
+  uses?: Prisma.PromptModuleUseUncheckedUpdateManyWithoutModuleNestedInput
 }
 
 export type ModuleCreateManyInput = {
@@ -285,6 +347,9 @@ export type ModuleCreateManyInput = {
   title: string
   content: string
   type?: string
+  embedding?: runtime.Bytes | null
+  embeddingModel?: string | null
+  embeddingUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -294,6 +359,9 @@ export type ModuleUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
+  embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -303,6 +371,9 @@ export type ModuleUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
+  embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -312,6 +383,9 @@ export type ModuleCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  embedding?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
+  embeddingUpdatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -321,6 +395,9 @@ export type ModuleMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  embedding?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
+  embeddingUpdatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -330,6 +407,9 @@ export type ModuleMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  embedding?: Prisma.SortOrder
+  embeddingModel?: Prisma.SortOrder
+  embeddingUpdatedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -337,6 +417,19 @@ export type ModuleMinOrderByAggregateInput = {
 export type ModuleScalarRelationFilter = {
   is?: Prisma.ModuleWhereInput
   isNot?: Prisma.ModuleWhereInput
+}
+
+export type ModuleNullableScalarRelationFilter = {
+  is?: Prisma.ModuleWhereInput | null
+  isNot?: Prisma.ModuleWhereInput | null
+}
+
+export type NullableBytesFieldUpdateOperationsInput = {
+  set?: runtime.Bytes | null
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type ModuleCreateNestedOneWithoutTagsInput = {
@@ -353,13 +446,48 @@ export type ModuleUpdateOneRequiredWithoutTagsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ModuleUpdateToOneWithWhereWithoutTagsInput, Prisma.ModuleUpdateWithoutTagsInput>, Prisma.ModuleUncheckedUpdateWithoutTagsInput>
 }
 
+export type ModuleCreateNestedOneWithoutStepsInput = {
+  create?: Prisma.XOR<Prisma.ModuleCreateWithoutStepsInput, Prisma.ModuleUncheckedCreateWithoutStepsInput>
+  connectOrCreate?: Prisma.ModuleCreateOrConnectWithoutStepsInput
+  connect?: Prisma.ModuleWhereUniqueInput
+}
+
+export type ModuleUpdateOneWithoutStepsNestedInput = {
+  create?: Prisma.XOR<Prisma.ModuleCreateWithoutStepsInput, Prisma.ModuleUncheckedCreateWithoutStepsInput>
+  connectOrCreate?: Prisma.ModuleCreateOrConnectWithoutStepsInput
+  upsert?: Prisma.ModuleUpsertWithoutStepsInput
+  disconnect?: Prisma.ModuleWhereInput | boolean
+  delete?: Prisma.ModuleWhereInput | boolean
+  connect?: Prisma.ModuleWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ModuleUpdateToOneWithWhereWithoutStepsInput, Prisma.ModuleUpdateWithoutStepsInput>, Prisma.ModuleUncheckedUpdateWithoutStepsInput>
+}
+
+export type ModuleCreateNestedOneWithoutUsesInput = {
+  create?: Prisma.XOR<Prisma.ModuleCreateWithoutUsesInput, Prisma.ModuleUncheckedCreateWithoutUsesInput>
+  connectOrCreate?: Prisma.ModuleCreateOrConnectWithoutUsesInput
+  connect?: Prisma.ModuleWhereUniqueInput
+}
+
+export type ModuleUpdateOneRequiredWithoutUsesNestedInput = {
+  create?: Prisma.XOR<Prisma.ModuleCreateWithoutUsesInput, Prisma.ModuleUncheckedCreateWithoutUsesInput>
+  connectOrCreate?: Prisma.ModuleCreateOrConnectWithoutUsesInput
+  upsert?: Prisma.ModuleUpsertWithoutUsesInput
+  connect?: Prisma.ModuleWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ModuleUpdateToOneWithWhereWithoutUsesInput, Prisma.ModuleUpdateWithoutUsesInput>, Prisma.ModuleUncheckedUpdateWithoutUsesInput>
+}
+
 export type ModuleCreateWithoutTagsInput = {
   id?: string
   title: string
   content: string
   type?: string
+  embedding?: runtime.Bytes | null
+  embeddingModel?: string | null
+  embeddingUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  steps?: Prisma.RecipeStepCreateNestedManyWithoutModuleInput
+  uses?: Prisma.PromptModuleUseCreateNestedManyWithoutModuleInput
 }
 
 export type ModuleUncheckedCreateWithoutTagsInput = {
@@ -367,8 +495,13 @@ export type ModuleUncheckedCreateWithoutTagsInput = {
   title: string
   content: string
   type?: string
+  embedding?: runtime.Bytes | null
+  embeddingModel?: string | null
+  embeddingUpdatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  steps?: Prisma.RecipeStepUncheckedCreateNestedManyWithoutModuleInput
+  uses?: Prisma.PromptModuleUseUncheckedCreateNestedManyWithoutModuleInput
 }
 
 export type ModuleCreateOrConnectWithoutTagsInput = {
@@ -392,8 +525,13 @@ export type ModuleUpdateWithoutTagsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
+  embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  steps?: Prisma.RecipeStepUpdateManyWithoutModuleNestedInput
+  uses?: Prisma.PromptModuleUseUpdateManyWithoutModuleNestedInput
 }
 
 export type ModuleUncheckedUpdateWithoutTagsInput = {
@@ -401,8 +539,157 @@ export type ModuleUncheckedUpdateWithoutTagsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
+  embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  steps?: Prisma.RecipeStepUncheckedUpdateManyWithoutModuleNestedInput
+  uses?: Prisma.PromptModuleUseUncheckedUpdateManyWithoutModuleNestedInput
+}
+
+export type ModuleCreateWithoutStepsInput = {
+  id?: string
+  title: string
+  content: string
+  type?: string
+  embedding?: runtime.Bytes | null
+  embeddingModel?: string | null
+  embeddingUpdatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.ModuleTagCreateNestedManyWithoutModuleInput
+  uses?: Prisma.PromptModuleUseCreateNestedManyWithoutModuleInput
+}
+
+export type ModuleUncheckedCreateWithoutStepsInput = {
+  id?: string
+  title: string
+  content: string
+  type?: string
+  embedding?: runtime.Bytes | null
+  embeddingModel?: string | null
+  embeddingUpdatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.ModuleTagUncheckedCreateNestedManyWithoutModuleInput
+  uses?: Prisma.PromptModuleUseUncheckedCreateNestedManyWithoutModuleInput
+}
+
+export type ModuleCreateOrConnectWithoutStepsInput = {
+  where: Prisma.ModuleWhereUniqueInput
+  create: Prisma.XOR<Prisma.ModuleCreateWithoutStepsInput, Prisma.ModuleUncheckedCreateWithoutStepsInput>
+}
+
+export type ModuleUpsertWithoutStepsInput = {
+  update: Prisma.XOR<Prisma.ModuleUpdateWithoutStepsInput, Prisma.ModuleUncheckedUpdateWithoutStepsInput>
+  create: Prisma.XOR<Prisma.ModuleCreateWithoutStepsInput, Prisma.ModuleUncheckedCreateWithoutStepsInput>
+  where?: Prisma.ModuleWhereInput
+}
+
+export type ModuleUpdateToOneWithWhereWithoutStepsInput = {
+  where?: Prisma.ModuleWhereInput
+  data: Prisma.XOR<Prisma.ModuleUpdateWithoutStepsInput, Prisma.ModuleUncheckedUpdateWithoutStepsInput>
+}
+
+export type ModuleUpdateWithoutStepsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
+  embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.ModuleTagUpdateManyWithoutModuleNestedInput
+  uses?: Prisma.PromptModuleUseUpdateManyWithoutModuleNestedInput
+}
+
+export type ModuleUncheckedUpdateWithoutStepsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
+  embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.ModuleTagUncheckedUpdateManyWithoutModuleNestedInput
+  uses?: Prisma.PromptModuleUseUncheckedUpdateManyWithoutModuleNestedInput
+}
+
+export type ModuleCreateWithoutUsesInput = {
+  id?: string
+  title: string
+  content: string
+  type?: string
+  embedding?: runtime.Bytes | null
+  embeddingModel?: string | null
+  embeddingUpdatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.ModuleTagCreateNestedManyWithoutModuleInput
+  steps?: Prisma.RecipeStepCreateNestedManyWithoutModuleInput
+}
+
+export type ModuleUncheckedCreateWithoutUsesInput = {
+  id?: string
+  title: string
+  content: string
+  type?: string
+  embedding?: runtime.Bytes | null
+  embeddingModel?: string | null
+  embeddingUpdatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.ModuleTagUncheckedCreateNestedManyWithoutModuleInput
+  steps?: Prisma.RecipeStepUncheckedCreateNestedManyWithoutModuleInput
+}
+
+export type ModuleCreateOrConnectWithoutUsesInput = {
+  where: Prisma.ModuleWhereUniqueInput
+  create: Prisma.XOR<Prisma.ModuleCreateWithoutUsesInput, Prisma.ModuleUncheckedCreateWithoutUsesInput>
+}
+
+export type ModuleUpsertWithoutUsesInput = {
+  update: Prisma.XOR<Prisma.ModuleUpdateWithoutUsesInput, Prisma.ModuleUncheckedUpdateWithoutUsesInput>
+  create: Prisma.XOR<Prisma.ModuleCreateWithoutUsesInput, Prisma.ModuleUncheckedCreateWithoutUsesInput>
+  where?: Prisma.ModuleWhereInput
+}
+
+export type ModuleUpdateToOneWithWhereWithoutUsesInput = {
+  where?: Prisma.ModuleWhereInput
+  data: Prisma.XOR<Prisma.ModuleUpdateWithoutUsesInput, Prisma.ModuleUncheckedUpdateWithoutUsesInput>
+}
+
+export type ModuleUpdateWithoutUsesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
+  embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.ModuleTagUpdateManyWithoutModuleNestedInput
+  steps?: Prisma.RecipeStepUpdateManyWithoutModuleNestedInput
+}
+
+export type ModuleUncheckedUpdateWithoutUsesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
+  embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.ModuleTagUncheckedUpdateManyWithoutModuleNestedInput
+  steps?: Prisma.RecipeStepUncheckedUpdateManyWithoutModuleNestedInput
 }
 
 
@@ -412,10 +699,14 @@ export type ModuleUncheckedUpdateWithoutTagsInput = {
 
 export type ModuleCountOutputType = {
   tags: number
+  steps: number
+  uses: number
 }
 
 export type ModuleCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tags?: boolean | ModuleCountOutputTypeCountTagsArgs
+  steps?: boolean | ModuleCountOutputTypeCountStepsArgs
+  uses?: boolean | ModuleCountOutputTypeCountUsesArgs
 }
 
 /**
@@ -435,15 +726,34 @@ export type ModuleCountOutputTypeCountTagsArgs<ExtArgs extends runtime.Types.Ext
   where?: Prisma.ModuleTagWhereInput
 }
 
+/**
+ * ModuleCountOutputType without action
+ */
+export type ModuleCountOutputTypeCountStepsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RecipeStepWhereInput
+}
+
+/**
+ * ModuleCountOutputType without action
+ */
+export type ModuleCountOutputTypeCountUsesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PromptModuleUseWhereInput
+}
+
 
 export type ModuleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
   content?: boolean
   type?: boolean
+  embedding?: boolean
+  embeddingModel?: boolean
+  embeddingUpdatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tags?: boolean | Prisma.Module$tagsArgs<ExtArgs>
+  steps?: boolean | Prisma.Module$stepsArgs<ExtArgs>
+  uses?: boolean | Prisma.Module$usesArgs<ExtArgs>
   _count?: boolean | Prisma.ModuleCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["module"]>
 
@@ -452,6 +762,9 @@ export type ModuleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   title?: boolean
   content?: boolean
   type?: boolean
+  embedding?: boolean
+  embeddingModel?: boolean
+  embeddingUpdatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["module"]>
@@ -461,6 +774,9 @@ export type ModuleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   title?: boolean
   content?: boolean
   type?: boolean
+  embedding?: boolean
+  embeddingModel?: boolean
+  embeddingUpdatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["module"]>
@@ -470,13 +786,18 @@ export type ModuleSelectScalar = {
   title?: boolean
   content?: boolean
   type?: boolean
+  embedding?: boolean
+  embeddingModel?: boolean
+  embeddingUpdatedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ModuleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "content" | "type" | "createdAt" | "updatedAt", ExtArgs["result"]["module"]>
+export type ModuleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "content" | "type" | "embedding" | "embeddingModel" | "embeddingUpdatedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["module"]>
 export type ModuleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tags?: boolean | Prisma.Module$tagsArgs<ExtArgs>
+  steps?: boolean | Prisma.Module$stepsArgs<ExtArgs>
+  uses?: boolean | Prisma.Module$usesArgs<ExtArgs>
   _count?: boolean | Prisma.ModuleCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ModuleIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -486,12 +807,17 @@ export type $ModulePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Module"
   objects: {
     tags: Prisma.$ModuleTagPayload<ExtArgs>[]
+    steps: Prisma.$RecipeStepPayload<ExtArgs>[]
+    uses: Prisma.$PromptModuleUsePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     title: string
     content: string
     type: string
+    embedding: runtime.Bytes | null
+    embeddingModel: string | null
+    embeddingUpdatedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["module"]>
@@ -889,6 +1215,8 @@ readonly fields: ModuleFieldRefs;
 export interface Prisma__ModuleClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   tags<T extends Prisma.Module$tagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Module$tagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModuleTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  steps<T extends Prisma.Module$stepsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Module$stepsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecipeStepPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  uses<T extends Prisma.Module$usesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Module$usesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PromptModuleUsePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -922,6 +1250,9 @@ export interface ModuleFieldRefs {
   readonly title: Prisma.FieldRef<"Module", 'String'>
   readonly content: Prisma.FieldRef<"Module", 'String'>
   readonly type: Prisma.FieldRef<"Module", 'String'>
+  readonly embedding: Prisma.FieldRef<"Module", 'Bytes'>
+  readonly embeddingModel: Prisma.FieldRef<"Module", 'String'>
+  readonly embeddingUpdatedAt: Prisma.FieldRef<"Module", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Module", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Module", 'DateTime'>
 }
@@ -1336,6 +1667,54 @@ export type Module$tagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.ModuleTagScalarFieldEnum | Prisma.ModuleTagScalarFieldEnum[]
+}
+
+/**
+ * Module.steps
+ */
+export type Module$stepsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RecipeStep
+   */
+  select?: Prisma.RecipeStepSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RecipeStep
+   */
+  omit?: Prisma.RecipeStepOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecipeStepInclude<ExtArgs> | null
+  where?: Prisma.RecipeStepWhereInput
+  orderBy?: Prisma.RecipeStepOrderByWithRelationInput | Prisma.RecipeStepOrderByWithRelationInput[]
+  cursor?: Prisma.RecipeStepWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RecipeStepScalarFieldEnum | Prisma.RecipeStepScalarFieldEnum[]
+}
+
+/**
+ * Module.uses
+ */
+export type Module$usesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PromptModuleUse
+   */
+  select?: Prisma.PromptModuleUseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PromptModuleUse
+   */
+  omit?: Prisma.PromptModuleUseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PromptModuleUseInclude<ExtArgs> | null
+  where?: Prisma.PromptModuleUseWhereInput
+  orderBy?: Prisma.PromptModuleUseOrderByWithRelationInput | Prisma.PromptModuleUseOrderByWithRelationInput[]
+  cursor?: Prisma.PromptModuleUseWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PromptModuleUseScalarFieldEnum | Prisma.PromptModuleUseScalarFieldEnum[]
 }
 
 /**
