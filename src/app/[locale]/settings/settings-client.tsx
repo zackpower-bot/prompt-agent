@@ -118,7 +118,7 @@ export function SettingsClient({ initialProfiles }: { initialProfiles: ProfileEn
                       </button>
                     )}
                     {existing && (
-                      <Badge variant="outline" className="mono-label">
+                      <Badge variant="outline">
                         {isActive ? "启用" : "禁用"}
                       </Badge>
                     )}

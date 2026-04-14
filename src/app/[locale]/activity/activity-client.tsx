@@ -63,7 +63,12 @@ export function ActivityClient({ initialActions }: ActivityClientProps) {
 
   const content = useMemo(() => {
     if (actions.length === 0) {
-      return <p className="py-12 text-center text-sm text-muted-foreground">{t("empty")}</p>
+      return (
+        <div className="rounded-2xl border border-dashed border-border bg-card/50 px-6 py-14 text-center">
+          <h2 className="text-xl">活动会在这里慢慢出现</h2>
+          <p className="mx-auto mt-3 max-w-[38rem] text-sm leading-7 text-muted-foreground">{t("empty")}</p>
+        </div>
+      )
     }
 
     return (

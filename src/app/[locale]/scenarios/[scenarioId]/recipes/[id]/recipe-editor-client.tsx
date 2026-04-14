@@ -528,9 +528,9 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
                   )}
                 </button>
                 {previewOpen ? (
-                  <pre className="mt-3 overflow-x-auto whitespace-pre-wrap rounded-xl bg-muted/40 p-3 text-sm text-foreground">
+                  <div className="mt-3 max-w-[72ch] whitespace-pre-wrap rounded-lg bg-muted/40 p-4 font-sans text-[15px] leading-[1.7] text-foreground">
                     {assembledPreview}
-                  </pre>
+                  </div>
                 ) : null}
               </section>
             ) : null}

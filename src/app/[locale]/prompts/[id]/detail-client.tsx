@@ -210,7 +210,7 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
           {editing ? (
             <Textarea value={content} onChange={e => setContent(e.target.value)} className="min-h-[200px] sm:min-h-[300px] font-mono text-sm" />
           ) : (
-            <div className="whitespace-pre-wrap rounded-md bg-muted/50 p-4 font-mono text-sm leading-relaxed">
+            <div className="max-w-[72ch] whitespace-pre-wrap rounded-md bg-muted/50 p-4 text-[15px] leading-[1.7] text-foreground">
               {prompt.content}
             </div>
           )}

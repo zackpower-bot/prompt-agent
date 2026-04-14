@@ -69,13 +69,14 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">{total} 条提示词</p>
         <div className="flex items-center gap-2">
-          <button
-            className="tag-chip hover:bg-accent"
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => window.open("/api/prompts/export")}
           >
             导出
-          </button>
-          <label className="tag-chip hover:bg-accent cursor-pointer">
+          </Button>
+          <label className="inline-flex h-7 cursor-pointer items-center justify-center rounded-[min(var(--radius-md),12px)] border border-border bg-background px-2.5 text-[0.8rem] font-medium transition-colors hover:bg-muted hover:text-foreground">
             导入
             <input
               type="file"
@@ -113,39 +114,44 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
 
       <div className="mb-3 flex gap-2">
         {["all", "inbox", "production", "archived"].map((s) => (
-          <button
+          <Button
             key={s}
-            className={`tag-chip cursor-pointer transition-colors ${selectedStatus === s ? "border-foreground bg-foreground text-background" : "bg-background text-foreground hover:bg-accent"}`}
+            variant={selectedStatus === s ? "default" : "outline"}
+            size="sm"
             onClick={() => setSelectedStatus(s)}
           >
             {s === "all" ? "全部" : s === "inbox" ? "收件箱" : s === "production" ? "生产" : "归档"}
-          </button>
+          </Button>
         ))}
       </div>
 
       <div className="mb-6 flex flex-wrap gap-1.5">
-        <button
-          className={`tag-chip cursor-pointer transition-colors ${selectedTag === "all" ? "border-foreground bg-foreground text-background" : "bg-background text-foreground hover:bg-accent"}`}
+        <Button
+          variant={selectedTag === "all" ? "default" : "secondary"}
+          size="sm"
           onClick={() => setSelectedTag("all")}
         >
           全部标签
-        </button>
+        </Button>
         {visibleTags.map((tag) => (
-          <button
+          <Button
             key={tag}
-            className={`tag-chip cursor-pointer transition-colors ${selectedTag === tag ? "border-foreground bg-foreground text-background" : "bg-background text-foreground hover:bg-accent"}`}
+            variant={selectedTag === tag ? "default" : "secondary"}
+            size="sm"
             onClick={() => setSelectedTag(tag)}
           >
             {tag}
-          </button>
+          </Button>
         ))}
         {allTags.length > TAG_LIMIT && (
-          <button
-            className="tag-chip cursor-pointer border-dashed text-muted-foreground hover:text-foreground"
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-dashed text-muted-foreground hover:text-foreground"
             onClick={() => setTagsExpanded(!tagsExpanded)}
           >
             {tagsExpanded ? "收起" : `+${allTags.length - TAG_LIMIT}`}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -191,7 +197,14 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
       </div>
 
       {prompts.length === 0 && !isPending && (
-        <div className="py-16 text-center text-sm text-muted-foreground">无匹配的提示词</div>
+        <div className="rounded-2xl border border-dashed border-border bg-card/50 px-6 py-16 text-center">
+          <h2 className="text-xl">还没有找到合适的提示词</h2>
+          <p className="mx-auto mt-3 max-w-[38rem] text-sm leading-7 text-muted-foreground">
+            可以先换一个关键词，或者放宽标签与状态筛选。
+            <br />
+            当库里开始积累内容后，这里会成为你回看、筛选和复用提示词的主入口。
+          </p>
+        </div>
       )}
 
       {totalPages > 1 && (

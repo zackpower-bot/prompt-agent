@@ -406,8 +406,9 @@ export function ScenariosClient({ initialScenarios }: ScenariosClientProps) {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-border py-16 text-center">
-            <p className="text-sm text-muted-foreground">{tScenarios("emptyList")}</p>
+          <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border bg-card/50 px-6 py-16 text-center">
+            <h2 className="text-xl">{tScenarios("title")}</h2>
+            <p className="max-w-[38rem] text-sm leading-7 text-muted-foreground">{tScenarios("emptyList")}</p>
             <Button onClick={() => setShowCreateForm(true)}>
               <Plus className="mr-2 h-4 w-4" />
               {tScenarios("newScenario")}

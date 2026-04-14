@@ -43,7 +43,7 @@
     "archived": "归档",
     "export": "导出",
     "import": "导入",
-    "noResults": "无匹配的提示词"
+    "noResults": "暂时没有找到匹配的提示词。\n换个关键词、标签或状态试试，库里的内容会慢慢把这里填满。"
   },
   "detail": {
     "edit": "编辑",
@@ -66,7 +66,7 @@
     "create": "新建模块",
     "search": "搜索模块...",
     "allTypes": "全部",
-    "noModules": "暂无模块",
+    "noModules": "还没有整理好的模块。\n先把最常复用的一段角色、约束或输出格式沉淀下来，这里很快就会形成自己的模块库。",
     "types": {
       "role": "角色",
       "goal": "目标",
@@ -115,7 +115,7 @@
   },
   "activity": {
     "title": "活动日志",
-    "empty": "还没有需要记录的活动。",
+    "empty": "还没有需要记录的活动。\n等你继续整理提示词、模块和状态流转后，这里会把关键动作按时间线慢慢留存下来。",
     "undo": "撤销",
     "undoing": "撤销中...",
     "undoFailed": "撤销失败",
@@ -133,7 +133,7 @@
   },
   "scenarios": {
     "title": "场景配方",
-    "emptyList": "还没有场景",
+    "emptyList": "还没有场景配方。\n先创建一个场景，把常见任务拆成可复用的配方结构，后续就能直接在这里继续迭代。",
     "searchPlaceholder": "按描述搜索场景...",
     "searchError": "场景搜索失败",
     "searchNoEmbedding": "当前查询无法生成 embedding",

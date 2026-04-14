@@ -38,7 +38,7 @@ type UsageApiSnapshot = {
 function StatCard({ title, value, icon: Icon, sub }: { title: string; value: string | number; icon: any; sub?: string }) {
   return (
     <Card>
-      <CardContent className="pt-4">
+      <CardContent className="p-5">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-muted-foreground">{title}</p>
@@ -103,7 +103,20 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
     }
   }, [])
 
-  if (!stats) return <p className="p-8 text-center text-muted-foreground">加载失败</p>
+  if (!stats) {
+    return (
+      <div className="h-full overflow-y-auto px-4 py-8">
+        <div className="mx-auto max-w-4xl rounded-2xl border border-dashed border-border bg-card/50 px-6 py-14 text-center">
+          <h2 className="text-xl">统计页暂时还没有准备好</h2>
+          <p className="mx-auto mt-3 max-w-[38rem] text-sm leading-7 text-muted-foreground">
+            当前还拿不到完整的统计快照，所以这页先留在一个安静的占位状态。
+            <br />
+            等使用记录累积起来后，这里会逐步展示质量、Provider 和近期活动的整体趋势。
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   const llmUsage = usageSnapshot?.llm.byProvider ?? []
   const totalTokens = llmUsage.length
@@ -201,7 +214,14 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
         <CardHeader className="pb-3"><CardTitle className="text-sm">质量分布</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           {totalQuality === 0 ? (
-            <p className="text-xs text-muted-foreground">暂无质量数据</p>
+            <div className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-6">
+              <h3 className="text-lg">质量数据还在积累</h3>
+              <p className="mt-2 text-sm leading-7 text-muted-foreground">
+                现在还没有足够的质量评分样本，所以这一区先保持安静。
+                <br />
+                当更多提示词进入评估流程后，这里会开始显示 A 到 D 的分布变化。
+              </p>
+            </div>
           ) : (
             stats.qualityDistribution.map((bucket) => (
               <BarItem
@@ -280,7 +300,14 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
               ))}
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground">暂无 LLM Provider 数据</p>
+            <div className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-6">
+              <h3 className="text-lg">还没有可读的 Provider 统计</h3>
+              <p className="mt-2 text-sm leading-7 text-muted-foreground">
+                当前没有采集到足够的 LLM Provider 调用记录，所以这张表先不展开。
+                <br />
+                等后续运行继续沉淀，这里会帮助你对比请求量、Token 消耗和成功率。
+              </p>
+            </div>
           )}
         </CardContent>
       </Card>

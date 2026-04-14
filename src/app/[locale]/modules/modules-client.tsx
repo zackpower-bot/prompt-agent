@@ -109,9 +109,9 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
         <Input placeholder="搜索模块..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
       </div>
       <div className="mb-6 flex flex-wrap gap-1.5">
-        <button className={`tag-chip cursor-pointer transition-colors ${typeFilter === "all" ? "border-foreground bg-foreground text-background" : "bg-background hover:bg-accent"}`} onClick={() => setTypeFilter("all")}>全部</button>
+        <Button variant={typeFilter === "all" ? "default" : "secondary"} size="sm" onClick={() => setTypeFilter("all")}>全部</Button>
         {MODULE_TYPES.map((t) => (
-          <button key={t.value} className={`tag-chip cursor-pointer transition-colors ${typeFilter === t.value ? "border-foreground bg-foreground text-background" : "bg-background hover:bg-accent"}`} onClick={() => setTypeFilter(t.value)}>{t.label}</button>
+          <Button key={t.value} variant={typeFilter === t.value ? "default" : "secondary"} size="sm" onClick={() => setTypeFilter(t.value)}>{t.label}</Button>
         ))}
       </div>
 
@@ -176,7 +176,20 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
           </Card>
         ))}
         {filtered.length === 0 && !isPending && (
-          <p className="py-8 text-center text-sm text-muted-foreground">暂无模块</p>
+          <div className="rounded-2xl border border-dashed border-border bg-card/50 px-6 py-14 text-center">
+            <h2 className="text-xl">还没有整理好的模块</h2>
+            <p className="mx-auto mt-3 max-w-[38rem] text-sm leading-7 text-muted-foreground">
+              当你开始把常用角色、约束和输出格式拆出来，这里会慢慢形成自己的模块库。
+              <br />
+              先新建一个模块，把最常复用的一段提示词沉淀下来，之后组装会轻松很多。
+            </p>
+            <div className="mt-5">
+              <Button onClick={() => setCreating(true)}>
+                <Plus className="mr-1 h-4 w-4" />
+                新建模块
+              </Button>
+            </div>
+          </div>
         )}
       </div>
       </div>
