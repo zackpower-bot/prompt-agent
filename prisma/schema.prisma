@@ -8,24 +8,25 @@ datasource db {
 }
 
 model Prompt {
-  id          String    @id @default(cuid())
-  title       String
-  description String    @default("")
-  content     String
-  category    String    @default("general")
-  model       String    @default("universal")
-  status      String    @default("inbox")
+  id           String    @id @default(cuid())
+  title        String
+  description  String    @default("")
+  content      String
+  category     String    @default("general")
+  model        String    @default("universal")
+  status       String    @default("inbox")
   qualityScore Float?
-  isFavorite  Boolean   @default(false)
-  lastUsedAt  DateTime?
-  deletedAt   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  isFavorite   Boolean   @default(false)
+  lastUsedAt   DateTime?
+  deletedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  tags     PromptTag[]
-  versions PromptVersion[]
-  history  AgentHistory[]
+  tags       PromptTag[]
+  versions   PromptVersion[]
+  history    AgentHistory[]
   moduleUses PromptModuleUse[]
+  testCases  TestCase[]
 
   @@index([deletedAt])
 }
@@ -47,20 +48,20 @@ model PromptTag {
 }
 
 model Module {
-  id        String      @id @default(cuid())
-  title     String
-  content   String
-  type      String      @default("role")
-  embedding Bytes?
-  embeddingModel String?
+  id                 String    @id @default(cuid())
+  title              String
+  content            String
+  type               String    @default("role")
+  embedding          Bytes?
+  embeddingModel     String?
   embeddingUpdatedAt DateTime?
-  deletedAt DateTime?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  deletedAt          DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
-  tags ModuleTag[]
+  tags  ModuleTag[]
   steps RecipeStep[]
-  uses PromptModuleUse[]
+  uses  PromptModuleUse[]
 
   @@index([deletedAt])
 }
@@ -75,14 +76,14 @@ model ModuleTag {
 }
 
 model Scenario {
-  id                  String   @id @default(cuid())
-  name                String
-  description         String   @default("")
-  embedding           Bytes?
-  embeddingModel      String?
-  embeddingUpdatedAt  DateTime?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                 String    @id @default(cuid())
+  name               String
+  description        String    @default("")
+  embedding          Bytes?
+  embeddingModel     String?
+  embeddingUpdatedAt DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   recipes Recipe[]
 
@@ -238,14 +239,14 @@ model UsageLog {
 }
 
 model Alert {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   type           String
   severity       String
   message        String
-  metadata       String   @default("{}")
-  acknowledged   Boolean  @default(false)
+  metadata       String    @default("{}")
+  acknowledged   Boolean   @default(false)
   acknowledgedAt DateTime?
-  createdAt      DateTime @default(now())
+  createdAt      DateTime  @default(now())
 
   @@index([acknowledged, createdAt])
   @@index([type, createdAt])
@@ -269,4 +270,20 @@ model ActionLog {
   @@index([targetType, targetId])
   @@index([reversibleUntil])
   @@index([reversedAt])
+}
+
+model TestCase {
+  id          String    @id @default(cuid())
+  promptId    String
+  variables   String    @default("{}")
+  expectation String?
+  checks      String    @default("[]")
+  lastRunAt   DateTime?
+  lastResult  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@index([promptId])
 }

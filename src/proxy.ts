@@ -5,6 +5,17 @@ import { NextRequest, NextResponse } from "next/server"
 const intlMiddleware = createMiddleware(routing)
 
 const PUBLIC_PATHS = ["/login", "/api/health"]
+const EN_LOCALE_PREFIX = "/en"
+
+function redirectEnglishLocale(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  if (pathname === EN_LOCALE_PREFIX || pathname.startsWith(`${EN_LOCALE_PREFIX}/`)) {
+    const suffix = pathname.slice(EN_LOCALE_PREFIX.length) || ""
+    const url = new URL(request.url)
+    url.pathname = `/zh${suffix}`
+    return NextResponse.redirect(url)
+  }
+}
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.endsWith(p))
@@ -12,6 +23,11 @@ function isPublic(pathname: string): boolean {
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  const zhRedirect = redirectEnglishLocale(request)
+  if (zhRedirect) {
+    return zhRedirect
+  }
 
   // Skip auth for API routes (except those needing protection)
   if (pathname.startsWith("/api/")) {

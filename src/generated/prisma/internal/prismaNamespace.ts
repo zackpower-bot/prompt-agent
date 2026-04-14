@@ -401,7 +401,8 @@ export const ModelName = {
   SemanticMemory: 'SemanticMemory',
   UsageLog: 'UsageLog',
   Alert: 'Alert',
-  ActionLog: 'ActionLog'
+  ActionLog: 'ActionLog',
+  TestCase: 'TestCase'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -417,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "prompt" | "tag" | "promptTag" | "module" | "moduleTag" | "scenario" | "recipe" | "recipeStep" | "promptModuleUse" | "promptVersion" | "agentHistory" | "setting" | "agentProfile" | "memoryEvent" | "semanticMemory" | "usageLog" | "alert" | "actionLog"
+    modelProps: "prompt" | "tag" | "promptTag" | "module" | "moduleTag" | "scenario" | "recipe" | "recipeStep" | "promptModuleUse" | "promptVersion" | "agentHistory" | "setting" | "agentProfile" | "memoryEvent" | "semanticMemory" | "usageLog" | "alert" | "actionLog" | "testCase"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1753,6 +1754,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TestCase: {
+      payload: Prisma.$TestCasePayload<ExtArgs>
+      fields: Prisma.TestCaseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TestCaseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TestCasePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TestCaseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TestCasePayload>
+        }
+        findFirst: {
+          args: Prisma.TestCaseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TestCasePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TestCaseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TestCasePayload>
+        }
+        findMany: {
+          args: Prisma.TestCaseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TestCasePayload>[]
+        }
+        create: {
+          args: Prisma.TestCaseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TestCasePayload>
+        }
+        createMany: {
+          args: Prisma.TestCaseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TestCaseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TestCasePayload>[]
+        }
+        delete: {
+          args: Prisma.TestCaseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TestCasePayload>
+        }
+        update: {
+          args: Prisma.TestCaseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TestCasePayload>
+        }
+        deleteMany: {
+          args: Prisma.TestCaseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TestCaseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TestCaseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TestCasePayload>[]
+        }
+        upsert: {
+          args: Prisma.TestCaseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TestCasePayload>
+        }
+        aggregate: {
+          args: Prisma.TestCaseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTestCase>
+        }
+        groupBy: {
+          args: Prisma.TestCaseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TestCaseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TestCaseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TestCaseCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2038,6 +2113,21 @@ export const ActionLogScalarFieldEnum = {
 export type ActionLogScalarFieldEnum = (typeof ActionLogScalarFieldEnum)[keyof typeof ActionLogScalarFieldEnum]
 
 
+export const TestCaseScalarFieldEnum = {
+  id: 'id',
+  promptId: 'promptId',
+  variables: 'variables',
+  expectation: 'expectation',
+  checks: 'checks',
+  lastRunAt: 'lastRunAt',
+  lastResult: 'lastResult',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TestCaseScalarFieldEnum = (typeof TestCaseScalarFieldEnum)[keyof typeof TestCaseScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2214,6 +2304,7 @@ export type GlobalOmitConfig = {
   usageLog?: Prisma.UsageLogOmit
   alert?: Prisma.AlertOmit
   actionLog?: Prisma.ActionLogOmit
+  testCase?: Prisma.TestCaseOmit
 }
 
 /* Types for Logging */

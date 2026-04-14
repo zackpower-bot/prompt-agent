@@ -131,3 +131,8 @@ export type Alert = Prisma.AlertModel
  * 
  */
 export type ActionLog = Prisma.ActionLogModel
+/**
+ * Model TestCase
+ * 
+ */
+export type TestCase = Prisma.TestCaseModel

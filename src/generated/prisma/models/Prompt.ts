@@ -284,6 +284,7 @@ export type PromptWhereInput = {
   versions?: Prisma.PromptVersionListRelationFilter
   history?: Prisma.AgentHistoryListRelationFilter
   moduleUses?: Prisma.PromptModuleUseListRelationFilter
+  testCases?: Prisma.TestCaseListRelationFilter
 }
 
 export type PromptOrderByWithRelationInput = {
@@ -304,6 +305,7 @@ export type PromptOrderByWithRelationInput = {
   versions?: Prisma.PromptVersionOrderByRelationAggregateInput
   history?: Prisma.AgentHistoryOrderByRelationAggregateInput
   moduleUses?: Prisma.PromptModuleUseOrderByRelationAggregateInput
+  testCases?: Prisma.TestCaseOrderByRelationAggregateInput
 }
 
 export type PromptWhereUniqueInput = Prisma.AtLeast<{
@@ -327,6 +329,7 @@ export type PromptWhereUniqueInput = Prisma.AtLeast<{
   versions?: Prisma.PromptVersionListRelationFilter
   history?: Prisma.AgentHistoryListRelationFilter
   moduleUses?: Prisma.PromptModuleUseListRelationFilter
+  testCases?: Prisma.TestCaseListRelationFilter
 }, "id">
 
 export type PromptOrderByWithAggregationInput = {
@@ -387,6 +390,7 @@ export type PromptCreateInput = {
   versions?: Prisma.PromptVersionCreateNestedManyWithoutPromptInput
   history?: Prisma.AgentHistoryCreateNestedManyWithoutPromptInput
   moduleUses?: Prisma.PromptModuleUseCreateNestedManyWithoutPromptInput
+  testCases?: Prisma.TestCaseCreateNestedManyWithoutPromptInput
 }
 
 export type PromptUncheckedCreateInput = {
@@ -407,6 +411,7 @@ export type PromptUncheckedCreateInput = {
   versions?: Prisma.PromptVersionUncheckedCreateNestedManyWithoutPromptInput
   history?: Prisma.AgentHistoryUncheckedCreateNestedManyWithoutPromptInput
   moduleUses?: Prisma.PromptModuleUseUncheckedCreateNestedManyWithoutPromptInput
+  testCases?: Prisma.TestCaseUncheckedCreateNestedManyWithoutPromptInput
 }
 
 export type PromptUpdateInput = {
@@ -427,6 +432,7 @@ export type PromptUpdateInput = {
   versions?: Prisma.PromptVersionUpdateManyWithoutPromptNestedInput
   history?: Prisma.AgentHistoryUpdateManyWithoutPromptNestedInput
   moduleUses?: Prisma.PromptModuleUseUpdateManyWithoutPromptNestedInput
+  testCases?: Prisma.TestCaseUpdateManyWithoutPromptNestedInput
 }
 
 export type PromptUncheckedUpdateInput = {
@@ -447,6 +453,7 @@ export type PromptUncheckedUpdateInput = {
   versions?: Prisma.PromptVersionUncheckedUpdateManyWithoutPromptNestedInput
   history?: Prisma.AgentHistoryUncheckedUpdateManyWithoutPromptNestedInput
   moduleUses?: Prisma.PromptModuleUseUncheckedUpdateManyWithoutPromptNestedInput
+  testCases?: Prisma.TestCaseUncheckedUpdateManyWithoutPromptNestedInput
 }
 
 export type PromptCreateManyInput = {
@@ -638,6 +645,20 @@ export type PromptUpdateOneRequiredWithoutHistoryNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PromptUpdateToOneWithWhereWithoutHistoryInput, Prisma.PromptUpdateWithoutHistoryInput>, Prisma.PromptUncheckedUpdateWithoutHistoryInput>
 }
 
+export type PromptCreateNestedOneWithoutTestCasesInput = {
+  create?: Prisma.XOR<Prisma.PromptCreateWithoutTestCasesInput, Prisma.PromptUncheckedCreateWithoutTestCasesInput>
+  connectOrCreate?: Prisma.PromptCreateOrConnectWithoutTestCasesInput
+  connect?: Prisma.PromptWhereUniqueInput
+}
+
+export type PromptUpdateOneRequiredWithoutTestCasesNestedInput = {
+  create?: Prisma.XOR<Prisma.PromptCreateWithoutTestCasesInput, Prisma.PromptUncheckedCreateWithoutTestCasesInput>
+  connectOrCreate?: Prisma.PromptCreateOrConnectWithoutTestCasesInput
+  upsert?: Prisma.PromptUpsertWithoutTestCasesInput
+  connect?: Prisma.PromptWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PromptUpdateToOneWithWhereWithoutTestCasesInput, Prisma.PromptUpdateWithoutTestCasesInput>, Prisma.PromptUncheckedUpdateWithoutTestCasesInput>
+}
+
 export type PromptCreateWithoutTagsInput = {
   id?: string
   title: string
@@ -655,6 +676,7 @@ export type PromptCreateWithoutTagsInput = {
   versions?: Prisma.PromptVersionCreateNestedManyWithoutPromptInput
   history?: Prisma.AgentHistoryCreateNestedManyWithoutPromptInput
   moduleUses?: Prisma.PromptModuleUseCreateNestedManyWithoutPromptInput
+  testCases?: Prisma.TestCaseCreateNestedManyWithoutPromptInput
 }
 
 export type PromptUncheckedCreateWithoutTagsInput = {
@@ -674,6 +696,7 @@ export type PromptUncheckedCreateWithoutTagsInput = {
   versions?: Prisma.PromptVersionUncheckedCreateNestedManyWithoutPromptInput
   history?: Prisma.AgentHistoryUncheckedCreateNestedManyWithoutPromptInput
   moduleUses?: Prisma.PromptModuleUseUncheckedCreateNestedManyWithoutPromptInput
+  testCases?: Prisma.TestCaseUncheckedCreateNestedManyWithoutPromptInput
 }
 
 export type PromptCreateOrConnectWithoutTagsInput = {
@@ -709,6 +732,7 @@ export type PromptUpdateWithoutTagsInput = {
   versions?: Prisma.PromptVersionUpdateManyWithoutPromptNestedInput
   history?: Prisma.AgentHistoryUpdateManyWithoutPromptNestedInput
   moduleUses?: Prisma.PromptModuleUseUpdateManyWithoutPromptNestedInput
+  testCases?: Prisma.TestCaseUpdateManyWithoutPromptNestedInput
 }
 
 export type PromptUncheckedUpdateWithoutTagsInput = {
@@ -728,6 +752,7 @@ export type PromptUncheckedUpdateWithoutTagsInput = {
   versions?: Prisma.PromptVersionUncheckedUpdateManyWithoutPromptNestedInput
   history?: Prisma.AgentHistoryUncheckedUpdateManyWithoutPromptNestedInput
   moduleUses?: Prisma.PromptModuleUseUncheckedUpdateManyWithoutPromptNestedInput
+  testCases?: Prisma.TestCaseUncheckedUpdateManyWithoutPromptNestedInput
 }
 
 export type PromptCreateWithoutModuleUsesInput = {
@@ -747,6 +772,7 @@ export type PromptCreateWithoutModuleUsesInput = {
   tags?: Prisma.PromptTagCreateNestedManyWithoutPromptInput
   versions?: Prisma.PromptVersionCreateNestedManyWithoutPromptInput
   history?: Prisma.AgentHistoryCreateNestedManyWithoutPromptInput
+  testCases?: Prisma.TestCaseCreateNestedManyWithoutPromptInput
 }
 
 export type PromptUncheckedCreateWithoutModuleUsesInput = {
@@ -766,6 +792,7 @@ export type PromptUncheckedCreateWithoutModuleUsesInput = {
   tags?: Prisma.PromptTagUncheckedCreateNestedManyWithoutPromptInput
   versions?: Prisma.PromptVersionUncheckedCreateNestedManyWithoutPromptInput
   history?: Prisma.AgentHistoryUncheckedCreateNestedManyWithoutPromptInput
+  testCases?: Prisma.TestCaseUncheckedCreateNestedManyWithoutPromptInput
 }
 
 export type PromptCreateOrConnectWithoutModuleUsesInput = {
@@ -801,6 +828,7 @@ export type PromptUpdateWithoutModuleUsesInput = {
   tags?: Prisma.PromptTagUpdateManyWithoutPromptNestedInput
   versions?: Prisma.PromptVersionUpdateManyWithoutPromptNestedInput
   history?: Prisma.AgentHistoryUpdateManyWithoutPromptNestedInput
+  testCases?: Prisma.TestCaseUpdateManyWithoutPromptNestedInput
 }
 
 export type PromptUncheckedUpdateWithoutModuleUsesInput = {
@@ -820,6 +848,7 @@ export type PromptUncheckedUpdateWithoutModuleUsesInput = {
   tags?: Prisma.PromptTagUncheckedUpdateManyWithoutPromptNestedInput
   versions?: Prisma.PromptVersionUncheckedUpdateManyWithoutPromptNestedInput
   history?: Prisma.AgentHistoryUncheckedUpdateManyWithoutPromptNestedInput
+  testCases?: Prisma.TestCaseUncheckedUpdateManyWithoutPromptNestedInput
 }
 
 export type PromptCreateWithoutVersionsInput = {
@@ -839,6 +868,7 @@ export type PromptCreateWithoutVersionsInput = {
   tags?: Prisma.PromptTagCreateNestedManyWithoutPromptInput
   history?: Prisma.AgentHistoryCreateNestedManyWithoutPromptInput
   moduleUses?: Prisma.PromptModuleUseCreateNestedManyWithoutPromptInput
+  testCases?: Prisma.TestCaseCreateNestedManyWithoutPromptInput
 }
 
 export type PromptUncheckedCreateWithoutVersionsInput = {
@@ -858,6 +888,7 @@ export type PromptUncheckedCreateWithoutVersionsInput = {
   tags?: Prisma.PromptTagUncheckedCreateNestedManyWithoutPromptInput
   history?: Prisma.AgentHistoryUncheckedCreateNestedManyWithoutPromptInput
   moduleUses?: Prisma.PromptModuleUseUncheckedCreateNestedManyWithoutPromptInput
+  testCases?: Prisma.TestCaseUncheckedCreateNestedManyWithoutPromptInput
 }
 
 export type PromptCreateOrConnectWithoutVersionsInput = {
@@ -893,6 +924,7 @@ export type PromptUpdateWithoutVersionsInput = {
   tags?: Prisma.PromptTagUpdateManyWithoutPromptNestedInput
   history?: Prisma.AgentHistoryUpdateManyWithoutPromptNestedInput
   moduleUses?: Prisma.PromptModuleUseUpdateManyWithoutPromptNestedInput
+  testCases?: Prisma.TestCaseUpdateManyWithoutPromptNestedInput
 }
 
 export type PromptUncheckedUpdateWithoutVersionsInput = {
@@ -912,6 +944,7 @@ export type PromptUncheckedUpdateWithoutVersionsInput = {
   tags?: Prisma.PromptTagUncheckedUpdateManyWithoutPromptNestedInput
   history?: Prisma.AgentHistoryUncheckedUpdateManyWithoutPromptNestedInput
   moduleUses?: Prisma.PromptModuleUseUncheckedUpdateManyWithoutPromptNestedInput
+  testCases?: Prisma.TestCaseUncheckedUpdateManyWithoutPromptNestedInput
 }
 
 export type PromptCreateWithoutHistoryInput = {
@@ -931,6 +964,7 @@ export type PromptCreateWithoutHistoryInput = {
   tags?: Prisma.PromptTagCreateNestedManyWithoutPromptInput
   versions?: Prisma.PromptVersionCreateNestedManyWithoutPromptInput
   moduleUses?: Prisma.PromptModuleUseCreateNestedManyWithoutPromptInput
+  testCases?: Prisma.TestCaseCreateNestedManyWithoutPromptInput
 }
 
 export type PromptUncheckedCreateWithoutHistoryInput = {
@@ -950,6 +984,7 @@ export type PromptUncheckedCreateWithoutHistoryInput = {
   tags?: Prisma.PromptTagUncheckedCreateNestedManyWithoutPromptInput
   versions?: Prisma.PromptVersionUncheckedCreateNestedManyWithoutPromptInput
   moduleUses?: Prisma.PromptModuleUseUncheckedCreateNestedManyWithoutPromptInput
+  testCases?: Prisma.TestCaseUncheckedCreateNestedManyWithoutPromptInput
 }
 
 export type PromptCreateOrConnectWithoutHistoryInput = {
@@ -985,6 +1020,7 @@ export type PromptUpdateWithoutHistoryInput = {
   tags?: Prisma.PromptTagUpdateManyWithoutPromptNestedInput
   versions?: Prisma.PromptVersionUpdateManyWithoutPromptNestedInput
   moduleUses?: Prisma.PromptModuleUseUpdateManyWithoutPromptNestedInput
+  testCases?: Prisma.TestCaseUpdateManyWithoutPromptNestedInput
 }
 
 export type PromptUncheckedUpdateWithoutHistoryInput = {
@@ -1004,6 +1040,103 @@ export type PromptUncheckedUpdateWithoutHistoryInput = {
   tags?: Prisma.PromptTagUncheckedUpdateManyWithoutPromptNestedInput
   versions?: Prisma.PromptVersionUncheckedUpdateManyWithoutPromptNestedInput
   moduleUses?: Prisma.PromptModuleUseUncheckedUpdateManyWithoutPromptNestedInput
+  testCases?: Prisma.TestCaseUncheckedUpdateManyWithoutPromptNestedInput
+}
+
+export type PromptCreateWithoutTestCasesInput = {
+  id?: string
+  title: string
+  description?: string
+  content: string
+  category?: string
+  model?: string
+  status?: string
+  qualityScore?: number | null
+  isFavorite?: boolean
+  lastUsedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.PromptTagCreateNestedManyWithoutPromptInput
+  versions?: Prisma.PromptVersionCreateNestedManyWithoutPromptInput
+  history?: Prisma.AgentHistoryCreateNestedManyWithoutPromptInput
+  moduleUses?: Prisma.PromptModuleUseCreateNestedManyWithoutPromptInput
+}
+
+export type PromptUncheckedCreateWithoutTestCasesInput = {
+  id?: string
+  title: string
+  description?: string
+  content: string
+  category?: string
+  model?: string
+  status?: string
+  qualityScore?: number | null
+  isFavorite?: boolean
+  lastUsedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.PromptTagUncheckedCreateNestedManyWithoutPromptInput
+  versions?: Prisma.PromptVersionUncheckedCreateNestedManyWithoutPromptInput
+  history?: Prisma.AgentHistoryUncheckedCreateNestedManyWithoutPromptInput
+  moduleUses?: Prisma.PromptModuleUseUncheckedCreateNestedManyWithoutPromptInput
+}
+
+export type PromptCreateOrConnectWithoutTestCasesInput = {
+  where: Prisma.PromptWhereUniqueInput
+  create: Prisma.XOR<Prisma.PromptCreateWithoutTestCasesInput, Prisma.PromptUncheckedCreateWithoutTestCasesInput>
+}
+
+export type PromptUpsertWithoutTestCasesInput = {
+  update: Prisma.XOR<Prisma.PromptUpdateWithoutTestCasesInput, Prisma.PromptUncheckedUpdateWithoutTestCasesInput>
+  create: Prisma.XOR<Prisma.PromptCreateWithoutTestCasesInput, Prisma.PromptUncheckedCreateWithoutTestCasesInput>
+  where?: Prisma.PromptWhereInput
+}
+
+export type PromptUpdateToOneWithWhereWithoutTestCasesInput = {
+  where?: Prisma.PromptWhereInput
+  data: Prisma.XOR<Prisma.PromptUpdateWithoutTestCasesInput, Prisma.PromptUncheckedUpdateWithoutTestCasesInput>
+}
+
+export type PromptUpdateWithoutTestCasesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  model?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  qualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.PromptTagUpdateManyWithoutPromptNestedInput
+  versions?: Prisma.PromptVersionUpdateManyWithoutPromptNestedInput
+  history?: Prisma.AgentHistoryUpdateManyWithoutPromptNestedInput
+  moduleUses?: Prisma.PromptModuleUseUpdateManyWithoutPromptNestedInput
+}
+
+export type PromptUncheckedUpdateWithoutTestCasesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  model?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  qualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.PromptTagUncheckedUpdateManyWithoutPromptNestedInput
+  versions?: Prisma.PromptVersionUncheckedUpdateManyWithoutPromptNestedInput
+  history?: Prisma.AgentHistoryUncheckedUpdateManyWithoutPromptNestedInput
+  moduleUses?: Prisma.PromptModuleUseUncheckedUpdateManyWithoutPromptNestedInput
 }
 
 
@@ -1016,6 +1149,7 @@ export type PromptCountOutputType = {
   versions: number
   history: number
   moduleUses: number
+  testCases: number
 }
 
 export type PromptCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1023,6 +1157,7 @@ export type PromptCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   versions?: boolean | PromptCountOutputTypeCountVersionsArgs
   history?: boolean | PromptCountOutputTypeCountHistoryArgs
   moduleUses?: boolean | PromptCountOutputTypeCountModuleUsesArgs
+  testCases?: boolean | PromptCountOutputTypeCountTestCasesArgs
 }
 
 /**
@@ -1063,6 +1198,13 @@ export type PromptCountOutputTypeCountModuleUsesArgs<ExtArgs extends runtime.Typ
   where?: Prisma.PromptModuleUseWhereInput
 }
 
+/**
+ * PromptCountOutputType without action
+ */
+export type PromptCountOutputTypeCountTestCasesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TestCaseWhereInput
+}
+
 
 export type PromptSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1082,6 +1224,7 @@ export type PromptSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   versions?: boolean | Prisma.Prompt$versionsArgs<ExtArgs>
   history?: boolean | Prisma.Prompt$historyArgs<ExtArgs>
   moduleUses?: boolean | Prisma.Prompt$moduleUsesArgs<ExtArgs>
+  testCases?: boolean | Prisma.Prompt$testCasesArgs<ExtArgs>
   _count?: boolean | Prisma.PromptCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["prompt"]>
 
@@ -1139,6 +1282,7 @@ export type PromptInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   versions?: boolean | Prisma.Prompt$versionsArgs<ExtArgs>
   history?: boolean | Prisma.Prompt$historyArgs<ExtArgs>
   moduleUses?: boolean | Prisma.Prompt$moduleUsesArgs<ExtArgs>
+  testCases?: boolean | Prisma.Prompt$testCasesArgs<ExtArgs>
   _count?: boolean | Prisma.PromptCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PromptIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1151,6 +1295,7 @@ export type $PromptPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     versions: Prisma.$PromptVersionPayload<ExtArgs>[]
     history: Prisma.$AgentHistoryPayload<ExtArgs>[]
     moduleUses: Prisma.$PromptModuleUsePayload<ExtArgs>[]
+    testCases: Prisma.$TestCasePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1564,6 +1709,7 @@ export interface Prisma__PromptClient<T, Null = never, ExtArgs extends runtime.T
   versions<T extends Prisma.Prompt$versionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Prompt$versionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PromptVersionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   history<T extends Prisma.Prompt$historyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Prompt$historyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   moduleUses<T extends Prisma.Prompt$moduleUsesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Prompt$moduleUsesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PromptModuleUsePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  testCases<T extends Prisma.Prompt$testCasesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Prompt$testCasesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TestCasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2090,6 +2236,30 @@ export type Prompt$moduleUsesArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.PromptModuleUseScalarFieldEnum | Prisma.PromptModuleUseScalarFieldEnum[]
+}
+
+/**
+ * Prompt.testCases
+ */
+export type Prompt$testCasesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TestCase
+   */
+  select?: Prisma.TestCaseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TestCase
+   */
+  omit?: Prisma.TestCaseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TestCaseInclude<ExtArgs> | null
+  where?: Prisma.TestCaseWhereInput
+  orderBy?: Prisma.TestCaseOrderByWithRelationInput | Prisma.TestCaseOrderByWithRelationInput[]
+  cursor?: Prisma.TestCaseWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TestCaseScalarFieldEnum | Prisma.TestCaseScalarFieldEnum[]
 }
 
 /**

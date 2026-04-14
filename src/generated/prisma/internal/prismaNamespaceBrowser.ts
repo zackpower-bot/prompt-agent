@@ -68,7 +68,8 @@ export const ModelName = {
   SemanticMemory: 'SemanticMemory',
   UsageLog: 'UsageLog',
   Alert: 'Alert',
-  ActionLog: 'ActionLog'
+  ActionLog: 'ActionLog',
+  TestCase: 'TestCase'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -331,6 +332,21 @@ export const ActionLogScalarFieldEnum = {
 } as const
 
 export type ActionLogScalarFieldEnum = (typeof ActionLogScalarFieldEnum)[keyof typeof ActionLogScalarFieldEnum]
+
+
+export const TestCaseScalarFieldEnum = {
+  id: 'id',
+  promptId: 'promptId',
+  variables: 'variables',
+  expectation: 'expectation',
+  checks: 'checks',
+  lastRunAt: 'lastRunAt',
+  lastResult: 'lastResult',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TestCaseScalarFieldEnum = (typeof TestCaseScalarFieldEnum)[keyof typeof TestCaseScalarFieldEnum]
 
 
 export const SortOrder = {
