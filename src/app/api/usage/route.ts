@@ -4,6 +4,21 @@ import { prisma } from "@/lib/prisma"
 const HOUR = 1000 * 60 * 60
 const DAY = HOUR * 24
 
+function firstOfMonthUTC(date = new Date()): Date {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1))
+}
+
+function startOfNextMonthUTC(date = new Date()): Date {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1))
+}
+
+function resolveMonthlyLimit(): number {
+  const raw = process.env.TAVILY_MONTHLY_LIMIT
+  const parsed = raw ? Number(raw) : NaN
+  if (Number.isFinite(parsed) && parsed > 0) return parsed
+  return 1000
+}
+
 function resolveSince(value: string | null): Date | undefined {
   if (!value || value === "all") return undefined
   const now = Date.now()
@@ -29,8 +44,12 @@ export async function GET(req: Request) {
     : { service: "tavily" as const }
 
   const now = Date.now()
+  const nowDate = new Date(now)
   const last24h = new Date(now - DAY)
   const last7d = new Date(now - DAY * 7)
+  const monthStart = firstOfMonthUTC(nowDate)
+  const nextReset = startOfNextMonthUTC(nowDate)
+  const monthlyLimit = resolveMonthlyLimit()
 
   const [llmTotals, llmSuccess, llm24h, llm7d] = await Promise.all([
     prisma.usageLog.groupBy({
@@ -87,7 +106,7 @@ export async function GET(req: Request) {
     }
   })
 
-  const [tavilyTotals, tavilySuccess, tavily24h, tavily7d, tavilyLastError] = await Promise.all([
+  const [tavilyTotals, tavilySuccess, tavily24h, tavily7d, tavilyLastError, tavilyMonthly] = await Promise.all([
     prisma.usageLog.aggregate({
       where: tavilyWhere,
       _count: { _all: true },
@@ -109,11 +128,18 @@ export async function GET(req: Request) {
       where: { service: "tavily", success: false },
       orderBy: { createdAt: "desc" },
     }),
+    prisma.usageLog.aggregate({
+      where: { service: "tavily", createdAt: { gte: monthStart } },
+      _sum: { requestCount: true },
+    }),
   ])
 
   const tavilyTotalRequests = tavilyTotals._sum.requestCount ?? tavilyTotals._count._all ?? 0
   const tavilySuccessCount = tavilySuccess._count._all ?? 0
   const tavilyTotalCount = tavilyTotals._count._all ?? 0
+  const usedThisMonth = tavilyMonthly._sum.requestCount ?? 0
+  const remaining = Math.max(0, monthlyLimit - usedThisMonth)
+  const percentUsed = monthlyLimit > 0 ? Math.min(1, Math.max(0, usedThisMonth / monthlyLimit)) : 1
   const tavilySummary = {
     total: tavilyTotalRequests,
     last24h: tavily24h._sum.requestCount ?? 0,
@@ -122,6 +148,13 @@ export async function GET(req: Request) {
     lastError: tavilyLastError
       ? { errorCode: tavilyLastError.errorCode, at: tavilyLastError.createdAt.toISOString() }
       : undefined,
+    quota: {
+      monthlyLimit,
+      usedThisMonth,
+      remaining,
+      resetAt: nextReset.toISOString(),
+      percentUsed,
+    },
   }
 
   return NextResponse.json({
