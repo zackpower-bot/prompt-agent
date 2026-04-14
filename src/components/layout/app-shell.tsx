@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { usePathname } from "next/navigation"
 import { Sidebar, TopBar } from "./app-nav"
 import { cn } from "@/lib/utils"
+import { Toaster } from "sonner"
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -47,23 +48,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (isLogin) return <>{children}</>
 
   return (
-    <div className="min-h-screen">
+    <div className="flex h-dvh flex-col">
       <TopBar onMenuClick={() => setMobileOpen(true)} />
 
-      {/* Mobile: Sheet overlay sidebar */}
       {isMobile && (
         <>
-          {/* Backdrop */}
           {mobileOpen && (
             <div
               className="fixed inset-0 z-50 bg-black/40 transition-opacity"
               onClick={() => setMobileOpen(false)}
             />
           )}
-          {/* Sliding panel */}
           <div
             className={cn(
-              "fixed left-0 top-0 z-50 h-full w-64 bg-background border-r shadow-lg transition-transform duration-200",
+              "fixed left-0 top-0 z-50 h-full w-64 border-r bg-background shadow-lg transition-transform duration-200",
               mobileOpen ? "translate-x-0" : "-translate-x-full"
             )}
           >
@@ -76,27 +74,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </>
       )}
 
-      {/* Desktop: persistent sidebar (no overlay) */}
-      {!isMobile && (
-        <aside
+      <div className="relative flex flex-1 min-h-0">
+        {!isMobile && (
+          <aside
+            className={cn(
+              "fixed left-0 top-12 z-30 h-[calc(100dvh-3rem)] border-r bg-background transition-all duration-200",
+              desktopCollapsed ? "w-12" : "w-48"
+            )}
+          >
+            <Sidebar collapsed={desktopCollapsed} onToggle={toggleDesktop} />
+          </aside>
+        )}
+
+        <main
           className={cn(
-            "fixed left-0 top-12 z-30 h-[calc(100vh-3rem)] border-r bg-background transition-all duration-200",
-            desktopCollapsed ? "w-12" : "w-48"
+            "flex-1 min-h-0 overflow-hidden",
+            !isMobile && (desktopCollapsed ? "md:ml-12" : "md:ml-48")
           )}
         >
-          <Sidebar collapsed={desktopCollapsed} onToggle={toggleDesktop} />
-        </aside>
-      )}
+          {children}
+        </main>
+      </div>
 
-      {/* Main content */}
-      <main
-        className={cn(
-          "transition-all duration-200",
-          !isMobile && (desktopCollapsed ? "md:ml-12" : "md:ml-48")
-        )}
-      >
-        {children}
-      </main>
+      <Toaster position="top-center" richColors />
     </div>
   )
 }
+
+

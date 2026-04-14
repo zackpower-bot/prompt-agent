@@ -84,7 +84,6 @@ export function CleanupClient({ prompts }: { prompts: PromptWithTags[] }) {
         return next
       })
 
-      // Small delay between requests to avoid rate limiting
       if (i < prompts.length - 1) {
         await new Promise(r => setTimeout(r, 2000))
       }
@@ -126,7 +125,7 @@ export function CleanupClient({ prompts }: { prompts: PromptWithTags[] }) {
         <div>
           <h1 className="text-2xl font-bold">批量清洗</h1>
           <p className="text-sm text-muted-foreground">
-            Agent 自动分析 {prompts.length} 条提示词，建议标题、描述、标签、分类
+            Agent 自动分析 {prompts.length} 条提示词，建议标题、描述、标签和分类
           </p>
         </div>
         <Button onClick={startBatchAnalysis} disabled={analyzing}>

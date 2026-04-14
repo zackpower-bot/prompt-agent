@@ -37,14 +37,12 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
   const TAG_LIMIT = 8
   const visibleTags = tagsExpanded ? allTags : allTags.slice(0, TAG_LIMIT)
 
-  // Debounce search
   useEffect(() => {
     if (!search) { setDebouncedSearch(""); return }
     const timer = setTimeout(() => setDebouncedSearch(search), 300)
     return () => clearTimeout(timer)
   }, [search])
 
-  // Fetch on filter/page change
   const fetchPrompts = useCallback((p: number) => {
     startTransition(async () => {
       const result = await getPromptsPaginated(p, pageSize, {
@@ -67,7 +65,6 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      {/* Count + Export/Import */}
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">{total} 条提示词</p>
         <div className="flex items-center gap-2">
@@ -103,7 +100,6 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
         </div>
       </div>
 
-      {/* Search */}
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
@@ -114,7 +110,6 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
         />
       </div>
 
-      {/* Status filter */}
       <div className="mb-3 flex gap-2">
         {["all", "inbox", "production", "archived"].map((s) => (
           <button
@@ -127,7 +122,6 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
         ))}
       </div>
 
-      {/* Tags */}
       <div className="mb-6 flex flex-wrap gap-1.5">
         <button
           className={`tag-chip cursor-pointer transition-colors ${selectedTag === "all" ? "border-foreground bg-foreground text-background" : "bg-background text-foreground hover:bg-accent"}`}
@@ -149,14 +143,13 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
             className="tag-chip cursor-pointer border-dashed text-muted-foreground hover:text-foreground"
             onClick={() => setTagsExpanded(!tagsExpanded)}
           >
-            {tagsExpanded ? "−" : `+${allTags.length - TAG_LIMIT}`}
+            {tagsExpanded ? "收起" : `+${allTags.length - TAG_LIMIT}`}
           </button>
         )}
       </div>
 
       <Separator className="mb-6" />
 
-      {/* Prompt list */}
       {isPending && (
         <div className="mb-4 text-center text-sm text-muted-foreground">加载中...</div>
       )}
@@ -200,7 +193,6 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
         <div className="py-16 text-center text-sm text-muted-foreground">无匹配的提示词</div>
       )}
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-6 flex items-center justify-center gap-3">
           <Button

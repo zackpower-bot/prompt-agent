@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Loader2, Send, Square } from "lucide-react"
@@ -10,18 +10,39 @@ interface AgentInputProps {
   status: AgentStatus
   onSubmit: (message: string) => void
   onStop: () => void
+  initialValue?: string
+  onChange?: (value: string) => void
 }
 
-export function AgentInput({ status, onSubmit, onStop }: AgentInputProps) {
-  const [input, setInput] = useState("")
+export function AgentInput({ status, onSubmit, onStop, initialValue, onChange }: AgentInputProps) {
+  const [internalValue, setInternalValue] = useState(initialValue ?? "")
+  const isControlled = typeof onChange === "function"
+  const value = isControlled ? initialValue ?? "" : internalValue
   const isRunning = status === "running"
 
+  useEffect(() => {
+    if (!isControlled && initialValue !== undefined) {
+      setInternalValue(initialValue)
+    }
+  }, [initialValue, isControlled])
+
+  const updateValue = useCallback((next: string) => {
+    if (!isControlled) {
+      setInternalValue(next)
+    }
+    onChange?.(next)
+  }, [isControlled, onChange])
+
   const handleSubmit = useCallback(() => {
-    const trimmed = input.trim()
+    const trimmed = value.trim()
     if (!trimmed || isRunning) return
     onSubmit(trimmed)
-    setInput("")
-  }, [input, isRunning, onSubmit])
+    if (isControlled) {
+      onChange?.("")
+    } else {
+      setInternalValue("")
+    }
+  }, [value, isRunning, onSubmit, isControlled, onChange])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -34,22 +55,23 @@ export function AgentInput({ status, onSubmit, onStop }: AgentInputProps) {
   )
 
   return (
-    <div className="flex gap-2 items-end">
+    <div className="flex items-end gap-2">
       <Textarea
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
+        value={value}
+        onChange={(e) => updateValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={isRunning ? "Agent 正在工作..." : "描述你想要的提示词..."}
         disabled={isRunning}
         className="min-h-[80px] resize-none"
         rows={3}
+        data-testid="agent-input-textarea"
       />
       {isRunning ? (
-        <Button variant="destructive" size="icon" onClick={onStop} className="shrink-0 h-10 w-10">
+        <Button variant="destructive" size="icon" onClick={onStop} className="h-10 w-10 shrink-0">
           <Square className="h-4 w-4" />
         </Button>
       ) : (
-        <Button size="icon" onClick={handleSubmit} disabled={!input.trim()} className="shrink-0 h-10 w-10">
+        <Button size="icon" onClick={handleSubmit} disabled={!value.trim()} className="h-10 w-10 shrink-0">
           <Send className="h-4 w-4" />
         </Button>
       )}

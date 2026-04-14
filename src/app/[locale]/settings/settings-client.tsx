@@ -16,7 +16,7 @@ const PROFILE_CONFIGS: { key: ProfileKey; label: string; description: string; pl
     key: "persona",
     label: "Agent 身份",
     description: "定义 Agent 的角色、专长和行为方式。始终生效，不参与语义检索。",
-    placeholder: "你是一个资深提示词工程师，专注于中文自然语言提示词。\n你的风格是简洁直接，每个提示词必须包含角色定义和约束条件。",
+    placeholder: "你是一个资深提示词工程师，专注于中文自然语言提示词。\n你的风格是简洁直接，每个提示词都必须包含角色定义和约束条件。",
   },
   {
     key: "style_rules",
@@ -27,7 +27,7 @@ const PROFILE_CONFIGS: { key: ProfileKey; label: string; description: string; pl
   {
     key: "default_language",
     label: "默认语言",
-    description: "Agent 生成提示词的默认语言。",
+    description: "Agent 生成提示词时的默认语言。",
     placeholder: "简体中文",
   },
 ]

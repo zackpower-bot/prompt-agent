@@ -17,7 +17,6 @@ const navItems = [
   { href: "/stats", label: "统计", icon: BarChart3 },
 ]
 
-// Top bar high-frequency shortcuts (desktop only)
 const topNavShortcuts = [
   { href: "/", label: "生成", icon: Sparkles },
   { href: "/prompts", label: "提示词库", icon: Library },
@@ -26,7 +25,7 @@ const topNavShortcuts = [
 interface SidebarProps {
   collapsed: boolean
   onToggle: () => void
-  onNavigate?: () => void // for mobile: close after click
+  onNavigate?: () => void
 }
 
 export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
@@ -35,7 +34,6 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
 
   return (
     <div className="flex h-full flex-col">
-      {/* Collapse toggle (desktop only) */}
       <div className="hidden md:flex h-12 items-center justify-end px-3 border-b">
         <button
           onClick={onToggle}
@@ -45,7 +43,6 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
         </button>
       </div>
 
-      {/* Nav items */}
       <nav className="flex-1 space-y-1 p-2">
         {navItems.map((item) => {
           const isActive = item.href === "/" ? path === "/" : path.startsWith(item.href)
@@ -71,14 +68,12 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
         })}
       </nav>
 
-      {/* Favorites & Recent (expanded only) */}
       {!collapsed && (
         <div className="border-t py-2">
           <SidebarPrompts onNavigate={onNavigate} />
         </div>
       )}
 
-      {/* Bottom: settings + theme + logout */}
       <div className="border-t p-2 space-y-1">
         <Link
           href="/settings"
@@ -120,7 +115,6 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-12 items-center px-4">
-        {/* Menu button (mobile) / Logo */}
         <button
           onClick={onMenuClick}
           className="mr-3 rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors md:hidden"
@@ -135,7 +129,6 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
           <span className="font-semibold tracking-tight text-sm">Prompt Agent</span>
         </Link>
 
-        {/* Desktop shortcuts */}
         <nav className="ml-6 hidden items-center gap-1 md:flex">
           {topNavShortcuts.map((item) => {
             const isActive = item.href === "/" ? path === "/" : path.startsWith(item.href)
@@ -158,7 +151,6 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
           })}
         </nav>
 
-        {/* Right side */}
         <div className="ml-auto flex items-center gap-1">
           <AlertsBell />
           <ThemeToggle />

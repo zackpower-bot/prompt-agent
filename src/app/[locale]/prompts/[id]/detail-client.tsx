@@ -30,7 +30,6 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [feedbackGiven, setFeedbackGiven] = useState<"positive" | "negative" | null>(null)
 
-  // Edit form state
   const [title, setTitle] = useState(prompt.title)
   const [description, setDescription] = useState(prompt.description)
   const [content, setContent] = useState(prompt.content)
@@ -103,7 +102,6 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
         返回列表
       </Link>
 
-      {/* Header */}
       <div className="mb-6">
         {editing ? (
           <Input value={title} onChange={e => setTitle(e.target.value)} className="mb-2 text-xl font-bold" />
@@ -148,7 +146,6 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
         </div>
       </div>
 
-      {/* Action buttons */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
         {editing ? (
           <>
@@ -204,7 +201,6 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
 
       <Separator className="mb-6" />
 
-      {/* Content */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium">提示词内容</CardTitle>

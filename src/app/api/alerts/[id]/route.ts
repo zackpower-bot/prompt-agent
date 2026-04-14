@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { Prisma } from "@/generated/prisma/client"
 import { prisma } from "@/lib/prisma"
 import { parseAlertMetadata } from "@/lib/alerts"
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params
   const body = await req.json().catch(() => null)
   if (!body || typeof body !== "object") {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
@@ -16,7 +17,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 
   try {
     const alert = await prisma.alert.update({
-      where: { id: params.id },
+      where: { id },
       data: { acknowledged: true, acknowledgedAt: new Date() },
     })
 

@@ -28,12 +28,10 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  // Create form state
   const [newTitle, setNewTitle] = useState("")
   const [newContent, setNewContent] = useState("")
   const [newType, setNewType] = useState("role")
 
-  // Edit form state
   const [editTitle, setEditTitle] = useState("")
   const [editContent, setEditContent] = useState("")
   const [editType, setEditType] = useState("")
@@ -84,7 +82,6 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
     })
   }, [refresh])
 
-  // Client-side filter (search is debounce-free for small lists)
   const filtered = modules.filter((m) => {
     if (typeFilter !== "all" && m.type !== typeFilter) return false
     if (search) {
@@ -106,7 +103,6 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
         </Button>
       </div>
 
-      {/* Search + type filter */}
       <div className="mb-4 relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input placeholder="搜索模块..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
@@ -120,7 +116,6 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
 
       <Separator className="mb-6" />
 
-      {/* Create form */}
       {creating && (
         <Card className="mb-4">
           <CardContent className="pt-4 space-y-3">
@@ -137,7 +132,6 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
         </Card>
       )}
 
-      {/* Module list */}
       <div className="space-y-3">
         {filtered.map((m) => (
           <Card key={m.id}>
