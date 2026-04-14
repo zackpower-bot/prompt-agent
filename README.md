@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prompt Agent
 
-## Getting Started
+Agent-driven prompt asset management built with Next.js, Prisma, and OpenAI-compatible providers.
 
-First, run the development server:
+## Current State
+
+- MVP is implemented locally and includes generation, analysis, prompt library management, module suggestions, semantic memory, observability, and alerts.
+- The app now builds successfully with Next.js 16.
+- Deployment is still unverified.
+
+## Implemented Features
+
+### Agent runtime
+
+- ReAct-style agent loop in `src/agent/core.ts`
+- Streaming generation over SSE via `src/app/api/agent/stream/route.ts`
+- Multi-provider LLM routing via `src/lib/providers.ts`
+- Dynamic prompt assembly via `src/agent/prompt-builder.ts`
+- Tavily-backed web search tool integration
+
+### Prompt assets
+
+- Prompt CRUD, detail pages, version history, cleanup workflow
+- Module library with relational tags
+- Quality checks and duplicate detection on agent flows
+- Import from `prompt-ide` via `scripts/import-from-prompt-ide.ts`
+
+### Personalization memory
+
+- Deterministic profile layer: `AgentProfile`
+- Event pipeline: `MemoryEvent`
+- Semantic memory store: `SemanticMemory`
+- AUDN materializer and type-aware retrieval
+
+### Product surface
+
+- Top bar + responsive sidebar layout
+- Favorites and recent prompts in sidebar
+- Settings page for agent profiles
+- Stats page backed by `/api/usage`
+- Alerts bell backed by `/api/alerts`
+- Dark mode and zh/en i18n
+
+### Observability
+
+- `UsageLog` table for LLM and Tavily usage
+- Tavily quota tracking and alert generation
+- Alert acknowledgement API
+- Smoke scripts:
+  - `npm run smoke:alerts`
+  - `tsx scripts/smoke-usage-quota.ts`
+
+## Stack
+
+- Next.js 16.2.3
+- React 19.2.4
+- Prisma 7.7 with SQLite via `@prisma/adapter-libsql`
+- OpenAI SDK for all provider calls
+- next-intl
+- shadcn/ui primitives + custom layout components
+
+## Local Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Known Issues
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Deployment files exist (`Dockerfile`, `compose.yaml`, `deploy/`) but have not been verified end-to-end.
+- Runtime behavior on the live VPS has not been revalidated after the latest agent/memory/alerting changes.
 
-## Learn More
+## Project Layout
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```text
+src/
+  agent/          Agent loop, prompts, tools, prompt builder
+  app/            App Router pages, server actions, API routes
+  components/     UI and layout components
+  lib/            Providers, memory, usage, alerts, status transitions
+  types/          Shared literal types and enums
+prisma/           Schema and migrations
+scripts/          Import and smoke scripts
+```
