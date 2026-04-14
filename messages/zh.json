@@ -102,5 +102,14 @@
     "light": "浅色",
     "dark": "深色",
     "system": "系统"
+  },
+  "alerts": {
+    "bellLabel": "警报",
+    "empty": "暂无警报",
+    "acknowledge": "已知悉",
+    "typeTavilyQuota": "Tavily 配额",
+    "severityInfo": "提示",
+    "severityWarning": "警告",
+    "severityCritical": "严重"
   }
 }

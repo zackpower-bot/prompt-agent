@@ -102,5 +102,14 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "alerts": {
+    "bellLabel": "Alerts",
+    "empty": "No alerts",
+    "acknowledge": "Acknowledge",
+    "typeTavilyQuota": "Tavily quota",
+    "severityInfo": "Info",
+    "severityWarning": "Warning",
+    "severityCritical": "Critical"
   }
 }
