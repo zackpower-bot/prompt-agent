@@ -25,7 +25,7 @@ export function ResultCanvas({
   const tokenLabel = result ? `${result.usage.inputTokens + result.usage.outputTokens} tokens` : "-- tokens"
 
   return (
-    <section className="rounded-3xl border border-border/60 bg-card/40 p-6 shadow-sm">
+    <section className="flex min-h-0 flex-1 flex-col rounded-3xl border border-border/60 bg-card/40 p-6 shadow-sm">
       <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
         <span>由 {providerLabel} 生成</span>
         <span className="text-muted-foreground/70">路 {tokenLabel}</span>
@@ -41,7 +41,7 @@ export function ResultCanvas({
         </button>
       )}
 
-      <div className="mt-4 min-h-[240px] overflow-y-auto pr-1">
+      <div className="mt-4 min-h-0 flex-1 overflow-y-auto pr-1">
         {hasContent ? (
           <article className="prose prose-lg max-w-none whitespace-pre-wrap leading-8 text-foreground dark:prose-invert">
             {text}
