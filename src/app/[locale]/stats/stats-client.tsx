@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { BarChart3, Tag, Bot, Clock, Layers, Zap } from "lucide-react"
+import { BarChart3, Tag, Clock } from "lucide-react"
 import type { UsageStats } from "@/app/actions/stats.actions"
 
 type UsageApiSnapshot = {
@@ -33,23 +33,6 @@ type UsageApiSnapshot = {
       percentUsed: number
     }
   }
-}
-
-function StatCard({ title, value, icon: Icon, sub }: { title: string; value: string | number; icon: any; sub?: string }) {
-  return (
-    <Card>
-      <CardContent className="p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold">{value}</p>
-            {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
-          </div>
-          <Icon className="h-8 w-8 text-muted-foreground/30" />
-        </div>
-      </CardContent>
-    </Card>
-  )
 }
 
 function BarItem({
@@ -105,8 +88,8 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
 
   if (!stats) {
     return (
-      <div className="h-full overflow-y-auto px-4 py-8">
-        <div className="mx-auto max-w-4xl rounded-2xl border border-dashed border-border bg-card/50 px-6 py-14 text-center">
+      <div className="container-dashboard">
+        <div className="rounded-2xl border border-dashed border-border bg-card/50 px-6 py-14 text-center">
           <h2 className="text-xl">统计页暂时还没有准备好</h2>
           <p className="mx-auto mt-3 max-w-[38rem] text-sm leading-7 text-muted-foreground">
             当前还拿不到完整的统计快照，所以这页先留在一个安静的占位状态。
@@ -149,19 +132,31 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
     new Date(d).toLocaleDateString("zh-CN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
 
   return (
-    <div className="h-full overflow-y-auto px-4 py-8">
-      <div className="mx-auto w-full">
-        <h1 className="mb-6 text-2xl font-bold">使用统计</h1>
+    <div className="container-dashboard">
+      <header className="mb-8 flex items-baseline justify-between">
+        <h1 className="text-2xl">使用统计</h1>
+      </header>
 
-      {/* Summary cards */}
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard title="提示词总数" value={stats.totalPrompts} icon={Layers} />
-        <StatCard title="Agent 运行" value={stats.agentRuns} icon={Bot} />
-        <StatCard title="Token 消耗" value={totalTokensLabel} icon={Zap} />
-        <StatCard title="标签数" value={stats.topTags.length} icon={Tag} />
+      <div className="grid grid-cols-2 gap-8 border-b border-border/60 pb-8 md:grid-cols-4">
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">提示词总数</p>
+          <p className="mt-1 font-serif text-3xl">{stats.totalPrompts}</p>
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Agent 运行</p>
+          <p className="mt-1 font-serif text-3xl">{stats.agentRuns}</p>
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Token 消耗</p>
+          <p className="mt-1 font-serif text-3xl">{totalTokensLabel}</p>
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">标签数</p>
+          <p className="mt-1 font-serif text-3xl">{stats.topTags.length}</p>
+        </div>
       </div>
 
-      <Card className="mb-6">
+      <Card className="mt-8">
         <CardHeader className="pb-3"><CardTitle className="text-sm">Tavily 网络搜索</CardTitle></CardHeader>
         <CardContent>
           {tavilyUsage && quota ? (
@@ -195,22 +190,25 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
         </CardContent>
       </Card>
 
-      {/* Status distribution */}
-      <Card className="mb-6">
-        <CardHeader className="pb-3"><CardTitle className="text-sm">按状态分布</CardTitle></CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-3">
-            {stats.byStatus.map((s) => (
-              <div key={s.status} className="flex items-center gap-2">
-                <Badge variant="outline" className="mono-label">{s.status}</Badge>
-                <span className="text-lg font-bold">{s.count}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="section-rule" />
 
-      <Card className="mb-6">
+      <section className="space-y-4">
+        <h2 className="text-xl">按状态分布</h2>
+        <div className="flex flex-wrap gap-3">
+          {stats.byStatus.map((s) => (
+            <div key={s.status} className="flex items-center gap-2">
+              <Badge variant="outline" className="mono-label">{s.status}</Badge>
+              <span className="text-lg font-semibold">{s.count}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="section-rule" />
+
+      <section className="space-y-4">
+        <h2 className="text-xl">质量分布</h2>
+        <Card>
         <CardHeader className="pb-3"><CardTitle className="text-sm">质量分布</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           {totalQuality === 0 ? (
@@ -235,27 +233,30 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
             ))
           )}
         </CardContent>
-      </Card>
+        </Card>
+      </section>
 
-      <div className="mb-6 grid gap-6 md:grid-cols-2">
-        {/* By category */}
-        <Card>
-          <CardHeader className="pb-3"><CardTitle className="flex items-center gap-1.5 text-sm"><BarChart3 className="h-3.5 w-3.5" />按分类</CardTitle></CardHeader>
-          <CardContent className="space-y-2">
+      <div className="section-rule" />
+
+      <div className="grid gap-8 md:grid-cols-2">
+        <section className="space-y-4">
+          <h2 className="flex items-center gap-2 text-xl"><BarChart3 className="h-4 w-4" />按分类</h2>
+          <div className="space-y-3">
             {stats.byCategory.map((c) => <BarItem key={c.category} label={c.category} count={c.count} max={maxCat} />)}
-          </CardContent>
-        </Card>
+          </div>
+        </section>
 
-        {/* Top tags */}
-        <Card>
-          <CardHeader className="pb-3"><CardTitle className="flex items-center gap-1.5 text-sm"><Tag className="h-3.5 w-3.5" />热门标签</CardTitle></CardHeader>
-          <CardContent className="space-y-2">
+        <section className="space-y-4">
+          <h2 className="flex items-center gap-2 text-xl"><Tag className="h-4 w-4" />热门标签</h2>
+          <div className="space-y-3">
             {stats.topTags.map((t) => <BarItem key={t.name} label={t.name} count={t.count} max={maxTag} />)}
-          </CardContent>
-        </Card>
+          </div>
+        </section>
       </div>
 
-      <Card className="mb-6 overflow-x-auto">
+      <div className="section-rule" />
+
+      <Card className="overflow-x-auto">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm">LLM Provider 用量</CardTitle>
           {!sortedProviders.length && (
@@ -312,21 +313,19 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
         </CardContent>
       </Card>
 
-      {/* Recent activity */}
-      <Card>
-        <CardHeader className="pb-3"><CardTitle className="flex items-center gap-1.5 text-sm"><Clock className="h-3.5 w-3.5" />最近活动</CardTitle></CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {stats.recentActivity.map((a) => (
-              <div key={a.id} className="flex items-center justify-between text-sm">
-                <span className="truncate">{a.title}</span>
-                <span className="shrink-0 text-[10px] text-muted-foreground">{formatDate(a.updatedAt)}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-      </div>
+      <div className="section-rule" />
+
+      <section className="space-y-4">
+        <h2 className="flex items-center gap-2 text-xl"><Clock className="h-4 w-4" />最近活动</h2>
+        <div className="space-y-2">
+          {stats.recentActivity.map((a) => (
+            <div key={a.id} className="flex items-center justify-between rounded-md px-2 py-2 text-sm hover:bg-muted/30">
+              <span className="truncate">{a.title}</span>
+              <span className="shrink-0 text-[10px] text-muted-foreground">{formatDate(a.updatedAt)}</span>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   )
 }

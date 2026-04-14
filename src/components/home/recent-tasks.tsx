@@ -11,9 +11,9 @@ export async function RecentTasksCard() {
   const prompts = await fetchRecentPrompts()
 
   return (
-    <article className="rounded-3xl border border-border/60 bg-card/40 p-5 shadow-sm">
+    <article className="space-y-4">
       <div className="mb-4 space-y-1">
-        <h2 className="text-lg font-semibold">最近任务</h2>
+        <h2 className="text-xl">最近任务</h2>
         <p className="text-sm text-muted-foreground">回看刚保存的提示词，继续复用或完善。</p>
       </div>
       {prompts.length === 0 ? (
@@ -21,18 +21,16 @@ export async function RecentTasksCard() {
           还没有任何提示词资产。运行一次任务并保存结果后会显示在这里。
         </div>
       ) : (
-        <div className="space-y-3">
+        <ul className="list-divider">
           {prompts.map((prompt) => (
-            <Link
-              key={prompt.id}
-              href={`/prompts/${prompt.id}`}
-              className="block rounded-2xl border border-border/60 bg-background/80 px-4 py-4 transition hover:border-agent/60"
-            >
-              <p className="font-medium text-foreground">{prompt.title}</p>
-              <p className="mt-1 text-xs leading-5 text-muted-foreground">{summarizePrompt(prompt)}</p>
-            </Link>
+            <li key={prompt.id}>
+              <Link href={`/prompts/${prompt.id}`} className="list-row">
+                <h3 className="font-serif text-base">{prompt.title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{summarizePrompt(prompt)}</p>
+              </Link>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </article>
   )
@@ -40,14 +38,14 @@ export async function RecentTasksCard() {
 
 export function RecentTasksSkeleton() {
   return (
-    <article className="rounded-3xl border border-border/60 bg-card/40 p-5 shadow-sm">
+    <article className="space-y-4">
       <div className="mb-4 space-y-1">
         <div className="h-4 w-32 rounded bg-muted/60" />
         <div className="h-3 w-40 rounded bg-muted/40" />
       </div>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {Array.from({ length: 3 }).map((_, idx) => (
-          <div key={idx} className="rounded-2xl border border-dashed border-border/60 px-4 py-4">
+          <div key={idx} className="rounded-lg border border-dashed border-border/60 px-4 py-4">
             <div className="h-4 rounded bg-muted/50" />
             <div className="mt-2 h-3 rounded bg-muted/30" />
           </div>

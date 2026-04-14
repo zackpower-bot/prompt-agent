@@ -8,24 +8,25 @@ interface TemplateGridProps {
 
 export function TemplateGrid({ onSelect }: TemplateGridProps) {
   return (
-    <article className="rounded-3xl border border-border/60 bg-card/40 p-5 shadow-sm">
+    <article className="space-y-4">
       <div className="mb-4 space-y-1">
-        <h2 className="text-lg font-semibold">从模板开始</h2>
+        <h2 className="text-xl">从模板开始</h2>
         <p className="text-sm text-muted-foreground">点击下方模板，快速填充你的提示词任务。</p>
       </div>
-      <div className="grid gap-3">
+      <ul className="grid gap-2 sm:grid-cols-2">
         {PROMPT_TEMPLATES.map((template) => (
-          <button
-            key={template.id}
-            type="button"
-            onClick={() => onSelect(template.prompt)}
-            className="rounded-2xl border border-border/60 bg-background/80 px-4 py-3 text-left transition hover:border-agent/60"
-          >
-            <p className="text-sm font-semibold leading-6 text-foreground">{template.title}</p>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground line-clamp-3">{template.prompt}</p>
-          </button>
+          <li key={template.id}>
+            <button
+              type="button"
+              onClick={() => onSelect(template.prompt)}
+              className="w-full rounded-lg border border-border/50 p-4 text-left transition-colors hover:bg-muted/40"
+            >
+              <h3 className="font-serif text-base">{template.title}</h3>
+              <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{template.prompt}</p>
+            </button>
+          </li>
         ))}
-      </div>
+      </ul>
     </article>
   )
 }

@@ -199,8 +199,8 @@ export function ScenarioDetailClient({ scenario, locale }: ScenarioDetailClientP
   }, [cancelEditingField, handleSaveField])
 
   return (
-    <div className="h-full overflow-y-auto px-4 py-8">
-      <div className="mx-auto flex max-w-4xl flex-col gap-6">
+    <div className="container-reading">
+      <div className="flex flex-col gap-6">
         <Link
           href="/scenarios"
           className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"

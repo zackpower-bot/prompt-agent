@@ -48,9 +48,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (isLogin) return <>{children}</>
 
   return (
-    <div className="flex h-dvh flex-col">
-      <TopBar onMenuClick={() => setMobileOpen(true)} />
-
+    <div className="flex h-screen overflow-hidden">
       {isMobile && (
         <>
           {mobileOpen && (
@@ -61,7 +59,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           )}
           <div
             className={cn(
-              "fixed left-0 top-0 z-50 h-full w-64 border-r bg-background shadow-lg transition-transform duration-200",
+              "fixed left-0 top-0 z-50 h-full w-64 border-r border-border/60 bg-background shadow-lg transition-transform duration-200",
               mobileOpen ? "translate-x-0" : "-translate-x-full"
             )}
           >
@@ -74,24 +72,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </>
       )}
 
-      <div className="relative flex flex-1 min-h-0">
-        {!isMobile && (
-          <aside
-            className={cn(
-              "fixed left-0 top-12 z-30 h-[calc(100dvh-3rem)] border-r bg-background transition-all duration-200",
-              desktopCollapsed ? "w-12" : "w-48"
-            )}
-          >
-            <Sidebar collapsed={desktopCollapsed} onToggle={toggleDesktop} />
-          </aside>
-        )}
-
-        <main
+      {!isMobile && (
+        <aside
           className={cn(
-            "flex-1 min-h-0 overflow-hidden",
-            !isMobile && (desktopCollapsed ? "md:ml-12" : "md:ml-48")
+            "hidden h-screen shrink-0 border-r border-border/60 bg-background md:block",
+            desktopCollapsed ? "w-14" : "w-60"
           )}
         >
+          <Sidebar collapsed={desktopCollapsed} onToggle={toggleDesktop} />
+        </aside>
+      )}
+
+      <div className="flex flex-1 min-h-0 flex-col overflow-hidden">
+        <TopBar onMenuClick={() => setMobileOpen(true)} />
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
       </div>

@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Separator } from "@/components/ui/separator"
 import { Bot, Save, Check, ToggleLeft, ToggleRight } from "lucide-react"
 import { upsertProfile, toggleProfile } from "@/app/actions/profile.actions"
 import type { ProfileEntry } from "@/app/actions/profile.actions"
@@ -73,10 +72,9 @@ export function SettingsClient({ initialProfiles }: { initialProfiles: ProfileEn
   }, [])
 
   return (
-    <div className="h-full overflow-y-auto px-4 py-8">
-      <div className="mx-auto max-w-3xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
+    <div className="container-reading">
+      <div className="mb-8">
+        <h1 className="flex items-center gap-2 text-2xl">
           <Bot className="h-6 w-6" />
           Agent 设置
         </h1>
@@ -85,71 +83,86 @@ export function SettingsClient({ initialProfiles }: { initialProfiles: ProfileEn
         </p>
       </div>
 
-      <Separator className="mb-6" />
+      <div className="flex gap-8">
+        <aside className="sticky top-20 hidden w-48 shrink-0 self-start lg:block">
+          <nav className="flex flex-col gap-1 text-sm">
+            {PROFILE_CONFIGS.map((config) => (
+              <a key={config.key} href={`#${config.key}`} className="rounded-md px-3 py-1.5 hover:bg-muted/50">
+                {config.label}
+              </a>
+            ))}
+          </nav>
+        </aside>
 
-      <div className="space-y-6">
-        {PROFILE_CONFIGS.map((config) => {
+        <div className="min-w-0 flex-1 space-y-8">
+          {PROFILE_CONFIGS.map((config) => {
           const existing = profiles.find((p) => p.key === config.key)
           const isActive = existing?.isActive ?? false
           const draft = drafts[config.key] ?? ""
           const isSaved = saved[config.key] ?? false
 
           return (
-            <Card key={config.key}>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-sm">{config.label}</CardTitle>
-                    <p className="mt-1 text-xs text-muted-foreground">{config.description}</p>
+            <section key={config.key} id={config.key} className="space-y-4 scroll-mt-20">
+              <div>
+                <h2 className="mb-2 text-xl">{config.label}</h2>
+                <p className="text-sm text-muted-foreground">{config.description}</p>
+              </div>
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-sm">{config.label}</CardTitle>
+                      <p className="mt-1 text-xs text-muted-foreground">{config.description}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {existing && (
+                        <button
+                          onClick={() => handleToggle(config.key, isActive)}
+                          className="text-muted-foreground transition-colors hover:text-foreground"
+                          title={isActive ? "已启用" : "已禁用"}
+                          disabled={isPending}
+                        >
+                          {isActive ? (
+                            <ToggleRight className="h-5 w-5 text-agent" />
+                          ) : (
+                            <ToggleLeft className="h-5 w-5" />
+                          )}
+                        </button>
+                      )}
+                      {existing && (
+                        <Badge variant="outline">
+                          {isActive ? "启用" : "禁用"}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {existing && (
-                      <button
-                        onClick={() => handleToggle(config.key, isActive)}
-                        className="text-muted-foreground hover:text-foreground transition-colors"
-                        title={isActive ? "已启用" : "已禁用"}
-                        disabled={isPending}
-                      >
-                        {isActive ? (
-                          <ToggleRight className="h-5 w-5 text-agent" />
-                        ) : (
-                          <ToggleLeft className="h-5 w-5" />
-                        )}
-                      </button>
-                    )}
-                    {existing && (
-                      <Badge variant="outline">
-                        {isActive ? "启用" : "禁用"}
-                      </Badge>
-                    )}
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    value={draft}
+                    onChange={(e) => setDrafts((prev) => ({ ...prev, [config.key]: e.target.value }))}
+                    placeholder={config.placeholder}
+                    className="min-h-[100px] sm:min-h-[120px] font-mono text-sm"
+                  />
+                  <div className="mt-3 flex justify-end">
+                    <Button
+                      size="sm"
+                      onClick={() => handleSave(config.key)}
+                      disabled={isPending || !draft.trim()}
+                    >
+                      {isSaved ? (
+                        <><Check className="mr-1 h-3 w-3" />已保存</>
+                      ) : (
+                        <><Save className="mr-1 h-3 w-3" />保存</>
+                      )}
+                    </Button>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  value={draft}
-                  onChange={(e) => setDrafts((prev) => ({ ...prev, [config.key]: e.target.value }))}
-                  placeholder={config.placeholder}
-                  className="min-h-[100px] sm:min-h-[120px] font-mono text-sm"
-                />
-                <div className="mt-3 flex justify-end">
-                  <Button
-                    size="sm"
-                    onClick={() => handleSave(config.key)}
-                    disabled={isPending || !draft.trim()}
-                  >
-                    {isSaved ? (
-                      <><Check className="mr-1 h-3 w-3" />已保存</>
-                    ) : (
-                      <><Save className="mr-1 h-3 w-3" />保存</>
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </section>
           )
         })}
-      </div>
+        </div>
       </div>
     </div>
   )

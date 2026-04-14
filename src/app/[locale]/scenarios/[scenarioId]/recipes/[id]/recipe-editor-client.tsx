@@ -282,39 +282,39 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
   }, [assembledAvailable, initialRecipe.id, previewOpen, t])
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex-1 overflow-y-auto">
-        <div className="px-4 py-6">
-          <div className="mx-auto max-w-5xl space-y-6 pb-32">
-            <div className="space-y-3">
+    <div className="container-editor">
+      <div className="space-y-6 pb-32">
+        <div className="space-y-3">
+          <Link
+            href={`/scenarios/${initialRecipe.scenario.id}`}
+            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {t("backToScenario", { name: initialRecipe.scenario.name })}
+          </Link>
+
+          <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-2">
+              <Link href="/scenarios" className="transition hover:text-foreground">
+                {t("breadcrumb.scenario")}
+              </Link>
+              <span>/</span>
               <Link
                 href={`/scenarios/${initialRecipe.scenario.id}`}
-                className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition hover:text-foreground"
+                className="transition hover:text-foreground"
               >
-                <ArrowLeft className="h-4 w-4" />
-                {t("backToScenario", { name: initialRecipe.scenario.name })}
+                {initialRecipe.scenario.name}
               </Link>
-
-              <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link href="/scenarios" className="transition hover:text-foreground">
-                    {t("breadcrumb.scenario")}
-                  </Link>
-                  <span>/</span>
-                  <Link
-                    href={`/scenarios/${initialRecipe.scenario.id}`}
-                    className="transition hover:text-foreground"
-                  >
-                    {initialRecipe.scenario.name}
-                  </Link>
-                  <span>/</span>
-                  <span className="text-foreground">{t("breadcrumb.recipe")}</span>
-                  <span>/</span>
-                  <span className="font-medium text-foreground">{initialRecipe.name}</span>
-                </div>
-              </nav>
+              <span>/</span>
+              <span className="text-foreground">{t("breadcrumb.recipe")}</span>
+              <span>/</span>
+              <span className="font-medium text-foreground">{initialRecipe.name}</span>
             </div>
+          </nav>
+        </div>
 
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
+          <div className="min-w-0 space-y-6">
             <section className="space-y-5 rounded-2xl border border-border bg-card p-5 shadow-sm">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="space-y-2">
@@ -514,7 +514,7 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
             </section>
 
             {assembledAvailable ? (
-              <section className="rounded-2xl border border-border bg-card/60 p-5 text-sm shadow-sm">
+              <section className="rounded-2xl border border-border bg-card/60 p-5 text-sm shadow-sm lg:hidden">
                 <button
                   type="button"
                   onClick={() => setPreviewOpen((current) => !current)}
@@ -535,21 +535,35 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
               </section>
             ) : null}
           </div>
-        </div>
 
-        <div className="sticky bottom-0 left-0 right-0 border-t border-border bg-background/95 px-4 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-          <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground">{t("stickyHint")}</p>
-            <div className="flex flex-wrap gap-2">
-              <Button type="button" variant="secondary" onClick={handleAssemble} disabled={isAssembling}>
-                {isAssembling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {previewOpen && assembledAvailable ? t("hidePreview") : t("assemble")}
-              </Button>
-              <Button type="button" onClick={handleSave} disabled={isSaving}>
-                {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {t("save")}
-              </Button>
-            </div>
+          {assembledAvailable ? (
+            <aside className="hidden lg:block lg:sticky lg:top-20 lg:self-start">
+              <section className="rounded-2xl border border-border bg-card/60 p-5 text-sm shadow-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-base font-semibold">{t("assembledPreview")}</span>
+                  <Badge variant="secondary">{t("assembledPreview")}</Badge>
+                </div>
+                <div className="mt-3 max-w-[72ch] whitespace-pre-wrap rounded-lg bg-muted/40 p-4 font-sans text-[15px] leading-[1.7] text-foreground">
+                  {assembledPreview}
+                </div>
+              </section>
+            </aside>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="sticky bottom-0 left-0 right-0 border-t border-border bg-background/95 px-4 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground">{t("stickyHint")}</p>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="secondary" onClick={handleAssemble} disabled={isAssembling}>
+              {isAssembling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {previewOpen && assembledAvailable ? t("hidePreview") : t("assemble")}
+            </Button>
+            <Button type="button" onClick={handleSave} disabled={isSaving}>
+              {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {t("save")}
+            </Button>
           </div>
         </div>
       </div>

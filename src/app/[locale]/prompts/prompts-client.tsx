@@ -5,8 +5,6 @@ import { Link } from "@/i18n/navigation"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
 import { Search, Clock, ChevronLeft, ChevronRight } from "lucide-react"
 import { getPromptsPaginated } from "@/app/actions/prompt.actions"
 import type { PromptWithTags } from "@/app/actions/prompt.actions"
@@ -63,138 +61,153 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("zh-CN", { month: "short", day: "numeric" })
 
+  const getQualityBadgeClass = (score: number | null) => {
+    if (score === null || score === undefined) return "bg-secondary text-secondary-foreground"
+    if (score >= 0.85) return "bg-agent/15 text-agent"
+    if (score >= 0.7) return "bg-secondary text-secondary-foreground"
+    if (score >= 0.5) return "bg-amber-500/15 text-amber-700"
+    return "bg-destructive/10 text-destructive"
+  }
+
   return (
-    <div className="h-full overflow-y-auto px-4 py-8">
-      <div className="mx-auto max-w-5xl">
-      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-muted-foreground">{total} 条提示词</p>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.open("/api/prompts/export")}
-          >
-            导出
-          </Button>
-          <label className="inline-flex h-7 cursor-pointer items-center justify-center rounded-[min(var(--radius-md),12px)] border border-border bg-background px-2.5 text-[0.8rem] font-medium transition-colors hover:bg-muted hover:text-foreground">
-            导入
-            <input
-              type="file"
-              accept=".json"
-              className="sr-only"
-              onChange={async (e) => {
-                const file = e.target.files?.[0]
-                if (!file) return
-                const text = await file.text()
-                const res = await fetch("/api/prompts/import", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: text,
-                })
-                const data = await res.json()
-                if (data.imported) {
-                  fetchPrompts(1)
-                }
-                e.target.value = ""
-              }}
-            />
-          </label>
+    <div className="container-reading">
+      <div className="sticky top-0 z-10 mb-6 border-b border-border/60 bg-background/80 py-3 backdrop-blur">
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="搜索提示词..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open("/api/prompts/export")}
+              >
+                导出
+              </Button>
+              <label className="inline-flex h-7 cursor-pointer items-center justify-center rounded-[min(var(--radius-md),12px)] border border-border bg-background px-2.5 text-[0.8rem] font-medium transition-colors hover:bg-muted hover:text-foreground">
+                导入
+                <input
+                  type="file"
+                  accept=".json"
+                  className="sr-only"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    const text = await file.text()
+                    const res = await fetch("/api/prompts/import", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: text,
+                    })
+                    const data = await res.json()
+                    if (data.imported) {
+                      fetchPrompts(1)
+                    }
+                    e.target.value = ""
+                  }}
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="mr-2 text-sm text-muted-foreground">{total} 条提示词</p>
+            {["all", "inbox", "production", "archived"].map((s) => (
+              <Button
+                key={s}
+                variant={selectedStatus === s ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedStatus(s)}
+              >
+                {s === "all" ? "全部" : s === "inbox" ? "收件箱" : s === "production" ? "生产" : "归档"}
+              </Button>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-1.5">
+            <Button
+              variant={selectedTag === "all" ? "default" : "secondary"}
+              size="sm"
+              onClick={() => setSelectedTag("all")}
+            >
+              全部标签
+            </Button>
+            {visibleTags.map((tag) => (
+              <Button
+                key={tag}
+                variant={selectedTag === tag ? "default" : "secondary"}
+                size="sm"
+                onClick={() => setSelectedTag(tag)}
+              >
+                {tag}
+              </Button>
+            ))}
+            {allTags.length > TAG_LIMIT && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-dashed text-muted-foreground hover:text-foreground"
+                onClick={() => setTagsExpanded(!tagsExpanded)}
+              >
+                {tagsExpanded ? "收起" : `+${allTags.length - TAG_LIMIT}`}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
-
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="搜索提示词..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-10"
-        />
-      </div>
-
-      <div className="mb-3 flex gap-2">
-        {["all", "inbox", "production", "archived"].map((s) => (
-          <Button
-            key={s}
-            variant={selectedStatus === s ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSelectedStatus(s)}
-          >
-            {s === "all" ? "全部" : s === "inbox" ? "收件箱" : s === "production" ? "生产" : "归档"}
-          </Button>
-        ))}
-      </div>
-
-      <div className="mb-6 flex flex-wrap gap-1.5">
-        <Button
-          variant={selectedTag === "all" ? "default" : "secondary"}
-          size="sm"
-          onClick={() => setSelectedTag("all")}
-        >
-          全部标签
-        </Button>
-        {visibleTags.map((tag) => (
-          <Button
-            key={tag}
-            variant={selectedTag === tag ? "default" : "secondary"}
-            size="sm"
-            onClick={() => setSelectedTag(tag)}
-          >
-            {tag}
-          </Button>
-        ))}
-        {allTags.length > TAG_LIMIT && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-dashed text-muted-foreground hover:text-foreground"
-            onClick={() => setTagsExpanded(!tagsExpanded)}
-          >
-            {tagsExpanded ? "收起" : `+${allTags.length - TAG_LIMIT}`}
-          </Button>
-        )}
-      </div>
-
-      <Separator className="mb-6" />
 
       {isPending && (
         <div className="mb-4 text-center text-sm text-muted-foreground">加载中...</div>
       )}
 
-      <div className="space-y-3">
+      <ul className="list-divider">
         {prompts.map((prompt) => (
-          <Link key={prompt.id} href={`/prompts/${prompt.id}`}>
-            <Card className="transition hover:bg-accent/50">
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-base">{prompt.title}</CardTitle>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Clock className="h-3 w-3" />
-                    {formatDate(prompt.updatedAt)}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pb-3">
-                <p className="mb-2 line-clamp-2 text-sm text-muted-foreground">
+          <li key={prompt.id}>
+            <Link href={`/prompts/${prompt.id}`} className="list-row">
+              <div className="min-w-0 flex-1">
+                <h3 className="truncate font-serif text-base">{prompt.title}</h3>
+                <p className="mt-1 truncate text-sm text-muted-foreground">
                   {prompt.description || prompt.content.slice(0, 120)}
                 </p>
-                <div className="flex items-center gap-2">
+                <div className="mt-2 flex flex-wrap items-center gap-2">
                   <Badge variant="secondary" className="text-[10px]">
                     {prompt.status === "inbox" ? "收件箱" : prompt.status === "production" ? "生产" : prompt.status}
                   </Badge>
-                  <Badge variant="outline" className="text-[10px]">{prompt.category}</Badge>
+                  <Badge variant="outline" className="text-[10px]">
+                    {prompt.category}
+                  </Badge>
                   {prompt.tags.slice(0, 3).map((t) => (
-                    <Badge key={t} variant="outline" className="text-[10px]">{t}</Badge>
+                    <Badge key={t} variant="outline" className="text-[10px]">
+                      {t}
+                    </Badge>
                   ))}
                   {prompt.tags.length > 3 && (
                     <span className="text-[10px] text-muted-foreground">+{prompt.tags.length - 3}</span>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-          </Link>
+              </div>
+              <div className="flex shrink-0 items-center gap-3">
+                {prompt.qualityScore !== null && (
+                  <Badge className={getQualityBadgeClass(prompt.qualityScore)}>
+                    {Math.round(prompt.qualityScore * 100)}%
+                  </Badge>
+                )}
+                <time className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  {formatDate(prompt.updatedAt)}
+                </time>
+              </div>
+            </Link>
+          </li>
         ))}
-      </div>
+      </ul>
 
       {prompts.length === 0 && !isPending && (
         <div className="rounded-2xl border border-dashed border-border bg-card/50 px-6 py-16 text-center">
@@ -230,7 +243,6 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
           </Button>
         </div>
       )}
-      </div>
     </div>
   )
 }

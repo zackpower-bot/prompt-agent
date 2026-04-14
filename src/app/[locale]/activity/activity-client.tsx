@@ -129,8 +129,8 @@ export function ActivityClient({ initialActions }: ActivityClientProps) {
   }, [actions, formatter, handleUndo, t, undoingId])
 
   return (
-    <div className="h-full overflow-y-auto px-4 py-8">
-      <div className="mx-auto max-w-4xl space-y-4">
+    <div className="container-reading">
+      <div className="space-y-4">
         <div className="flex items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold">{t("title")}</h1>

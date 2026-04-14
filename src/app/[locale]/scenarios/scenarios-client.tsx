@@ -18,7 +18,6 @@ import { createScenario, type ScenarioRecord } from "@/app/actions/scenario.acti
 import { Link } from "@/i18n/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -284,10 +283,10 @@ export function ScenariosClient({ initialScenarios }: ScenariosClientProps) {
   )
 
   return (
-    <div className="h-full overflow-y-auto px-4 py-8">
-      <div className="mx-auto flex max-w-5xl flex-col gap-6">
-        <header className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <form onSubmit={handleSearchSubmit} className="flex w-full flex-1 items-center gap-2">
+    <div className="container-reading">
+      <div className="flex flex-col gap-6">
+        <header className="sticky top-0 z-10 border-b border-border/60 bg-background/80 py-3 backdrop-blur">
+          <form onSubmit={handleSearchSubmit} className="flex flex-col gap-3 md:flex-row md:items-center">
             <div className="relative flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -305,19 +304,19 @@ export function ScenariosClient({ initialScenarios }: ScenariosClientProps) {
                 {tCommon("reset")}
               </Button>
             )}
+            <Button
+              onClick={() => setShowCreateForm((prev) => !prev)}
+              aria-expanded={showCreateForm}
+              className="shrink-0"
+            >
+              {isCreating ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="mr-2 h-4 w-4" />
+              )}
+              {tScenarios("newScenario")}
+            </Button>
           </form>
-          <Button
-            onClick={() => setShowCreateForm((prev) => !prev)}
-            aria-expanded={showCreateForm}
-            className="shrink-0"
-          >
-            {isCreating ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Plus className="mr-2 h-4 w-4" />
-            )}
-            {tScenarios("newScenario")}
-          </Button>
         </header>
 
         {searchIndicator && (
@@ -377,34 +376,35 @@ export function ScenariosClient({ initialScenarios }: ScenariosClientProps) {
         )}
 
         {displayScenarios.length > 0 ? (
-          <div className="space-y-3">
+          <ul className="list-divider">
             {displayScenarios.map((scenario) => (
-              <Link key={scenario.id} href={`/scenarios/${scenario.id}`} className="block">
-                <Card className="transition hover:bg-accent/50">
-                  <CardHeader className="pb-2">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <CardTitle className="text-base">{scenario.name}</CardTitle>
-                      <div className="flex items-center gap-2 text-xs">
-                        <Badge variant="outline" className="text-[11px]">
-                          {tScenarios("recipeCount", { count: scenario.recipeCount })}
-                        </Badge>
-                        {scenario.similarity !== null && (
-                          <Badge className="text-[11px] bg-agent text-agent-foreground">
-                            {formatSimilarity(scenario.similarity)}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pb-4">
-                    <p className="line-clamp-2 text-sm text-muted-foreground">
+              <li key={scenario.id}>
+                <Link href={`/scenarios/${scenario.id}`} className="list-row">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-serif text-base">{scenario.name}</h3>
+                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                       {renderDescription(scenario.description)}
                     </p>
-                  </CardContent>
-                </Card>
-              </Link>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-3">
+                    {scenario.similarity !== null && (
+                      <Badge className="bg-agent/15 text-agent">
+                        {formatSimilarity(scenario.similarity)}
+                      </Badge>
+                    )}
+                    <Badge variant="secondary" className="text-[11px]">
+                      {tScenarios("recipeCount", { count: scenario.recipeCount })}
+                    </Badge>
+                    <time className="text-xs text-muted-foreground">
+                      {sortedScenarios.find((item) => item.id === scenario.id)?.updatedAt
+                        ? new Date(sortedScenarios.find((item) => item.id === scenario.id)!.updatedAt).toLocaleDateString("zh-CN", { month: "short", day: "numeric" })
+                        : ""}
+                    </time>
+                  </div>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         ) : (
           <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border bg-card/50 px-6 py-16 text-center">
             <h2 className="text-xl">{tScenarios("title")}</h2>

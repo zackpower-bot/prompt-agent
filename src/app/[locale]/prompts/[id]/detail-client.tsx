@@ -93,8 +93,8 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
     })
 
   return (
-    <div className="h-full overflow-y-auto px-4 py-8">
-      <div className="mx-auto max-w-3xl">
+    <div className="container-reading">
+      <div>
       <Link
         href="/prompts"
         className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"

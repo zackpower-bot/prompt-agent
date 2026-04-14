@@ -91,12 +91,12 @@ export default function HomeClient({ recentTasksSlot }: HomeClientProps) {
   const runningStep = steps.length > 0 ? steps[steps.length - 1] : null
 
   return (
-    <div className="flex h-full flex-col" data-testid="home-workspace">
+    <div className="flex min-h-full flex-col" data-testid="home-workspace">
       {workspaceActive ? (
         <>
           <TaskBanner task={displayTask} status={status} onReset={handleReset} />
-          <section className="flex-1 min-h-0 overflow-hidden">
-            <div className="mx-auto flex h-full max-w-5xl flex-col gap-5 px-4 py-6">
+          <section className="flex-1">
+            <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-6 py-8">
               {status === "running" && (
                 <RunningTicker stepIndex={Math.max(steps.length, 1)} tool={runningStep?.tool ?? null} />
               )}
@@ -160,10 +160,10 @@ export default function HomeClient({ recentTasksSlot }: HomeClientProps) {
 
 function TaskBanner({ task, status, onReset }: { task: string; status: AgentStatus; onReset: () => void }) {
   return (
-    <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl items-start justify-between gap-4 px-4 py-3">
+    <div className="sticky top-0 z-10 border-b border-border/60 bg-background/95 backdrop-blur">
+      <div className="mx-auto flex max-w-3xl items-start justify-between gap-4 px-6 py-4">
         <div className="space-y-2">
-          <p className="text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">当前任务</p>
+          <p className="text-xs font-medium text-muted-foreground">当前任务</p>
           <p className="text-sm leading-6 text-foreground line-clamp-2">{task || "等待新的任务描述"}</p>
         </div>
         <div className="flex items-center gap-2">
@@ -218,8 +218,8 @@ function ComposerBar({
   showResetButton?: boolean
 }) {
   return (
-    <div className="border-t bg-background/95 px-4 py-4 backdrop-blur">
-      <div className="mx-auto w-full max-w-5xl space-y-2">
+    <div className="border-t border-border/60 bg-background/95 px-4 py-4 backdrop-blur">
+      <div className="mx-auto w-full max-w-3xl space-y-2 px-2 sm:px-0">
         <div className="flex items-end gap-3">
           <div className="flex-1">
             <AgentInput status={status} onSubmit={onSubmit} onStop={onStop} initialValue={value} onChange={onChange} />
