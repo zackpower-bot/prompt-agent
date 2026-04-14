@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
     category: classification?.category ?? "general",
     model: classification?.model ?? "universal",
     tags: classification?.tags ?? [],
+    qualityScore: classification?.qualityScore,
   })
 
   if (!result.success) {

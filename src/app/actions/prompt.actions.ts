@@ -10,6 +10,7 @@ export interface CreatePromptInput {
   model?: string
   status?: string
   tags?: string[]
+  qualityScore?: number
 }
 
 export interface PromptWithTags {
@@ -25,6 +26,7 @@ export interface PromptWithTags {
   createdAt: string
   updatedAt: string
   tags: string[]
+  qualityScore: number | null
 }
 
 function serializePrompt(row: any): PromptWithTags {
@@ -41,7 +43,13 @@ function serializePrompt(row: any): PromptWithTags {
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
     tags: row.tags?.map((pt: any) => pt.tag.name) ?? [],
+    qualityScore: row.qualityScore ?? null,
   }
+}
+
+function normalizeQualityScore(value?: number | null): number | undefined {
+  if (typeof value !== "number" || Number.isNaN(value)) return undefined
+  return Math.min(1, Math.max(0, value))
 }
 
 export async function createPrompt(
@@ -49,6 +57,7 @@ export async function createPrompt(
 ): Promise<{ success: true; data: PromptWithTags } | { success: false; error: string }> {
   try {
     const tagNames = (input.tags ?? []).map(t => t.trim().toLowerCase()).filter(Boolean)
+    const normalizedQuality = normalizeQualityScore(input.qualityScore)
 
     // Upsert tags
     const tagRecords = await Promise.all(
@@ -69,6 +78,7 @@ export async function createPrompt(
         category: input.category ?? "general",
         model: input.model ?? "universal",
         status: input.status ?? "inbox",
+        ...(normalizedQuality !== undefined && { qualityScore: normalizedQuality }),
         tags: {
           create: tagRecords.map(tag => ({
             tag: { connect: { id: tag.id } },
@@ -179,6 +189,7 @@ export async function updatePrompt(
   try {
     const existing = await prisma.prompt.findUnique({ where: { id } })
     if (!existing) return { success: false, error: "Prompt not found" }
+    const normalizedQuality = normalizeQualityScore(input.qualityScore)
 
     // Handle tag updates if provided
     if (input.tags) {
@@ -206,6 +217,7 @@ export async function updatePrompt(
         ...(input.category !== undefined && { category: input.category }),
         ...(input.model !== undefined && { model: input.model }),
         ...(input.status !== undefined && { status: input.status }),
+        ...(normalizedQuality !== undefined && { qualityScore: normalizedQuality }),
       },
       include: { tags: { include: { tag: true } } },
     })

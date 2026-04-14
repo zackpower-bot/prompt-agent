@@ -15,6 +15,7 @@ model Prompt {
   category    String    @default("general")
   model       String    @default("universal")
   status      String    @default("inbox")
+  qualityScore Float?
   isFavorite  Boolean   @default(false)
   lastUsedAt  DateTime?
   createdAt   DateTime  @default(now())

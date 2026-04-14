@@ -20,8 +20,18 @@ export type PromptModel = runtime.Types.Result.DefaultSelection<Prisma.$PromptPa
 
 export type AggregatePrompt = {
   _count: PromptCountAggregateOutputType | null
+  _avg: PromptAvgAggregateOutputType | null
+  _sum: PromptSumAggregateOutputType | null
   _min: PromptMinAggregateOutputType | null
   _max: PromptMaxAggregateOutputType | null
+}
+
+export type PromptAvgAggregateOutputType = {
+  qualityScore: number | null
+}
+
+export type PromptSumAggregateOutputType = {
+  qualityScore: number | null
 }
 
 export type PromptMinAggregateOutputType = {
@@ -32,6 +42,7 @@ export type PromptMinAggregateOutputType = {
   category: string | null
   model: string | null
   status: string | null
+  qualityScore: number | null
   isFavorite: boolean | null
   lastUsedAt: Date | null
   createdAt: Date | null
@@ -46,6 +57,7 @@ export type PromptMaxAggregateOutputType = {
   category: string | null
   model: string | null
   status: string | null
+  qualityScore: number | null
   isFavorite: boolean | null
   lastUsedAt: Date | null
   createdAt: Date | null
@@ -60,6 +72,7 @@ export type PromptCountAggregateOutputType = {
   category: number
   model: number
   status: number
+  qualityScore: number
   isFavorite: number
   lastUsedAt: number
   createdAt: number
@@ -67,6 +80,14 @@ export type PromptCountAggregateOutputType = {
   _all: number
 }
 
+
+export type PromptAvgAggregateInputType = {
+  qualityScore?: true
+}
+
+export type PromptSumAggregateInputType = {
+  qualityScore?: true
+}
 
 export type PromptMinAggregateInputType = {
   id?: true
@@ -76,6 +97,7 @@ export type PromptMinAggregateInputType = {
   category?: true
   model?: true
   status?: true
+  qualityScore?: true
   isFavorite?: true
   lastUsedAt?: true
   createdAt?: true
@@ -90,6 +112,7 @@ export type PromptMaxAggregateInputType = {
   category?: true
   model?: true
   status?: true
+  qualityScore?: true
   isFavorite?: true
   lastUsedAt?: true
   createdAt?: true
@@ -104,6 +127,7 @@ export type PromptCountAggregateInputType = {
   category?: true
   model?: true
   status?: true
+  qualityScore?: true
   isFavorite?: true
   lastUsedAt?: true
   createdAt?: true
@@ -149,6 +173,18 @@ export type PromptAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: PromptAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: PromptSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: PromptMinAggregateInputType
@@ -179,6 +215,8 @@ export type PromptGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   _count?: PromptCountAggregateInputType | true
+  _avg?: PromptAvgAggregateInputType
+  _sum?: PromptSumAggregateInputType
   _min?: PromptMinAggregateInputType
   _max?: PromptMaxAggregateInputType
 }
@@ -191,11 +229,14 @@ export type PromptGroupByOutputType = {
   category: string
   model: string
   status: string
+  qualityScore: number | null
   isFavorite: boolean
   lastUsedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: PromptCountAggregateOutputType | null
+  _avg: PromptAvgAggregateOutputType | null
+  _sum: PromptSumAggregateOutputType | null
   _min: PromptMinAggregateOutputType | null
   _max: PromptMaxAggregateOutputType | null
 }
@@ -226,6 +267,7 @@ export type PromptWhereInput = {
   category?: Prisma.StringFilter<"Prompt"> | string
   model?: Prisma.StringFilter<"Prompt"> | string
   status?: Prisma.StringFilter<"Prompt"> | string
+  qualityScore?: Prisma.FloatNullableFilter<"Prompt"> | number | null
   isFavorite?: Prisma.BoolFilter<"Prompt"> | boolean
   lastUsedAt?: Prisma.DateTimeNullableFilter<"Prompt"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Prompt"> | Date | string
@@ -243,6 +285,7 @@ export type PromptOrderByWithRelationInput = {
   category?: Prisma.SortOrder
   model?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  qualityScore?: Prisma.SortOrderInput | Prisma.SortOrder
   isFavorite?: Prisma.SortOrder
   lastUsedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -263,6 +306,7 @@ export type PromptWhereUniqueInput = Prisma.AtLeast<{
   category?: Prisma.StringFilter<"Prompt"> | string
   model?: Prisma.StringFilter<"Prompt"> | string
   status?: Prisma.StringFilter<"Prompt"> | string
+  qualityScore?: Prisma.FloatNullableFilter<"Prompt"> | number | null
   isFavorite?: Prisma.BoolFilter<"Prompt"> | boolean
   lastUsedAt?: Prisma.DateTimeNullableFilter<"Prompt"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Prompt"> | Date | string
@@ -280,13 +324,16 @@ export type PromptOrderByWithAggregationInput = {
   category?: Prisma.SortOrder
   model?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  qualityScore?: Prisma.SortOrderInput | Prisma.SortOrder
   isFavorite?: Prisma.SortOrder
   lastUsedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PromptCountOrderByAggregateInput
+  _avg?: Prisma.PromptAvgOrderByAggregateInput
   _max?: Prisma.PromptMaxOrderByAggregateInput
   _min?: Prisma.PromptMinOrderByAggregateInput
+  _sum?: Prisma.PromptSumOrderByAggregateInput
 }
 
 export type PromptScalarWhereWithAggregatesInput = {
@@ -300,6 +347,7 @@ export type PromptScalarWhereWithAggregatesInput = {
   category?: Prisma.StringWithAggregatesFilter<"Prompt"> | string
   model?: Prisma.StringWithAggregatesFilter<"Prompt"> | string
   status?: Prisma.StringWithAggregatesFilter<"Prompt"> | string
+  qualityScore?: Prisma.FloatNullableWithAggregatesFilter<"Prompt"> | number | null
   isFavorite?: Prisma.BoolWithAggregatesFilter<"Prompt"> | boolean
   lastUsedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Prompt"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Prompt"> | Date | string
@@ -314,6 +362,7 @@ export type PromptCreateInput = {
   category?: string
   model?: string
   status?: string
+  qualityScore?: number | null
   isFavorite?: boolean
   lastUsedAt?: Date | string | null
   createdAt?: Date | string
@@ -331,6 +380,7 @@ export type PromptUncheckedCreateInput = {
   category?: string
   model?: string
   status?: string
+  qualityScore?: number | null
   isFavorite?: boolean
   lastUsedAt?: Date | string | null
   createdAt?: Date | string
@@ -348,6 +398,7 @@ export type PromptUpdateInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  qualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -365,6 +416,7 @@ export type PromptUncheckedUpdateInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  qualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -382,6 +434,7 @@ export type PromptCreateManyInput = {
   category?: string
   model?: string
   status?: string
+  qualityScore?: number | null
   isFavorite?: boolean
   lastUsedAt?: Date | string | null
   createdAt?: Date | string
@@ -396,6 +449,7 @@ export type PromptUpdateManyMutationInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  qualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -410,6 +464,7 @@ export type PromptUncheckedUpdateManyInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  qualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -424,10 +479,15 @@ export type PromptCountOrderByAggregateInput = {
   category?: Prisma.SortOrder
   model?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  qualityScore?: Prisma.SortOrder
   isFavorite?: Prisma.SortOrder
   lastUsedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type PromptAvgOrderByAggregateInput = {
+  qualityScore?: Prisma.SortOrder
 }
 
 export type PromptMaxOrderByAggregateInput = {
@@ -438,6 +498,7 @@ export type PromptMaxOrderByAggregateInput = {
   category?: Prisma.SortOrder
   model?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  qualityScore?: Prisma.SortOrder
   isFavorite?: Prisma.SortOrder
   lastUsedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -452,10 +513,15 @@ export type PromptMinOrderByAggregateInput = {
   category?: Prisma.SortOrder
   model?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  qualityScore?: Prisma.SortOrder
   isFavorite?: Prisma.SortOrder
   lastUsedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type PromptSumOrderByAggregateInput = {
+  qualityScore?: Prisma.SortOrder
 }
 
 export type PromptScalarRelationFilter = {
@@ -465,6 +531,14 @@ export type PromptScalarRelationFilter = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type BoolFieldUpdateOperationsInput = {
@@ -529,6 +603,7 @@ export type PromptCreateWithoutTagsInput = {
   category?: string
   model?: string
   status?: string
+  qualityScore?: number | null
   isFavorite?: boolean
   lastUsedAt?: Date | string | null
   createdAt?: Date | string
@@ -545,6 +620,7 @@ export type PromptUncheckedCreateWithoutTagsInput = {
   category?: string
   model?: string
   status?: string
+  qualityScore?: number | null
   isFavorite?: boolean
   lastUsedAt?: Date | string | null
   createdAt?: Date | string
@@ -577,6 +653,7 @@ export type PromptUpdateWithoutTagsInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  qualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -593,6 +670,7 @@ export type PromptUncheckedUpdateWithoutTagsInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  qualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -609,6 +687,7 @@ export type PromptCreateWithoutVersionsInput = {
   category?: string
   model?: string
   status?: string
+  qualityScore?: number | null
   isFavorite?: boolean
   lastUsedAt?: Date | string | null
   createdAt?: Date | string
@@ -625,6 +704,7 @@ export type PromptUncheckedCreateWithoutVersionsInput = {
   category?: string
   model?: string
   status?: string
+  qualityScore?: number | null
   isFavorite?: boolean
   lastUsedAt?: Date | string | null
   createdAt?: Date | string
@@ -657,6 +737,7 @@ export type PromptUpdateWithoutVersionsInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  qualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -673,6 +754,7 @@ export type PromptUncheckedUpdateWithoutVersionsInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  qualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -689,6 +771,7 @@ export type PromptCreateWithoutHistoryInput = {
   category?: string
   model?: string
   status?: string
+  qualityScore?: number | null
   isFavorite?: boolean
   lastUsedAt?: Date | string | null
   createdAt?: Date | string
@@ -705,6 +788,7 @@ export type PromptUncheckedCreateWithoutHistoryInput = {
   category?: string
   model?: string
   status?: string
+  qualityScore?: number | null
   isFavorite?: boolean
   lastUsedAt?: Date | string | null
   createdAt?: Date | string
@@ -737,6 +821,7 @@ export type PromptUpdateWithoutHistoryInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  qualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -753,6 +838,7 @@ export type PromptUncheckedUpdateWithoutHistoryInput = {
   category?: Prisma.StringFieldUpdateOperationsInput | string
   model?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  qualityScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   isFavorite?: Prisma.BoolFieldUpdateOperationsInput | boolean
   lastUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -818,6 +904,7 @@ export type PromptSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   category?: boolean
   model?: boolean
   status?: boolean
+  qualityScore?: boolean
   isFavorite?: boolean
   lastUsedAt?: boolean
   createdAt?: boolean
@@ -836,6 +923,7 @@ export type PromptSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   category?: boolean
   model?: boolean
   status?: boolean
+  qualityScore?: boolean
   isFavorite?: boolean
   lastUsedAt?: boolean
   createdAt?: boolean
@@ -850,6 +938,7 @@ export type PromptSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   category?: boolean
   model?: boolean
   status?: boolean
+  qualityScore?: boolean
   isFavorite?: boolean
   lastUsedAt?: boolean
   createdAt?: boolean
@@ -864,13 +953,14 @@ export type PromptSelectScalar = {
   category?: boolean
   model?: boolean
   status?: boolean
+  qualityScore?: boolean
   isFavorite?: boolean
   lastUsedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PromptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "content" | "category" | "model" | "status" | "isFavorite" | "lastUsedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["prompt"]>
+export type PromptOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "content" | "category" | "model" | "status" | "qualityScore" | "isFavorite" | "lastUsedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["prompt"]>
 export type PromptInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tags?: boolean | Prisma.Prompt$tagsArgs<ExtArgs>
   versions?: boolean | Prisma.Prompt$versionsArgs<ExtArgs>
@@ -895,6 +985,7 @@ export type $PromptPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     category: string
     model: string
     status: string
+    qualityScore: number | null
     isFavorite: boolean
     lastUsedAt: Date | null
     createdAt: Date
@@ -1332,6 +1423,7 @@ export interface PromptFieldRefs {
   readonly category: Prisma.FieldRef<"Prompt", 'String'>
   readonly model: Prisma.FieldRef<"Prompt", 'String'>
   readonly status: Prisma.FieldRef<"Prompt", 'String'>
+  readonly qualityScore: Prisma.FieldRef<"Prompt", 'Float'>
   readonly isFavorite: Prisma.FieldRef<"Prompt", 'Boolean'>
   readonly lastUsedAt: Prisma.FieldRef<"Prompt", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Prompt", 'DateTime'>

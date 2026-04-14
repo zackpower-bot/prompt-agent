@@ -52,15 +52,24 @@ function StatCard({ title, value, icon: Icon, sub }: { title: string; value: str
   )
 }
 
-function BarItem({ label, count, max }: { label: string; count: number; max: number }) {
+function BarItem({
+  label,
+  count,
+  max,
+  colorClass = "bg-agent",
+  subLabel,
+}: { label: string; count: number; max: number; colorClass?: string; subLabel?: string }) {
   const pct = max > 0 ? (count / max) * 100 : 0
   return (
-    <div className="flex items-center gap-3 text-sm">
-      <span className="w-16 sm:w-24 truncate text-xs text-muted-foreground">{label}</span>
-      <div className="flex-1 h-5 rounded-sm bg-muted overflow-hidden">
-        <div className="h-full rounded-sm bg-agent transition-all" style={{ width: `${pct}%` }} />
+    <div className="space-y-1">
+      <div className="flex items-center gap-3 text-sm">
+        <span className="w-16 truncate text-xs text-muted-foreground sm:w-24">{label}</span>
+        <div className="flex-1 h-5 overflow-hidden rounded-sm bg-muted">
+          <div className={`h-full rounded-sm transition-all ${colorClass}`} style={{ width: `${pct}%` }} />
+        </div>
+        <span className="w-6 text-right mono-label sm:w-8">{count}</span>
       </div>
-      <span className="w-6 sm:w-8 text-right mono-label">{count}</span>
+      {subLabel && <p className="ml-16 text-[10px] text-muted-foreground sm:ml-24">{subLabel}</p>}
     </div>
   )
 }
@@ -111,6 +120,17 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
   const maxCat = Math.max(...stats.byCategory.map((c) => c.count), 1)
   const maxTag = Math.max(...stats.topTags.map((t) => t.count), 1)
   const fallbackProviders = stats.byProvider
+  type QualityBucket = UsageStats["qualityDistribution"][number]["bucket"]
+  const qualityColorMap: Record<QualityBucket, string> = {
+    A: "bg-agent",
+    B: "bg-agent/50",
+    C: "bg-amber-500",
+    D: "bg-red-500",
+    unscored: "bg-muted",
+  }
+  const qualityCounts = stats.qualityDistribution.map((bucket) => bucket.count)
+  const qualityMax = Math.max(...qualityCounts, 1)
+  const totalQuality = qualityCounts.reduce((sum, value) => sum + value, 0)
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("zh-CN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
@@ -118,7 +138,7 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
   return (
     <div className="h-full overflow-y-auto px-4 py-8">
       <div className="mx-auto w-full">
-      <h1 className="mb-6 text-2xl font-bold">使用统计</h1>
+        <h1 className="mb-6 text-2xl font-bold">使用统计</h1>
 
       {/* Summary cards */}
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -174,6 +194,26 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
               </div>
             ))}
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mb-6">
+        <CardHeader className="pb-3"><CardTitle className="text-sm">质量分布</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          {totalQuality === 0 ? (
+            <p className="text-xs text-muted-foreground">暂无质量数据</p>
+          ) : (
+            stats.qualityDistribution.map((bucket) => (
+              <BarItem
+                key={bucket.bucket}
+                label={bucket.label}
+                count={bucket.count}
+                max={qualityMax}
+                colorClass={qualityColorMap[bucket.bucket]}
+                subLabel={bucket.range}
+              />
+            ))
+          )}
         </CardContent>
       </Card>
 

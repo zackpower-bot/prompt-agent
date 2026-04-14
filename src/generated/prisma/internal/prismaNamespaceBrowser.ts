@@ -87,6 +87,7 @@ export const PromptScalarFieldEnum = {
   category: 'category',
   model: 'model',
   status: 'status',
+  qualityScore: 'qualityScore',
   isFavorite: 'isFavorite',
   lastUsedAt: 'lastUsedAt',
   createdAt: 'createdAt',
