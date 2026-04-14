@@ -7,10 +7,10 @@ import { ScenarioDetailClient } from "./scenario-detail-client"
 export default async function ScenarioDetailPage({
   params,
 }: {
-  params: Promise<{ id: string; locale: string }>
+  params: Promise<{ scenarioId: string; locale: string }>
 }) {
-  const { id, locale } = await params
-  const result = await getScenarioById(id)
+  const { scenarioId, locale } = await params
+  const result = await getScenarioById(scenarioId)
 
   if (!result.success) {
     notFound()
