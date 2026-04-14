@@ -1,18 +1,33 @@
 "use client"
 
 import { usePathname } from "next/navigation"
+import {
+  BarChart3,
+  Blocks,
+  Bot,
+  History,
+  Library,
+  LogOut,
+  PanelLeft,
+  PanelLeftClose,
+  Settings,
+  Sparkles,
+  Wrench,
+} from "lucide-react"
+
+import { logoutAction } from "@/app/actions/auth.actions"
 import { Link } from "@/i18n/navigation"
-import { Bot, Library, Sparkles, Wrench, Blocks, BarChart3, LogOut, PanelLeftClose, PanelLeft, Settings, History } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { ThemeToggle } from "./theme-toggle"
+
 import { AlertsBell } from "./alerts-bell"
 import { SidebarPrompts } from "./sidebar-prompts"
-import { logoutAction } from "@/app/actions/auth.actions"
+import { ThemeToggle } from "./theme-toggle"
 
 const navItems = [
   { href: "/", label: "生成", icon: Sparkles },
   { href: "/prompts", label: "提示词库", icon: Library },
   { href: "/modules", label: "模块", icon: Blocks },
+  { href: "/scenarios", label: "场景配方", icon: Sparkles },
   { href: "/cleanup", label: "清洗", icon: Wrench },
   { href: "/stats", label: "统计", icon: BarChart3 },
   { href: "/activity", label: "活动", icon: History },
@@ -35,10 +50,10 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="hidden md:flex h-12 items-center justify-end px-3 border-b">
+      <div className="hidden h-12 items-center justify-end border-b px-3 md:flex">
         <button
           onClick={onToggle}
-          className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+          className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
           {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
         </button>
@@ -57,7 +72,7 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
                 "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
                 collapsed && "justify-center px-2",
                 isActive
-                  ? "bg-foreground text-background font-medium"
+                  ? "bg-foreground font-medium text-background"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground"
               )}
               title={collapsed ? item.label : undefined}
@@ -75,12 +90,12 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
         </div>
       )}
 
-      <div className="border-t p-2 space-y-1">
+      <div className="space-y-1 border-t p-2">
         <Link
           href="/settings"
           onClick={onNavigate}
           className={cn(
-            "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors",
+            "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
             collapsed && "justify-center px-2"
           )}
           title={collapsed ? "设置" : undefined}
@@ -95,7 +110,7 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
           <button
             type="submit"
             className={cn(
-              "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors",
+              "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
               collapsed && "justify-center px-2"
             )}
             title={collapsed ? "退出" : undefined}
@@ -118,7 +133,7 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
       <div className="flex h-12 items-center px-4">
         <button
           onClick={onMenuClick}
-          className="mr-3 rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors md:hidden"
+          className="mr-3 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:hidden"
         >
           <PanelLeft className="h-4 w-4" />
         </button>
@@ -127,7 +142,7 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
           <div className="flex h-6 w-6 items-center justify-center rounded-sm border-2 border-foreground bg-agent">
             <Bot className="h-3 w-3 text-agent-foreground" />
           </div>
-          <span className="font-semibold tracking-tight text-sm">Prompt Agent</span>
+          <span className="text-sm font-semibold tracking-tight">Prompt Agent</span>
         </Link>
 
         <nav className="ml-6 hidden items-center gap-1 md:flex">
@@ -141,7 +156,7 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
                 className={cn(
                   "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-sm transition-colors",
                   isActive
-                    ? "bg-foreground text-background font-medium"
+                    ? "bg-foreground font-medium text-background"
                     : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 )}
               >

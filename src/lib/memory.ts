@@ -4,7 +4,7 @@
  */
 
 import { prisma } from "@/lib/prisma"
-import { embed, cosineSimilarity, float32ToBytes, bytesToFloat32, getEmbeddingMeta } from "@/lib/embedding"
+import { embed, cosineSimilarity, float32ToBytes, bytesToFloat32Array, getEmbeddingMeta } from "@/lib/embedding"
 import type { MemoryType } from "@/types/memory"
 import { DECAY_FACTORS, MIN_CONFIDENCE, RETRIEVAL_BUDGET, AUDN_SIMILARITY_THRESHOLD } from "@/types/memory"
 
@@ -126,7 +126,7 @@ export async function searchSimilarMemories(
       if (daysSinceCreation < 7) continue // Only exclude recent memories from same prompt
     }
 
-    const stored = bytesToFloat32(row.embedding as Buffer)
+    const stored = bytesToFloat32Array(row.embedding as Buffer)
     const similarity = cosineSimilarity(vec, stored)
     if (similarity < threshold) continue
 
@@ -192,7 +192,7 @@ export async function retrieveForPrompt(
       if (days < 7) continue
     }
 
-    const stored = bytesToFloat32(row.embedding as Buffer)
+    const stored = bytesToFloat32Array(row.embedding as Buffer)
     const similarity = cosineSimilarity(vec, stored)
     const daysSinceUpdate = (now.getTime() - row.updatedAt.getTime()) / (1000 * 60 * 60 * 24)
     const decayFactor = DECAY_FACTORS[row.type as MemoryType] ?? 0.995

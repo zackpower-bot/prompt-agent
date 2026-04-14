@@ -9,10 +9,11 @@ export interface ScenarioRecord {
   description: string
   createdAt: string
   updatedAt: string
+  recipeCount: number
 }
 
 export interface ScenarioWithRecipes extends ScenarioRecord {
-  recipes: { id: string; name: string; description: string; updatedAt: string }[]
+  recipes: { id: string; name: string; description: string; quality: number | null; updatedAt: string }[]
 }
 
 function serializeScenario(row: {
@@ -21,6 +22,8 @@ function serializeScenario(row: {
   description: string
   createdAt: Date
   updatedAt: Date
+  _count?: { recipes: number }
+  recipes?: { id: string }[]
 }): ScenarioRecord {
   return {
     id: row.id,
@@ -28,6 +31,7 @@ function serializeScenario(row: {
     description: row.description,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
+    recipeCount: row._count?.recipes ?? row.recipes?.length ?? 0,
   }
 }
 
@@ -38,6 +42,7 @@ function serializeScenarioWithRecipes(row: any): ScenarioWithRecipes {
       id: recipe.id,
       name: recipe.name,
       description: recipe.description,
+      quality: recipe.quality ?? null,
       updatedAt: recipe.updatedAt.toISOString(),
     })),
   }
@@ -106,6 +111,9 @@ export async function getScenarios(filters?: {
     const rows = await prisma.scenario.findMany({
       where,
       orderBy: { updatedAt: "desc" },
+      include: {
+        _count: { select: { recipes: true } },
+      },
     })
     return { success: true, data: rows.map(serializeScenario) }
   } catch (e) {
@@ -121,7 +129,7 @@ export async function getScenarioById(id: string): Promise<
       where: { id },
       include: {
         recipes: {
-          select: { id: true, name: true, description: true, updatedAt: true },
+          select: { id: true, name: true, description: true, quality: true, updatedAt: true },
           orderBy: { updatedAt: "desc" },
         },
       },

@@ -111,7 +111,7 @@ export function float32ToBytes(arr: Float32Array): Uint8Array<ArrayBuffer> {
 /**
  * Deserialize Prisma Bytes (Buffer/Uint8Array) back to Float32Array.
  */
-export function bytesToFloat32(buf: Buffer | Uint8Array): Float32Array {
+export function bytesToFloat32Array(buf: Buffer | Uint8Array): Float32Array {
   const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf)
   return new Float32Array(bytes.buffer, bytes.byteOffset, bytes.byteLength / 4)
 }
