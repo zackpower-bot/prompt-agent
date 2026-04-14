@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation"
 import { Bot, Library, Sparkles, Wrench, Blocks, BarChart3, LogOut, PanelLeftClose, PanelLeft, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ThemeToggle } from "./theme-toggle"
+import { AlertsBell } from "./alerts-bell"
 import { SidebarPrompts } from "./sidebar-prompts"
 import { logoutAction } from "@/app/actions/auth.actions"
 
@@ -159,6 +160,7 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
 
         {/* Right side */}
         <div className="ml-auto flex items-center gap-1">
+          <AlertsBell />
           <ThemeToggle />
         </div>
       </div>
