@@ -164,3 +164,17 @@ model UsageLog {
   @@index([service, createdAt])
   @@index([provider, createdAt])
 }
+
+model Alert {
+  id             String   @id @default(cuid())
+  type           String
+  severity       String
+  message        String
+  metadata       String   @default("{}")
+  acknowledged   Boolean  @default(false)
+  acknowledgedAt DateTime?
+  createdAt      DateTime @default(now())
+
+  @@index([acknowledged, createdAt])
+  @@index([type, createdAt])
+}

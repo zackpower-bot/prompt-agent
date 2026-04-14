@@ -395,7 +395,8 @@ export const ModelName = {
   AgentProfile: 'AgentProfile',
   MemoryEvent: 'MemoryEvent',
   SemanticMemory: 'SemanticMemory',
-  UsageLog: 'UsageLog'
+  UsageLog: 'UsageLog',
+  Alert: 'Alert'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -411,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "prompt" | "tag" | "promptTag" | "module" | "moduleTag" | "promptVersion" | "agentHistory" | "setting" | "agentProfile" | "memoryEvent" | "semanticMemory" | "usageLog"
+    modelProps: "prompt" | "tag" | "promptTag" | "module" | "moduleTag" | "promptVersion" | "agentHistory" | "setting" | "agentProfile" | "memoryEvent" | "semanticMemory" | "usageLog" | "alert"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1303,6 +1304,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Alert: {
+      payload: Prisma.$AlertPayload<ExtArgs>
+      fields: Prisma.AlertFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AlertFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AlertFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertPayload>
+        }
+        findFirst: {
+          args: Prisma.AlertFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AlertFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertPayload>
+        }
+        findMany: {
+          args: Prisma.AlertFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertPayload>[]
+        }
+        create: {
+          args: Prisma.AlertCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertPayload>
+        }
+        createMany: {
+          args: Prisma.AlertCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AlertCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertPayload>[]
+        }
+        delete: {
+          args: Prisma.AlertDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertPayload>
+        }
+        update: {
+          args: Prisma.AlertUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertPayload>
+        }
+        deleteMany: {
+          args: Prisma.AlertDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AlertUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AlertUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertPayload>[]
+        }
+        upsert: {
+          args: Prisma.AlertUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertPayload>
+        }
+        aggregate: {
+          args: Prisma.AlertAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAlert>
+        }
+        groupBy: {
+          args: Prisma.AlertGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AlertGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AlertCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AlertCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1500,6 +1575,20 @@ export const UsageLogScalarFieldEnum = {
 export type UsageLogScalarFieldEnum = (typeof UsageLogScalarFieldEnum)[keyof typeof UsageLogScalarFieldEnum]
 
 
+export const AlertScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  severity: 'severity',
+  message: 'message',
+  metadata: 'metadata',
+  acknowledged: 'acknowledged',
+  acknowledgedAt: 'acknowledgedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type AlertScalarFieldEnum = (typeof AlertScalarFieldEnum)[keyof typeof AlertScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1670,6 +1759,7 @@ export type GlobalOmitConfig = {
   memoryEvent?: Prisma.MemoryEventOmit
   semanticMemory?: Prisma.SemanticMemoryOmit
   usageLog?: Prisma.UsageLogOmit
+  alert?: Prisma.AlertOmit
 }
 
 /* Types for Logging */

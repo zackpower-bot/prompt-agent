@@ -24,7 +24,7 @@ WITH parsed_tags AS (
     WHERE m.tags IS NOT NULL
       AND json_valid(m.tags)
 )
-INSERT INTO "Tag" ("id", "name")
+INSERT OR IGNORE INTO "Tag" ("id", "name")
 SELECT lower(hex(randomblob(16))), pt.tagName
 FROM (
     SELECT DISTINCT tagName
@@ -32,9 +32,18 @@ FROM (
     WHERE tagName IS NOT NULL
       AND tagName != ''
 ) AS pt
-ON CONFLICT("name") DO NOTHING;
+;
 
-INSERT INTO "ModuleTag" ("moduleId", "tagId")
+WITH parsed_tags AS (
+    SELECT
+        m.id AS moduleId,
+        TRIM(json_each.value) AS tagName
+    FROM "Module" AS m,
+         json_each(m.tags)
+    WHERE m.tags IS NOT NULL
+      AND json_valid(m.tags)
+)
+INSERT OR IGNORE INTO "ModuleTag" ("moduleId", "tagId")
 SELECT mt.moduleId, t.id
 FROM (
     SELECT DISTINCT moduleId, tagName
@@ -42,8 +51,7 @@ FROM (
     WHERE tagName IS NOT NULL
       AND tagName != ''
 ) AS mt
-JOIN "Tag" AS t ON t.name = mt.tagName
-ON CONFLICT("moduleId", "tagId") DO NOTHING;
+JOIN "Tag" AS t ON t.name = mt.tagName;
 
 -- RedefineTables
 PRAGMA defer_foreign_keys=ON;

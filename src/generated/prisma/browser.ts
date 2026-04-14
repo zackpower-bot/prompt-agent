@@ -77,3 +77,8 @@ export type SemanticMemory = Prisma.SemanticMemoryModel
  * 
  */
 export type UsageLog = Prisma.UsageLogModel
+/**
+ * Model Alert
+ * 
+ */
+export type Alert = Prisma.AlertModel

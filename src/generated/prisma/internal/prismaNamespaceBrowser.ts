@@ -62,7 +62,8 @@ export const ModelName = {
   AgentProfile: 'AgentProfile',
   MemoryEvent: 'MemoryEvent',
   SemanticMemory: 'SemanticMemory',
-  UsageLog: 'UsageLog'
+  UsageLog: 'UsageLog',
+  Alert: 'Alert'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -237,6 +238,20 @@ export const UsageLogScalarFieldEnum = {
 } as const
 
 export type UsageLogScalarFieldEnum = (typeof UsageLogScalarFieldEnum)[keyof typeof UsageLogScalarFieldEnum]
+
+
+export const AlertScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  severity: 'severity',
+  message: 'message',
+  metadata: 'metadata',
+  acknowledged: 'acknowledged',
+  acknowledgedAt: 'acknowledgedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type AlertScalarFieldEnum = (typeof AlertScalarFieldEnum)[keyof typeof AlertScalarFieldEnum]
 
 
 export const SortOrder = {
