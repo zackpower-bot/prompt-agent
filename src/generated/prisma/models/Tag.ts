@@ -159,12 +159,14 @@ export type TagWhereInput = {
   id?: Prisma.StringFilter<"Tag"> | string
   name?: Prisma.StringFilter<"Tag"> | string
   prompts?: Prisma.PromptTagListRelationFilter
+  modules?: Prisma.ModuleTagListRelationFilter
 }
 
 export type TagOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   prompts?: Prisma.PromptTagOrderByRelationAggregateInput
+  modules?: Prisma.ModuleTagOrderByRelationAggregateInput
 }
 
 export type TagWhereUniqueInput = Prisma.AtLeast<{
@@ -174,6 +176,7 @@ export type TagWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.TagWhereInput[]
   NOT?: Prisma.TagWhereInput | Prisma.TagWhereInput[]
   prompts?: Prisma.PromptTagListRelationFilter
+  modules?: Prisma.ModuleTagListRelationFilter
 }, "id" | "name">
 
 export type TagOrderByWithAggregationInput = {
@@ -196,24 +199,28 @@ export type TagCreateInput = {
   id?: string
   name: string
   prompts?: Prisma.PromptTagCreateNestedManyWithoutTagInput
+  modules?: Prisma.ModuleTagCreateNestedManyWithoutTagInput
 }
 
 export type TagUncheckedCreateInput = {
   id?: string
   name: string
   prompts?: Prisma.PromptTagUncheckedCreateNestedManyWithoutTagInput
+  modules?: Prisma.ModuleTagUncheckedCreateNestedManyWithoutTagInput
 }
 
 export type TagUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   prompts?: Prisma.PromptTagUpdateManyWithoutTagNestedInput
+  modules?: Prisma.ModuleTagUpdateManyWithoutTagNestedInput
 }
 
 export type TagUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   prompts?: Prisma.PromptTagUncheckedUpdateManyWithoutTagNestedInput
+  modules?: Prisma.ModuleTagUncheckedUpdateManyWithoutTagNestedInput
 }
 
 export type TagCreateManyInput = {
@@ -265,14 +272,30 @@ export type TagUpdateOneRequiredWithoutPromptsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TagUpdateToOneWithWhereWithoutPromptsInput, Prisma.TagUpdateWithoutPromptsInput>, Prisma.TagUncheckedUpdateWithoutPromptsInput>
 }
 
+export type TagCreateNestedOneWithoutModulesInput = {
+  create?: Prisma.XOR<Prisma.TagCreateWithoutModulesInput, Prisma.TagUncheckedCreateWithoutModulesInput>
+  connectOrCreate?: Prisma.TagCreateOrConnectWithoutModulesInput
+  connect?: Prisma.TagWhereUniqueInput
+}
+
+export type TagUpdateOneRequiredWithoutModulesNestedInput = {
+  create?: Prisma.XOR<Prisma.TagCreateWithoutModulesInput, Prisma.TagUncheckedCreateWithoutModulesInput>
+  connectOrCreate?: Prisma.TagCreateOrConnectWithoutModulesInput
+  upsert?: Prisma.TagUpsertWithoutModulesInput
+  connect?: Prisma.TagWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TagUpdateToOneWithWhereWithoutModulesInput, Prisma.TagUpdateWithoutModulesInput>, Prisma.TagUncheckedUpdateWithoutModulesInput>
+}
+
 export type TagCreateWithoutPromptsInput = {
   id?: string
   name: string
+  modules?: Prisma.ModuleTagCreateNestedManyWithoutTagInput
 }
 
 export type TagUncheckedCreateWithoutPromptsInput = {
   id?: string
   name: string
+  modules?: Prisma.ModuleTagUncheckedCreateNestedManyWithoutTagInput
 }
 
 export type TagCreateOrConnectWithoutPromptsInput = {
@@ -294,11 +317,53 @@ export type TagUpdateToOneWithWhereWithoutPromptsInput = {
 export type TagUpdateWithoutPromptsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  modules?: Prisma.ModuleTagUpdateManyWithoutTagNestedInput
 }
 
 export type TagUncheckedUpdateWithoutPromptsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  modules?: Prisma.ModuleTagUncheckedUpdateManyWithoutTagNestedInput
+}
+
+export type TagCreateWithoutModulesInput = {
+  id?: string
+  name: string
+  prompts?: Prisma.PromptTagCreateNestedManyWithoutTagInput
+}
+
+export type TagUncheckedCreateWithoutModulesInput = {
+  id?: string
+  name: string
+  prompts?: Prisma.PromptTagUncheckedCreateNestedManyWithoutTagInput
+}
+
+export type TagCreateOrConnectWithoutModulesInput = {
+  where: Prisma.TagWhereUniqueInput
+  create: Prisma.XOR<Prisma.TagCreateWithoutModulesInput, Prisma.TagUncheckedCreateWithoutModulesInput>
+}
+
+export type TagUpsertWithoutModulesInput = {
+  update: Prisma.XOR<Prisma.TagUpdateWithoutModulesInput, Prisma.TagUncheckedUpdateWithoutModulesInput>
+  create: Prisma.XOR<Prisma.TagCreateWithoutModulesInput, Prisma.TagUncheckedCreateWithoutModulesInput>
+  where?: Prisma.TagWhereInput
+}
+
+export type TagUpdateToOneWithWhereWithoutModulesInput = {
+  where?: Prisma.TagWhereInput
+  data: Prisma.XOR<Prisma.TagUpdateWithoutModulesInput, Prisma.TagUncheckedUpdateWithoutModulesInput>
+}
+
+export type TagUpdateWithoutModulesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  prompts?: Prisma.PromptTagUpdateManyWithoutTagNestedInput
+}
+
+export type TagUncheckedUpdateWithoutModulesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  prompts?: Prisma.PromptTagUncheckedUpdateManyWithoutTagNestedInput
 }
 
 
@@ -308,10 +373,12 @@ export type TagUncheckedUpdateWithoutPromptsInput = {
 
 export type TagCountOutputType = {
   prompts: number
+  modules: number
 }
 
 export type TagCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   prompts?: boolean | TagCountOutputTypeCountPromptsArgs
+  modules?: boolean | TagCountOutputTypeCountModulesArgs
 }
 
 /**
@@ -331,11 +398,19 @@ export type TagCountOutputTypeCountPromptsArgs<ExtArgs extends runtime.Types.Ext
   where?: Prisma.PromptTagWhereInput
 }
 
+/**
+ * TagCountOutputType without action
+ */
+export type TagCountOutputTypeCountModulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ModuleTagWhereInput
+}
+
 
 export type TagSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   prompts?: boolean | Prisma.Tag$promptsArgs<ExtArgs>
+  modules?: boolean | Prisma.Tag$modulesArgs<ExtArgs>
   _count?: boolean | Prisma.TagCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tag"]>
 
@@ -357,6 +432,7 @@ export type TagSelectScalar = {
 export type TagOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name", ExtArgs["result"]["tag"]>
 export type TagInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   prompts?: boolean | Prisma.Tag$promptsArgs<ExtArgs>
+  modules?: boolean | Prisma.Tag$modulesArgs<ExtArgs>
   _count?: boolean | Prisma.TagCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TagIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -366,6 +442,7 @@ export type $TagPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   name: "Tag"
   objects: {
     prompts: Prisma.$PromptTagPayload<ExtArgs>[]
+    modules: Prisma.$ModuleTagPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -765,6 +842,7 @@ readonly fields: TagFieldRefs;
 export interface Prisma__TagClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   prompts<T extends Prisma.Tag$promptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tag$promptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PromptTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  modules<T extends Prisma.Tag$modulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tag$modulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModuleTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1208,6 +1286,30 @@ export type Tag$promptsArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.PromptTagScalarFieldEnum | Prisma.PromptTagScalarFieldEnum[]
+}
+
+/**
+ * Tag.modules
+ */
+export type Tag$modulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ModuleTag
+   */
+  select?: Prisma.ModuleTagSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ModuleTag
+   */
+  omit?: Prisma.ModuleTagOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ModuleTagInclude<ExtArgs> | null
+  where?: Prisma.ModuleTagWhereInput
+  orderBy?: Prisma.ModuleTagOrderByWithRelationInput | Prisma.ModuleTagOrderByWithRelationInput[]
+  cursor?: Prisma.ModuleTagWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ModuleTagScalarFieldEnum | Prisma.ModuleTagScalarFieldEnum[]
 }
 
 /**

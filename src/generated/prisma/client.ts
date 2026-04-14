@@ -62,6 +62,11 @@ export type PromptTag = Prisma.PromptTagModel
  */
 export type Module = Prisma.ModuleModel
 /**
+ * Model ModuleTag
+ * 
+ */
+export type ModuleTag = Prisma.ModuleTagModel
+/**
  * Model PromptVersion
  * 
  */

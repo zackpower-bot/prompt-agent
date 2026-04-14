@@ -1,5 +1,6 @@
 "use server"
 
+import type { Prisma } from "@/generated/prisma/client"
 import { prisma } from "@/lib/prisma"
 
 export interface ModuleWithMeta {
@@ -12,16 +13,48 @@ export interface ModuleWithMeta {
   updatedAt: string
 }
 
+const moduleWithTagsInclude = {
+  tags: {
+    include: { tag: true },
+  },
+} as const
+
+type TxClient = Prisma.TransactionClient
+type TagRecord = { id: string; name: string }
+
 function serializeModule(row: any): ModuleWithMeta {
   return {
     id: row.id,
     title: row.title,
     content: row.content,
     type: row.type,
-    tags: JSON.parse(row.tags || "[]"),
+    tags: Array.isArray(row.tags) ? row.tags.map((t: any) => t.tag?.name ?? "").filter(Boolean) : [],
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   }
+}
+
+function normalizeTagNames(tags?: string[]) {
+  if (!tags) return []
+  const seen = new Set<string>()
+  for (const raw of tags) {
+    const trimmed = raw?.trim()
+    if (trimmed && !seen.has(trimmed)) seen.add(trimmed)
+  }
+  return Array.from(seen)
+}
+
+async function upsertTags(tx: TxClient, tagNames: string[]): Promise<TagRecord[]> {
+  if (!tagNames.length) return []
+  return Promise.all(
+    tagNames.map((name) =>
+      tx.tag.upsert({
+        where: { name },
+        create: { name },
+        update: {},
+      })
+    )
+  )
 }
 
 export async function getModules(filters?: {
@@ -37,7 +70,11 @@ export async function getModules(filters?: {
         { content: { contains: filters.search } },
       ]
     }
-    const rows = await prisma.module.findMany({ where, orderBy: { updatedAt: "desc" } })
+    const rows = await prisma.module.findMany({
+      where,
+      orderBy: { updatedAt: "desc" },
+      include: moduleWithTagsInclude,
+    })
     return { success: true, data: rows.map(serializeModule) }
   } catch (e) {
     return { success: false, error: (e as Error).message }
@@ -51,13 +88,24 @@ export async function createModule(input: {
   tags?: string[]
 }): Promise<{ success: true; data: ModuleWithMeta } | { success: false; error: string }> {
   try {
-    const row = await prisma.module.create({
-      data: {
-        title: input.title,
-        content: input.content,
-        type: input.type,
-        tags: JSON.stringify(input.tags ?? []),
-      },
+    const tagNames = normalizeTagNames(input.tags)
+    const row = await prisma.$transaction(async (tx) => {
+      const tags = await upsertTags(tx, tagNames)
+      return tx.module.create({
+        data: {
+          title: input.title,
+          content: input.content,
+          type: input.type,
+          tags: tags.length
+            ? {
+                create: tags.map((tag) => ({
+                  tag: { connect: { id: tag.id } },
+                })),
+              }
+            : undefined,
+        },
+        include: moduleWithTagsInclude,
+      })
     })
     return { success: true, data: serializeModule(row) }
   } catch (e) {
@@ -70,14 +118,33 @@ export async function updateModule(
   input: Partial<{ title: string; content: string; type: string; tags: string[] }>
 ): Promise<{ success: true; data: ModuleWithMeta } | { success: false; error: string }> {
   try {
-    const row = await prisma.module.update({
-      where: { id },
-      data: {
-        ...(input.title !== undefined && { title: input.title }),
-        ...(input.content !== undefined && { content: input.content }),
-        ...(input.type !== undefined && { type: input.type }),
-        ...(input.tags !== undefined && { tags: JSON.stringify(input.tags) }),
-      },
+    const row = await prisma.$transaction(async (tx) => {
+      const data: Prisma.ModuleUpdateInput = {}
+      if (input.title !== undefined) data.title = input.title
+      if (input.content !== undefined) data.content = input.content
+      if (input.type !== undefined) data.type = input.type
+
+      if (Object.keys(data).length) {
+        await tx.module.update({ where: { id }, data })
+      }
+
+      if (input.tags !== undefined) {
+        const tagNames = normalizeTagNames(input.tags)
+        const tags = await upsertTags(tx, tagNames)
+        await tx.moduleTag.deleteMany({ where: { moduleId: id } })
+        if (tags.length) {
+          await tx.moduleTag.createMany({
+            data: tags.map((tag) => ({ moduleId: id, tagId: tag.id })),
+          })
+        }
+      }
+
+      const module = await tx.module.findUnique({
+        where: { id },
+        include: moduleWithTagsInclude,
+      })
+      if (!module) throw new Error("Module not found")
+      return module
     })
     return { success: true, data: serializeModule(row) }
   } catch (e) {

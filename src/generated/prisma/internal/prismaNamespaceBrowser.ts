@@ -55,6 +55,7 @@ export const ModelName = {
   Tag: 'Tag',
   PromptTag: 'PromptTag',
   Module: 'Module',
+  ModuleTag: 'ModuleTag',
   PromptVersion: 'PromptVersion',
   AgentHistory: 'AgentHistory',
   Setting: 'Setting',
@@ -115,12 +116,19 @@ export const ModuleScalarFieldEnum = {
   title: 'title',
   content: 'content',
   type: 'type',
-  tags: 'tags',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ModuleScalarFieldEnum = (typeof ModuleScalarFieldEnum)[keyof typeof ModuleScalarFieldEnum]
+
+
+export const ModuleTagScalarFieldEnum = {
+  moduleId: 'moduleId',
+  tagId: 'tagId'
+} as const
+
+export type ModuleTagScalarFieldEnum = (typeof ModuleTagScalarFieldEnum)[keyof typeof ModuleTagScalarFieldEnum]
 
 
 export const PromptVersionScalarFieldEnum = {

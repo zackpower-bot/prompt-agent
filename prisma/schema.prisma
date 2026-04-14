@@ -29,6 +29,7 @@ model Tag {
   id      String      @id @default(cuid())
   name    String      @unique
   prompts PromptTag[]
+  modules ModuleTag[]
 }
 
 model PromptTag {
@@ -41,13 +42,23 @@ model PromptTag {
 }
 
 model Module {
-  id        String   @id @default(cuid())
+  id        String      @id @default(cuid())
   title     String
   content   String
-  type      String   @default("role")
-  tags      String   @default("[]")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  type      String      @default("role")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  tags ModuleTag[]
+}
+
+model ModuleTag {
+  moduleId String
+  tagId    String
+  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([moduleId, tagId])
 }
 
 model PromptVersion {

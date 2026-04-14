@@ -32,7 +32,15 @@ export const searchModulesTool: AgentToolDefinition = {
         OR: [
           { title: { contains: query } },
           { content: { contains: query } },
-          { tags: { contains: query } },
+          {
+            tags: {
+              some: {
+                tag: {
+                  name: { contains: query },
+                },
+              },
+            },
+          },
         ],
       },
       take: 5,

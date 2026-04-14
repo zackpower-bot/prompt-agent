@@ -388,6 +388,7 @@ export const ModelName = {
   Tag: 'Tag',
   PromptTag: 'PromptTag',
   Module: 'Module',
+  ModuleTag: 'ModuleTag',
   PromptVersion: 'PromptVersion',
   AgentHistory: 'AgentHistory',
   Setting: 'Setting',
@@ -410,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "prompt" | "tag" | "promptTag" | "module" | "promptVersion" | "agentHistory" | "setting" | "agentProfile" | "memoryEvent" | "semanticMemory" | "usageLog"
+    modelProps: "prompt" | "tag" | "promptTag" | "module" | "moduleTag" | "promptVersion" | "agentHistory" | "setting" | "agentProfile" | "memoryEvent" | "semanticMemory" | "usageLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -707,6 +708,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ModuleCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ModuleCountAggregateOutputType> | number
+        }
+      }
+    }
+    ModuleTag: {
+      payload: Prisma.$ModuleTagPayload<ExtArgs>
+      fields: Prisma.ModuleTagFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ModuleTagFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleTagPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ModuleTagFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleTagPayload>
+        }
+        findFirst: {
+          args: Prisma.ModuleTagFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleTagPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ModuleTagFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleTagPayload>
+        }
+        findMany: {
+          args: Prisma.ModuleTagFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleTagPayload>[]
+        }
+        create: {
+          args: Prisma.ModuleTagCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleTagPayload>
+        }
+        createMany: {
+          args: Prisma.ModuleTagCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ModuleTagCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleTagPayload>[]
+        }
+        delete: {
+          args: Prisma.ModuleTagDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleTagPayload>
+        }
+        update: {
+          args: Prisma.ModuleTagUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleTagPayload>
+        }
+        deleteMany: {
+          args: Prisma.ModuleTagDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ModuleTagUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ModuleTagUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleTagPayload>[]
+        }
+        upsert: {
+          args: Prisma.ModuleTagUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleTagPayload>
+        }
+        aggregate: {
+          args: Prisma.ModuleTagAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateModuleTag>
+        }
+        groupBy: {
+          args: Prisma.ModuleTagGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ModuleTagGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ModuleTagCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ModuleTagCountAggregateOutputType> | number
         }
       }
     }
@@ -1302,12 +1377,19 @@ export const ModuleScalarFieldEnum = {
   title: 'title',
   content: 'content',
   type: 'type',
-  tags: 'tags',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type ModuleScalarFieldEnum = (typeof ModuleScalarFieldEnum)[keyof typeof ModuleScalarFieldEnum]
+
+
+export const ModuleTagScalarFieldEnum = {
+  moduleId: 'moduleId',
+  tagId: 'tagId'
+} as const
+
+export type ModuleTagScalarFieldEnum = (typeof ModuleTagScalarFieldEnum)[keyof typeof ModuleTagScalarFieldEnum]
 
 
 export const PromptVersionScalarFieldEnum = {
@@ -1580,6 +1662,7 @@ export type GlobalOmitConfig = {
   tag?: Prisma.TagOmit
   promptTag?: Prisma.PromptTagOmit
   module?: Prisma.ModuleOmit
+  moduleTag?: Prisma.ModuleTagOmit
   promptVersion?: Prisma.PromptVersionOmit
   agentHistory?: Prisma.AgentHistoryOmit
   setting?: Prisma.SettingOmit
