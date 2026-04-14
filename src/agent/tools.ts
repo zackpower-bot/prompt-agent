@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { maybeEmitTavilyQuotaAlert } from "@/lib/alerts"
 import { summarizeText } from "@/lib/utils"
 import { logUsage } from "@/lib/usage"
 import type { AgentToolDefinition, NarrationLocale } from "./core"
@@ -112,6 +113,7 @@ export const webSearchTool: AgentToolDefinition = {
         requestCount: 1,
       })
       usageLogged = true
+      await maybeEmitTavilyQuotaAlert().catch(() => {})
 
       const parts: string[] = []
 
