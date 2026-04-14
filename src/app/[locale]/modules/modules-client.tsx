@@ -92,7 +92,8 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
   })
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="h-full overflow-y-auto px-4 py-8">
+      <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">模块管理</h1>
@@ -177,6 +178,7 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
         {filtered.length === 0 && !isPending && (
           <p className="py-8 text-center text-sm text-muted-foreground">暂无模块</p>
         )}
+      </div>
       </div>
     </div>
   )

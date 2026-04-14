@@ -73,7 +73,8 @@ export function SettingsClient({ initialProfiles }: { initialProfiles: ProfileEn
   }, [])
 
   return (
-    <div className="px-4 py-8 max-w-3xl mx-auto">
+    <div className="h-full overflow-y-auto px-4 py-8">
+      <div className="mx-auto max-w-3xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Bot className="h-6 w-6" />
@@ -148,6 +149,7 @@ export function SettingsClient({ initialProfiles }: { initialProfiles: ProfileEn
             </Card>
           )
         })}
+      </div>
       </div>
     </div>
   )

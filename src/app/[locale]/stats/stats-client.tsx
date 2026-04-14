@@ -116,7 +116,8 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
     new Date(d).toLocaleDateString("zh-CN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
 
   return (
-    <div className="px-4 py-8">
+    <div className="h-full overflow-y-auto px-4 py-8">
+      <div className="mx-auto w-full">
       <h1 className="mb-6 text-2xl font-bold">使用统计</h1>
 
       {/* Summary cards */}
@@ -258,6 +259,7 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   )
 }

@@ -64,7 +64,8 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
     new Date(date).toLocaleDateString("zh-CN", { month: "short", day: "numeric" })
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <div className="h-full overflow-y-auto px-4 py-8">
+      <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">{total} 条提示词</p>
         <div className="flex items-center gap-2">
@@ -216,6 +217,7 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
           </Button>
         </div>
       )}
+      </div>
     </div>
   )
 }

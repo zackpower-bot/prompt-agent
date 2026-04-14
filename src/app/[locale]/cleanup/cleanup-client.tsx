@@ -116,7 +116,8 @@ export function CleanupClient({ prompts }: { prompts: PromptWithTags[] }) {
   const errorCount = [...suggestions.values()].filter(s => s.status === "error").length
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <div className="h-full overflow-y-auto px-4 py-8">
+      <div className="mx-auto max-w-4xl">
       <Link href="/prompts" className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" />返回列表
       </Link>
@@ -205,6 +206,7 @@ export function CleanupClient({ prompts }: { prompts: PromptWithTags[] }) {
             </Card>
           )
         })}
+      </div>
       </div>
     </div>
   )
