@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { getTavilyMonthlyUsage } from "@/lib/quota"
+import { getTavilyUsage } from "@/lib/tavily-quota"
 
 const DAY = 1000 * 60 * 60 * 24
 
@@ -32,7 +32,7 @@ export async function GET(req: Request) {
   const nowDate = new Date(now)
   const last24h = new Date(now - DAY)
   const last7d = new Date(now - DAY * 7)
-  const quotaPromise = getTavilyMonthlyUsage(nowDate)
+  const quotaPromise = getTavilyUsage(nowDate)
 
   const [llmTotals, llmSuccess, llm24h, llm7d] = await Promise.all([
     prisma.usageLog.groupBy({
