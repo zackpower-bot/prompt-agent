@@ -1,7 +1,17 @@
 import { prisma } from "@/lib/prisma"
 import { summarizeText } from "@/lib/utils"
+import { logUsage } from "@/lib/usage"
 import type { AgentToolDefinition, NarrationLocale } from "./core"
 import { getTemplateById, getTemplateList, type PromptTemplate } from "./templates"
+
+function getErrorCode(error: unknown): string {
+  if (error instanceof Error) {
+    const match = error.message.match(/\b(\d{3}|[a-z_]+)\b/i)
+    return match?.[1]?.toLowerCase() ?? error.message
+  }
+  if (typeof error === "string") return error
+  return "unknown"
+}
 
 export const searchModulesTool: AgentToolDefinition = {
   name: "search_modules",
@@ -61,36 +71,67 @@ export const webSearchTool: AgentToolDefinition = {
         : "Web search unavailable (TAVILY_API_KEY not configured)."
     }
 
-    const response = await fetch("https://api.tavily.com/search", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        api_key: apiKey,
-        query,
-        max_results: 5,
-        search_depth: "basic",
-        include_answer: true,
-      }),
-    })
+    let usageLogged = false
+    try {
+      const response = await fetch("https://api.tavily.com/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          api_key: apiKey,
+          query,
+          max_results: 5,
+          search_depth: "basic",
+          include_answer: true,
+        }),
+      })
 
-    if (!response.ok) throw new Error(`Tavily API error: ${response.status}`)
+      if (!response.ok) {
+        usageLogged = true
+        await logUsage({
+          service: "tavily",
+          provider: "tavily",
+          requestCount: 1,
+          success: false,
+          errorCode: response.status.toString(),
+        })
+        throw new Error(`Tavily API error: ${response.status}`)
+      }
 
-    const data = await response.json()
-    const parts: string[] = []
+      const data = await response.json()
+      await logUsage({
+        service: "tavily",
+        provider: "tavily",
+        requestCount: 1,
+      })
+      usageLogged = true
 
-    if (data.answer) {
-      parts.push(locale === "zh" ? `摘要：${data.answer}` : `Summary: ${data.answer}`)
+      const parts: string[] = []
+
+      if (data.answer) {
+        parts.push(locale === "zh" ? `摘要：${data.answer}` : `Summary: ${data.answer}`)
+      }
+
+      for (const result of (data.results ?? []).slice(0, 5)) {
+        parts.push(`- [${result.title}](${result.url})\n  ${summarizeText(result.content, 200)}`)
+      }
+
+      return parts.length > 0
+        ? parts.join("\n\n")
+        : locale === "zh"
+          ? `未找到"${query}"相关结果。`
+          : `No results for "${query}".`
+    } catch (error) {
+      if (!usageLogged) {
+        await logUsage({
+          service: "tavily",
+          provider: "tavily",
+          requestCount: 1,
+          success: false,
+          errorCode: getErrorCode(error),
+        })
+      }
+      throw error
     }
-
-    for (const result of (data.results ?? []).slice(0, 5)) {
-      parts.push(`- [${result.title}](${result.url})\n  ${summarizeText(result.content, 200)}`)
-    }
-
-    return parts.length > 0
-      ? parts.join("\n\n")
-      : locale === "zh"
-        ? `未找到"${query}"相关结果。`
-        : `No results for "${query}".`
   },
 }
 

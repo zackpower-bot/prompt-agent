@@ -393,7 +393,8 @@ export const ModelName = {
   Setting: 'Setting',
   AgentProfile: 'AgentProfile',
   MemoryEvent: 'MemoryEvent',
-  SemanticMemory: 'SemanticMemory'
+  SemanticMemory: 'SemanticMemory',
+  UsageLog: 'UsageLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -409,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "prompt" | "tag" | "promptTag" | "module" | "promptVersion" | "agentHistory" | "setting" | "agentProfile" | "memoryEvent" | "semanticMemory"
+    modelProps: "prompt" | "tag" | "promptTag" | "module" | "promptVersion" | "agentHistory" | "setting" | "agentProfile" | "memoryEvent" | "semanticMemory" | "usageLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1153,6 +1154,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    UsageLog: {
+      payload: Prisma.$UsageLogPayload<ExtArgs>
+      fields: Prisma.UsageLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UsageLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UsageLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageLogPayload>
+        }
+        findFirst: {
+          args: Prisma.UsageLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UsageLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageLogPayload>
+        }
+        findMany: {
+          args: Prisma.UsageLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageLogPayload>[]
+        }
+        create: {
+          args: Prisma.UsageLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageLogPayload>
+        }
+        createMany: {
+          args: Prisma.UsageLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UsageLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageLogPayload>[]
+        }
+        delete: {
+          args: Prisma.UsageLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageLogPayload>
+        }
+        update: {
+          args: Prisma.UsageLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.UsageLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UsageLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UsageLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.UsageLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UsageLogPayload>
+        }
+        aggregate: {
+          args: Prisma.UsageLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUsageLog>
+        }
+        groupBy: {
+          args: Prisma.UsageLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UsageLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UsageLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UsageLogCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1327,6 +1402,22 @@ export const SemanticMemoryScalarFieldEnum = {
 export type SemanticMemoryScalarFieldEnum = (typeof SemanticMemoryScalarFieldEnum)[keyof typeof SemanticMemoryScalarFieldEnum]
 
 
+export const UsageLogScalarFieldEnum = {
+  id: 'id',
+  service: 'service',
+  provider: 'provider',
+  model: 'model',
+  inputTokens: 'inputTokens',
+  outputTokens: 'outputTokens',
+  requestCount: 'requestCount',
+  success: 'success',
+  errorCode: 'errorCode',
+  createdAt: 'createdAt'
+} as const
+
+export type UsageLogScalarFieldEnum = (typeof UsageLogScalarFieldEnum)[keyof typeof UsageLogScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1495,6 +1586,7 @@ export type GlobalOmitConfig = {
   agentProfile?: Prisma.AgentProfileOmit
   memoryEvent?: Prisma.MemoryEventOmit
   semanticMemory?: Prisma.SemanticMemoryOmit
+  usageLog?: Prisma.UsageLogOmit
 }
 
 /* Types for Logging */

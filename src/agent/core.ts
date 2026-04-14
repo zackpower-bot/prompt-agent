@@ -6,6 +6,7 @@ import type {
 } from "openai/resources/chat/completions"
 import { createClient, getDefaultProvider, getAvailableProviders, PROVIDER_CONFIGS } from "@/lib/providers"
 import type { ProviderName } from "@/lib/providers"
+import { logUsage } from "@/lib/usage"
 
 export type NarrationLocale = "zh" | "en"
 
@@ -115,10 +116,34 @@ function isRetryableError(error: unknown): boolean {
   return false
 }
 
+function extractErrorCode(error: unknown): string {
+  if (error instanceof Error) {
+    const match = error.message.match(/\b(\d{3}|[a-z_]+)\b/i)
+    return match?.[1]?.toLowerCase() ?? error.message
+  }
+  if (typeof error === "string") return error
+  return "unknown"
+}
+
+async function logLlmFailure(provider: ProviderName, model: string, error: unknown) {
+  await logUsage({
+    service: "llm",
+    provider,
+    model,
+    inputTokens: 0,
+    outputTokens: 0,
+    success: false,
+    errorCode: extractErrorCode(error),
+  })
+}
+
 export async function runAgent(options: AgentRunOptions): Promise<AgentRunResult> {
+  const initialProvider = options.provider ?? getDefaultProvider()
+  const initialModel = options.model ?? PROVIDER_CONFIGS[initialProvider].defaultModel
   try {
     return await runAgentInternal(options)
   } catch (error) {
+    await logLlmFailure(initialProvider, initialModel, error)
     // On retryable error, try fallback providers
     if (isRetryableError(error) && !options.provider) {
       const available = getAvailableProviders()
@@ -130,6 +155,7 @@ export async function runAgent(options: AgentRunOptions): Promise<AgentRunResult
           const result = await runAgentInternal({ ...options, provider: fallback })
           return result
         } catch (fallbackError) {
+          await logLlmFailure(fallback, options.model ?? PROVIDER_CONFIGS[fallback].defaultModel, fallbackError)
           if (!isRetryableError(fallbackError)) throw fallbackError
         }
       }
@@ -179,6 +205,26 @@ async function runAgentInternal(options: AgentRunOptions): Promise<AgentRunResul
   const trajectory: AgentTrajectoryStep[] = []
   let totalInput = 0
   let totalOutput = 0
+
+  const createResult = (text: string): AgentRunResult => ({
+    text,
+    trajectory,
+    provider: providerName,
+    model: modelName,
+    usage: { inputTokens: totalInput, outputTokens: totalOutput },
+  })
+
+  const finalizeResult = async (text: string): Promise<AgentRunResult> => {
+    const result = createResult(text)
+    await logUsage({
+      service: "llm",
+      provider: providerName,
+      model: modelName,
+      inputTokens: totalInput,
+      outputTokens: totalOutput,
+    })
+    return result
+  }
 
   for (let iteration = 0; iteration < maxIterations; iteration++) {
     // Use streaming to provide real-time token updates
@@ -249,26 +295,14 @@ async function runAgentInternal(options: AgentRunOptions): Promise<AgentRunResul
         pushStep(trajectory, "thought", thinking, null, null, null, onStep)
       }
       if (output && !toolCalls?.length) {
-        return {
-          text: output,
-          trajectory,
-          provider: providerName,
-          model: modelName,
-          usage: { inputTokens: totalInput, outputTokens: totalOutput },
-        }
+        return finalizeResult(output)
       }
     }
 
     // Handle tool calls (from streamed accumulation)
     const accumulatedToolCalls = toolCalls ?? []
     if (accumulatedToolCalls.length === 0 && rawContent) {
-      return {
-        text: parseThinkingContent(rawContent).output || rawContent,
-        trajectory,
-        provider: providerName,
-        model: modelName,
-        usage: { inputTokens: totalInput, outputTokens: totalOutput },
-      }
+      return finalizeResult(parseThinkingContent(rawContent).output || rawContent)
     }
 
     if (accumulatedToolCalls.length > 0) {
@@ -322,11 +356,5 @@ async function runAgentInternal(options: AgentRunOptions): Promise<AgentRunResul
   }
 
   // Iteration limit reached
-  return {
-    text: locale === "zh" ? "Agent 达到最大迭代次数。" : "Agent reached maximum iterations.",
-    trajectory,
-    provider: providerName,
-    model: modelName,
-    usage: { inputTokens: totalInput, outputTokens: totalOutput },
-  }
+  return finalizeResult(locale === "zh" ? "Agent 达到最大迭代次数。" : "Agent reached maximum iterations.")
 }

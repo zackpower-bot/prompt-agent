@@ -91,3 +91,8 @@ export type MemoryEvent = Prisma.MemoryEventModel
  * 
  */
 export type SemanticMemory = Prisma.SemanticMemoryModel
+/**
+ * Model UsageLog
+ * 
+ */
+export type UsageLog = Prisma.UsageLogModel

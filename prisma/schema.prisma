@@ -137,3 +137,19 @@ model SemanticMemory {
   @@index([supersededById])
   @@index([decayAt])
 }
+
+model UsageLog {
+  id           String   @id @default(cuid())
+  service      String
+  provider     String
+  model        String?
+  inputTokens  Int?
+  outputTokens Int?
+  requestCount Int      @default(1)
+  success      Boolean  @default(true)
+  errorCode    String?
+  createdAt    DateTime @default(now())
+
+  @@index([service, createdAt])
+  @@index([provider, createdAt])
+}
