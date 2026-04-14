@@ -28,7 +28,7 @@ export function ResultCanvas({
     <section className="flex min-h-0 flex-1 flex-col rounded-3xl border border-border/60 bg-card/40 p-6 shadow-sm">
       <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
         <span>由 {providerLabel} 生成</span>
-        <span className="text-muted-foreground/70">路 {tokenLabel}</span>
+        <span className="text-muted-foreground/70">· {tokenLabel}</span>
       </div>
 
       {duplicates.length > 0 && (

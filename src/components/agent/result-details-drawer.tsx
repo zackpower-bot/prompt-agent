@@ -89,7 +89,7 @@ export function ResultDetailsDrawer({
                     {qualitySignal.suggestions.length > 0 && (
                       <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                         {qualitySignal.suggestions.map((suggestion) => (
-                          <li key={suggestion}>路 {suggestion}</li>
+                          <li key={suggestion}>· {suggestion}</li>
                         ))}
                       </ul>
                     )}
