@@ -18,6 +18,7 @@ model Prompt {
   qualityScore Float?
   isFavorite  Boolean   @default(false)
   lastUsedAt  DateTime?
+  deletedAt   DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -25,6 +26,8 @@ model Prompt {
   versions PromptVersion[]
   history  AgentHistory[]
   moduleUses PromptModuleUse[]
+
+  @@index([deletedAt])
 }
 
 model Tag {
@@ -51,12 +54,15 @@ model Module {
   embedding Bytes?
   embeddingModel String?
   embeddingUpdatedAt DateTime?
+  deletedAt DateTime?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
   tags ModuleTag[]
   steps RecipeStep[]
   uses PromptModuleUse[]
+
+  @@index([deletedAt])
 }
 
 model ModuleTag {
@@ -243,4 +249,24 @@ model Alert {
 
   @@index([acknowledged, createdAt])
   @@index([type, createdAt])
+}
+
+model ActionLog {
+  id              String    @id @default(cuid())
+  actor           String
+  action          String
+  targetType      String
+  targetId        String
+  before          String
+  after           String
+  reversibleUntil DateTime?
+  reversedAt      DateTime?
+  reversedBy      String?
+  reason          String?
+  createdAt       DateTime  @default(now())
+
+  @@index([actor, createdAt])
+  @@index([targetType, targetId])
+  @@index([reversibleUntil])
+  @@index([reversedAt])
 }

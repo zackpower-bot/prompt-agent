@@ -15,7 +15,8 @@
     "prompts": "提示词库",
     "modules": "模块",
     "cleanup": "清洗",
-    "stats": "统计"
+    "stats": "统计",
+    "activity": "活动"
   },
   "agent": {
     "thinking": "思考中...",
@@ -111,5 +112,23 @@
     "severityInfo": "提示",
     "severityWarning": "警告",
     "severityCritical": "严重"
+  },
+  "activity": {
+    "title": "活动日志",
+    "empty": "还没有需要记录的活动。",
+    "undo": "撤销",
+    "undoing": "撤销中...",
+    "undoFailed": "撤销失败",
+    "refresh": "刷新",
+    "refreshing": "刷新中...",
+    "actorUser": "用户",
+    "actorAgent": "Agent",
+    "actorSystem": "系统",
+    "softDeletePrompt": "软删除提示词“{title}”",
+    "softDeleteModule": "软删除模块“{title}”",
+    "statusReversed": "{actor}已恢复",
+    "statusExpired": "已过期，无法恢复",
+    "statusNotReversible": "不可恢复",
+    "reversibleUntil": "可在 {time} 前恢复"
   }
 }

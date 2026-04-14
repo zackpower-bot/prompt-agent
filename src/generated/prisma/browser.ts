@@ -102,3 +102,8 @@ export type UsageLog = Prisma.UsageLogModel
  * 
  */
 export type Alert = Prisma.AlertModel
+/**
+ * Model ActionLog
+ * 
+ */
+export type ActionLog = Prisma.ActionLogModel

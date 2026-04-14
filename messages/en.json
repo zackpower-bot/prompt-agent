@@ -15,7 +15,8 @@
     "prompts": "Library",
     "modules": "Modules",
     "cleanup": "Cleanup",
-    "stats": "Stats"
+    "stats": "Stats",
+    "activity": "Activity"
   },
   "agent": {
     "thinking": "Thinking...",
@@ -111,5 +112,23 @@
     "severityInfo": "Info",
     "severityWarning": "Warning",
     "severityCritical": "Critical"
+  },
+  "activity": {
+    "title": "Activity Log",
+    "empty": "No activity yet.",
+    "undo": "Undo",
+    "undoing": "Undoing...",
+    "undoFailed": "Undo failed",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing...",
+    "actorUser": "User",
+    "actorAgent": "Agent",
+    "actorSystem": "System",
+    "softDeletePrompt": "Soft-deleted Prompt \"{title}\"",
+    "softDeleteModule": "Soft-deleted Module \"{title}\"",
+    "statusReversed": "Reversed by {actor}",
+    "statusExpired": "Cannot reverse (expired)",
+    "statusNotReversible": "Not reversible",
+    "reversibleUntil": "Reversible until {time}"
   }
 }

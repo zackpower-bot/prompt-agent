@@ -18,6 +18,7 @@ export async function getUsageStats(): Promise<{ success: true; data: UsageStats
   try {
     // Quality buckets:
     // A >= 0.85 (label: 优秀 ≥85%), B: 0.70-0.85 (达标 70–85%), C: 0.50-0.70 (待改进 50–70%), D: <0.50 (低质 <50%), unscored: null (未评分)
+    const promptWhere = { deletedAt: null as null | Date }
     const [
       totalPrompts,
       prompts,
@@ -26,11 +27,24 @@ export async function getUsageStats(): Promise<{ success: true; data: UsageStats
       recentPrompts,
       qualityBuckets,
     ] = await Promise.all([
-      prisma.prompt.count(),
-      prisma.prompt.findMany({ select: { status: true, category: true } }),
-      prisma.tag.findMany({ include: { _count: { select: { prompts: true } } }, orderBy: { name: "asc" } }),
+      prisma.prompt.count({ where: promptWhere }),
+      prisma.prompt.findMany({ select: { status: true, category: true }, where: promptWhere }),
+      prisma.tag.findMany({
+        orderBy: { name: "asc" },
+        include: {
+          prompts: {
+            where: { prompt: { deletedAt: null } },
+            select: { promptId: true },
+          },
+        },
+      }),
       prisma.agentHistory.findMany({ select: { provider: true, output: true } }),
-      prisma.prompt.findMany({ select: { id: true, title: true, updatedAt: true }, orderBy: { updatedAt: "desc" }, take: 20 }),
+      prisma.prompt.findMany({
+        select: { id: true, title: true, updatedAt: true },
+        where: promptWhere,
+        orderBy: { updatedAt: "desc" },
+        take: 20,
+      }),
       prisma.$queryRaw<{ bucket: string; count: bigint }[]>`
         SELECT bucket, COUNT(*) AS count
         FROM (
@@ -43,6 +57,7 @@ export async function getUsageStats(): Promise<{ success: true; data: UsageStats
               ELSE 'D'
             END AS bucket
           FROM "Prompt"
+          WHERE "deletedAt" IS NULL
         ) q
         GROUP BY bucket
       `,
@@ -63,7 +78,7 @@ export async function getUsageStats(): Promise<{ success: true; data: UsageStats
 
     // Top tags
     const topTags = tags
-      .map((t) => ({ name: t.name, count: t._count.prompts }))
+      .map((t) => ({ name: t.name, count: t.prompts.length }))
       .filter((t) => t.count > 0)
       .sort((a, b) => b.count - a.count)
       .slice(0, 10)

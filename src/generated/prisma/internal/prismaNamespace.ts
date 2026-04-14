@@ -400,7 +400,8 @@ export const ModelName = {
   MemoryEvent: 'MemoryEvent',
   SemanticMemory: 'SemanticMemory',
   UsageLog: 'UsageLog',
-  Alert: 'Alert'
+  Alert: 'Alert',
+  ActionLog: 'ActionLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "prompt" | "tag" | "promptTag" | "module" | "moduleTag" | "scenario" | "recipe" | "recipeStep" | "promptModuleUse" | "promptVersion" | "agentHistory" | "setting" | "agentProfile" | "memoryEvent" | "semanticMemory" | "usageLog" | "alert"
+    modelProps: "prompt" | "tag" | "promptTag" | "module" | "moduleTag" | "scenario" | "recipe" | "recipeStep" | "promptModuleUse" | "promptVersion" | "agentHistory" | "setting" | "agentProfile" | "memoryEvent" | "semanticMemory" | "usageLog" | "alert" | "actionLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1678,6 +1679,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ActionLog: {
+      payload: Prisma.$ActionLogPayload<ExtArgs>
+      fields: Prisma.ActionLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ActionLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ActionLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionLogPayload>
+        }
+        findFirst: {
+          args: Prisma.ActionLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ActionLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionLogPayload>
+        }
+        findMany: {
+          args: Prisma.ActionLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionLogPayload>[]
+        }
+        create: {
+          args: Prisma.ActionLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionLogPayload>
+        }
+        createMany: {
+          args: Prisma.ActionLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ActionLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionLogPayload>[]
+        }
+        delete: {
+          args: Prisma.ActionLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionLogPayload>
+        }
+        update: {
+          args: Prisma.ActionLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.ActionLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ActionLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ActionLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.ActionLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionLogPayload>
+        }
+        aggregate: {
+          args: Prisma.ActionLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateActionLog>
+        }
+        groupBy: {
+          args: Prisma.ActionLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActionLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ActionLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActionLogCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1725,6 +1800,7 @@ export const PromptScalarFieldEnum = {
   qualityScore: 'qualityScore',
   isFavorite: 'isFavorite',
   lastUsedAt: 'lastUsedAt',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1756,6 +1832,7 @@ export const ModuleScalarFieldEnum = {
   embedding: 'embedding',
   embeddingModel: 'embeddingModel',
   embeddingUpdatedAt: 'embeddingUpdatedAt',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1943,6 +2020,24 @@ export const AlertScalarFieldEnum = {
 export type AlertScalarFieldEnum = (typeof AlertScalarFieldEnum)[keyof typeof AlertScalarFieldEnum]
 
 
+export const ActionLogScalarFieldEnum = {
+  id: 'id',
+  actor: 'actor',
+  action: 'action',
+  targetType: 'targetType',
+  targetId: 'targetId',
+  before: 'before',
+  after: 'after',
+  reversibleUntil: 'reversibleUntil',
+  reversedAt: 'reversedAt',
+  reversedBy: 'reversedBy',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type ActionLogScalarFieldEnum = (typeof ActionLogScalarFieldEnum)[keyof typeof ActionLogScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2118,6 +2213,7 @@ export type GlobalOmitConfig = {
   semanticMemory?: Prisma.SemanticMemoryOmit
   usageLog?: Prisma.UsageLogOmit
   alert?: Prisma.AlertOmit
+  actionLog?: Prisma.ActionLogOmit
 }
 
 /* Types for Logging */

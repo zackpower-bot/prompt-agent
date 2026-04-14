@@ -22,7 +22,7 @@ function serializeVersion(row: any): VersionWithMeta {
 
 export async function createVersion(promptId: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const prompt = await prisma.prompt.findUnique({ where: { id: promptId } })
+    const prompt = await prisma.prompt.findUnique({ where: { id: promptId, deletedAt: null } })
     if (!prompt) return { success: false, error: "Prompt not found" }
 
     const lastVersion = await prisma.promptVersion.findFirst({

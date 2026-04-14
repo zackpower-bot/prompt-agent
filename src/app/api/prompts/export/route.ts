@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic"
 export async function GET() {
   try {
     const prompts = await prisma.prompt.findMany({
+      where: { deletedAt: null },
       include: { tags: { include: { tag: true } } },
       orderBy: { updatedAt: "desc" },
     })

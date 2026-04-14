@@ -1,6 +1,7 @@
 "use server"
 
 import { prisma } from "@/lib/prisma"
+import { recordAction } from "@/lib/action-log"
 
 export interface CreatePromptInput {
   title: string
@@ -27,6 +28,7 @@ export interface PromptWithTags {
   updatedAt: string
   tags: string[]
   qualityScore: number | null
+  deletedAt: string | null
 }
 
 function serializePrompt(row: any): PromptWithTags {
@@ -44,6 +46,7 @@ function serializePrompt(row: any): PromptWithTags {
     updatedAt: row.updatedAt.toISOString(),
     tags: row.tags?.map((pt: any) => pt.tag.name) ?? [],
     qualityScore: row.qualityScore ?? null,
+    deletedAt: row.deletedAt?.toISOString() ?? null,
   }
 }
 
@@ -97,7 +100,7 @@ export async function createPrompt(
 export async function getPromptsPaginated(
   page: number = 1,
   pageSize: number = 20,
-  filters?: { search?: string; category?: string; tag?: string; status?: string }
+  filters?: { search?: string; category?: string; tag?: string; status?: string; includeTrashed?: boolean }
 ): Promise<
   | { success: true; data: { prompts: PromptWithTags[]; total: number; page: number; pageSize: number } }
   | { success: false; error: string }
@@ -105,6 +108,9 @@ export async function getPromptsPaginated(
   try {
     const where: any = {}
     const andClauses: any[] = []
+    if (!filters?.includeTrashed) {
+      where.deletedAt = null
+    }
 
     if (filters?.status && filters.status !== "all") {
       where.status = filters.status
@@ -161,7 +167,7 @@ export async function getAllTags(): Promise<
   try {
     const tags = await prisma.tag.findMany({
       orderBy: { name: "asc" },
-      where: { prompts: { some: {} } },
+      where: { prompts: { some: { prompt: { deletedAt: null } } } },
     })
     return { success: true, data: tags.map(t => t.name) }
   } catch (e) {
@@ -187,8 +193,12 @@ export async function updatePrompt(
   input: Partial<CreatePromptInput> & { status?: string }
 ): Promise<{ success: true; data: PromptWithTags } | { success: false; error: string }> {
   try {
-    const existing = await prisma.prompt.findUnique({ where: { id } })
+    const existing = await prisma.prompt.findUnique({
+      where: { id },
+      select: { id: true, deletedAt: true },
+    })
     if (!existing) return { success: false, error: "Prompt not found" }
+    if (existing.deletedAt) return { success: false, error: "Prompt already deleted" }
     const normalizedQuality = normalizeQualityScore(input.qualityScore)
 
     // Handle tag updates if provided
@@ -228,10 +238,34 @@ export async function updatePrompt(
   }
 }
 
-export async function deletePrompt(id: string): Promise<{ success: boolean; error?: string }> {
+export async function deletePrompt(
+  id: string
+): Promise<{ success: true; actionLogId: string } | { success: false; error: string }> {
   try {
-    await prisma.prompt.delete({ where: { id } })
-    return { success: true }
+    const existing = await prisma.prompt.findUnique({
+      where: { id },
+      include: { tags: { include: { tag: true } } },
+    })
+    if (!existing) return { success: false, error: "Prompt not found" }
+    if (existing.deletedAt) return { success: false, error: "Prompt already deleted" }
+
+    const before = serializePrompt(existing)
+    const deletedAt = new Date()
+    const updated = await prisma.prompt.update({
+      where: { id },
+      data: { deletedAt },
+      include: { tags: { include: { tag: true } } },
+    })
+    const after = serializePrompt(updated)
+    const log = await recordAction({
+      actor: "user",
+      action: "soft_delete",
+      targetType: "prompt",
+      targetId: id,
+      before,
+      after,
+    })
+    return { success: true, actionLogId: log.id }
   } catch (e) {
     return { success: false, error: (e as Error).message }
   }
@@ -247,6 +281,7 @@ export async function getPromptsForCleanup(
   try {
     // Get prompts that likely need cleanup: single tag, no description, or status "inbox"
     const rows = await prisma.prompt.findMany({
+      where: { deletedAt: null },
       include: { tags: { include: { tag: true } } },
       orderBy: { updatedAt: "asc" }, // oldest first
       take: limit,
@@ -264,13 +299,13 @@ export async function getSidebarPrompts(): Promise<{
   try {
     const [favorites, recent] = await Promise.all([
       prisma.prompt.findMany({
-        where: { isFavorite: true },
+        where: { isFavorite: true, deletedAt: null },
         include: { tags: { include: { tag: true } } },
         orderBy: { updatedAt: "desc" },
         take: 5,
       }),
       prisma.prompt.findMany({
-        where: { lastUsedAt: { not: null } },
+        where: { lastUsedAt: { not: null }, deletedAt: null },
         include: { tags: { include: { tag: true } } },
         orderBy: { lastUsedAt: "desc" },
         take: 5,

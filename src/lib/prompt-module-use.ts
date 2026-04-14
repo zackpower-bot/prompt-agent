@@ -41,6 +41,7 @@ export async function getPromptsUsingModule(moduleId: string): Promise<Prompt[]>
   return prisma.prompt.findMany({
     where: {
       moduleUses: { some: { moduleId } },
+      deletedAt: null,
     },
     orderBy: { updatedAt: "desc" },
   })

@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation"
 import { Link } from "@/i18n/navigation"
-import { Bot, Library, Sparkles, Wrench, Blocks, BarChart3, LogOut, PanelLeftClose, PanelLeft, Settings } from "lucide-react"
+import { Bot, Library, Sparkles, Wrench, Blocks, BarChart3, LogOut, PanelLeftClose, PanelLeft, Settings, History } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ThemeToggle } from "./theme-toggle"
 import { AlertsBell } from "./alerts-bell"
@@ -15,6 +15,7 @@ const navItems = [
   { href: "/modules", label: "模块", icon: Blocks },
   { href: "/cleanup", label: "清洗", icon: Wrench },
   { href: "/stats", label: "统计", icon: BarChart3 },
+  { href: "/activity", label: "活动", icon: History },
 ]
 
 const topNavShortcuts = [

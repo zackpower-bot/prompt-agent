@@ -67,7 +67,8 @@ export const ModelName = {
   MemoryEvent: 'MemoryEvent',
   SemanticMemory: 'SemanticMemory',
   UsageLog: 'UsageLog',
-  Alert: 'Alert'
+  Alert: 'Alert',
+  ActionLog: 'ActionLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -94,6 +95,7 @@ export const PromptScalarFieldEnum = {
   qualityScore: 'qualityScore',
   isFavorite: 'isFavorite',
   lastUsedAt: 'lastUsedAt',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -125,6 +127,7 @@ export const ModuleScalarFieldEnum = {
   embedding: 'embedding',
   embeddingModel: 'embeddingModel',
   embeddingUpdatedAt: 'embeddingUpdatedAt',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -310,6 +313,24 @@ export const AlertScalarFieldEnum = {
 } as const
 
 export type AlertScalarFieldEnum = (typeof AlertScalarFieldEnum)[keyof typeof AlertScalarFieldEnum]
+
+
+export const ActionLogScalarFieldEnum = {
+  id: 'id',
+  actor: 'actor',
+  action: 'action',
+  targetType: 'targetType',
+  targetId: 'targetId',
+  before: 'before',
+  after: 'after',
+  reversibleUntil: 'reversibleUntil',
+  reversedAt: 'reversedAt',
+  reversedBy: 'reversedBy',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type ActionLogScalarFieldEnum = (typeof ActionLogScalarFieldEnum)[keyof typeof ActionLogScalarFieldEnum]
 
 
 export const SortOrder = {

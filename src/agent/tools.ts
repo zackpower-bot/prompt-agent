@@ -30,6 +30,7 @@ export const searchModulesTool: AgentToolDefinition = {
 
     const modules = await prisma.module.findMany({
       where: {
+        deletedAt: null,
         OR: [
           { title: { contains: query } },
           { content: { contains: query } },

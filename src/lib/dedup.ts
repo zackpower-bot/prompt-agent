@@ -43,6 +43,7 @@ export async function findDuplicates(
 ): Promise<DuplicateCandidate[]> {
   const prompts = await prisma.prompt.findMany({
     select: { id: true, title: true, content: true },
+    where: { deletedAt: null },
   })
 
   const inputText = `${title} ${content.slice(0, 500)}`

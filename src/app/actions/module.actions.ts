@@ -3,6 +3,7 @@
 import type { Prisma } from "@/generated/prisma/client"
 import { prisma } from "@/lib/prisma"
 import { embedModuleAsync } from "@/lib/embedding"
+import { recordAction } from "@/lib/action-log"
 
 export interface ModuleWithMeta {
   id: string
@@ -12,6 +13,7 @@ export interface ModuleWithMeta {
   tags: string[]
   createdAt: string
   updatedAt: string
+  deletedAt: string | null
 }
 
 const moduleWithTagsInclude = {
@@ -32,6 +34,7 @@ function serializeModule(row: any): ModuleWithMeta {
     tags: Array.isArray(row.tags) ? row.tags.map((t: any) => t.tag?.name ?? "").filter(Boolean) : [],
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
+    deletedAt: row.deletedAt?.toISOString() ?? null,
   }
 }
 
@@ -61,9 +64,11 @@ async function upsertTags(tx: TxClient, tagNames: string[]): Promise<TagRecord[]
 export async function getModules(filters?: {
   type?: string
   search?: string
+  includeTrashed?: boolean
 }): Promise<{ success: true; data: ModuleWithMeta[] } | { success: false; error: string }> {
   try {
     const where: any = {}
+    if (!filters?.includeTrashed) where.deletedAt = null
     if (filters?.type && filters.type !== "all") where.type = filters.type
     if (filters?.search) {
       where.OR = [
@@ -123,9 +128,10 @@ export async function updateModule(
     const result = await prisma.$transaction(async (tx) => {
       const existing = await tx.module.findUnique({
         where: { id },
-        select: { id: true, title: true, content: true },
+        select: { id: true, title: true, content: true, deletedAt: true },
       })
       if (!existing) throw new Error("Module not found")
+      if (existing.deletedAt) throw new Error("Module deleted")
 
       let shouldEmbed = false
       if (input.title !== undefined && input.title !== existing.title) shouldEmbed = true
@@ -167,10 +173,34 @@ export async function updateModule(
   }
 }
 
-export async function deleteModule(id: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteModule(
+  id: string
+): Promise<{ success: true; actionLogId: string } | { success: false; error: string }> {
   try {
-    await prisma.module.delete({ where: { id } })
-    return { success: true }
+    const existing = await prisma.module.findUnique({
+      where: { id },
+      include: moduleWithTagsInclude,
+    })
+    if (!existing) return { success: false, error: "Module not found" }
+    if (existing.deletedAt) return { success: false, error: "Module already deleted" }
+
+    const before = serializeModule(existing)
+    const deletedAt = new Date()
+    const updated = await prisma.module.update({
+      where: { id },
+      data: { deletedAt },
+      include: moduleWithTagsInclude,
+    })
+    const after = serializeModule(updated)
+    const log = await recordAction({
+      actor: "user",
+      action: "soft_delete",
+      targetType: "module",
+      targetId: id,
+      before,
+      after,
+    })
+    return { success: true, actionLogId: log.id }
   } catch (e) {
     return { success: false, error: (e as Error).message }
   }
