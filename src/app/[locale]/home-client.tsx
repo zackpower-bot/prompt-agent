@@ -230,7 +230,6 @@ function ComposerBar({
             </Button>
           )}
         </div>
-        <p className="text-center text-xs text-muted-foreground">Enter 发送 · Shift+Enter 换行</p>
       </div>
     </div>
   )
