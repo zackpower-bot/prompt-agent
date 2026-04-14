@@ -11,8 +11,8 @@ interface EmptyStateProps {
 
 export function EmptyState({ onTemplateSelect, recentTasksSlot }: EmptyStateProps) {
   return (
-    <section className="flex flex-1 flex-col items-center justify-center px-4 py-10">
-      <div className="w-full max-w-5xl space-y-8">
+    <section className="flex-1 min-h-0 overflow-y-auto px-4 py-10">
+      <div className="mx-auto w-full max-w-5xl space-y-8">
         <header className="space-y-3 text-center md:text-left">
           <p className="mono-label text-xs uppercase tracking-[0.35em] text-muted-foreground">Prompt Agent</p>
           <h1 className="text-4xl font-semibold tracking-tight text-foreground">Prompt Agent</h1>
