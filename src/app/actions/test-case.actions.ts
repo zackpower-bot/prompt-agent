@@ -7,18 +7,22 @@ import { serializeTestCase, stringifyChecks, stringifyVariables } from "@/lib/te
 
 export interface CreateTestCaseInput {
   promptId: string
+  name?: string
+  userMessage?: string
   variables?: VariablesMap
   expectation?: string | null
   checks?: Check[]
 }
 
 export interface UpdateTestCaseInput {
+  name?: string
+  userMessage?: string
   variables?: VariablesMap
   expectation?: string | null
   checks?: Check[]
 }
 
-export async function listTestCases(
+export async function getTestCasesByPrompt(
   promptId: string
 ): Promise<{ success: true; data: TestCaseDTO[] } | { success: false; error: string }> {
   try {
@@ -31,6 +35,8 @@ export async function listTestCases(
     return { success: false, error: (error as Error).message }
   }
 }
+
+export const listTestCases = getTestCasesByPrompt
 
 export async function getTestCaseById(
   id: string
@@ -54,6 +60,8 @@ export async function createTestCase(
     const row = await prisma.testCase.create({
       data: {
         promptId: input.promptId,
+        name: input.name?.trim() || "Untitled test case",
+        userMessage: input.userMessage ?? "",
         variables: stringifyVariables(input.variables),
         expectation: input.expectation ?? null,
         checks: stringifyChecks(input.checks),
@@ -76,6 +84,8 @@ export async function updateTestCase(
     const row = await prisma.testCase.update({
       where: { id },
       data: {
+        ...(input.name !== undefined && { name: input.name.trim() || "Untitled test case" }),
+        ...(input.userMessage !== undefined && { userMessage: input.userMessage }),
         ...(input.variables !== undefined && { variables: stringifyVariables(input.variables) }),
         ...(input.expectation !== undefined && { expectation: input.expectation ?? null }),
         ...(input.checks !== undefined && { checks: stringifyChecks(input.checks) }),

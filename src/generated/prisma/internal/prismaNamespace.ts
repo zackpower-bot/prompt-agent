@@ -402,6 +402,7 @@ export const ModelName = {
   UsageLog: 'UsageLog',
   Alert: 'Alert',
   ActionLog: 'ActionLog',
+  EntityUsage: 'EntityUsage',
   TestCase: 'TestCase'
 } as const
 
@@ -418,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "prompt" | "tag" | "promptTag" | "module" | "moduleTag" | "scenario" | "recipe" | "recipeStep" | "promptModuleUse" | "promptVersion" | "agentHistory" | "setting" | "agentProfile" | "memoryEvent" | "semanticMemory" | "usageLog" | "alert" | "actionLog" | "testCase"
+    modelProps: "prompt" | "tag" | "promptTag" | "module" | "moduleTag" | "scenario" | "recipe" | "recipeStep" | "promptModuleUse" | "promptVersion" | "agentHistory" | "setting" | "agentProfile" | "memoryEvent" | "semanticMemory" | "usageLog" | "alert" | "actionLog" | "entityUsage" | "testCase"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1754,6 +1755,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    EntityUsage: {
+      payload: Prisma.$EntityUsagePayload<ExtArgs>
+      fields: Prisma.EntityUsageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EntityUsageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityUsagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EntityUsageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityUsagePayload>
+        }
+        findFirst: {
+          args: Prisma.EntityUsageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityUsagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EntityUsageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityUsagePayload>
+        }
+        findMany: {
+          args: Prisma.EntityUsageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityUsagePayload>[]
+        }
+        create: {
+          args: Prisma.EntityUsageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityUsagePayload>
+        }
+        createMany: {
+          args: Prisma.EntityUsageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EntityUsageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityUsagePayload>[]
+        }
+        delete: {
+          args: Prisma.EntityUsageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityUsagePayload>
+        }
+        update: {
+          args: Prisma.EntityUsageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityUsagePayload>
+        }
+        deleteMany: {
+          args: Prisma.EntityUsageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EntityUsageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EntityUsageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityUsagePayload>[]
+        }
+        upsert: {
+          args: Prisma.EntityUsageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EntityUsagePayload>
+        }
+        aggregate: {
+          args: Prisma.EntityUsageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEntityUsage>
+        }
+        groupBy: {
+          args: Prisma.EntityUsageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EntityUsageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EntityUsageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EntityUsageCountAggregateOutputType> | number
+        }
+      }
+    }
     TestCase: {
       payload: Prisma.$TestCasePayload<ExtArgs>
       fields: Prisma.TestCaseFieldRefs
@@ -2113,9 +2188,23 @@ export const ActionLogScalarFieldEnum = {
 export type ActionLogScalarFieldEnum = (typeof ActionLogScalarFieldEnum)[keyof typeof ActionLogScalarFieldEnum]
 
 
+export const EntityUsageScalarFieldEnum = {
+  id: 'id',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  action: 'action',
+  context: 'context',
+  createdAt: 'createdAt'
+} as const
+
+export type EntityUsageScalarFieldEnum = (typeof EntityUsageScalarFieldEnum)[keyof typeof EntityUsageScalarFieldEnum]
+
+
 export const TestCaseScalarFieldEnum = {
   id: 'id',
   promptId: 'promptId',
+  name: 'name',
+  userMessage: 'userMessage',
   variables: 'variables',
   expectation: 'expectation',
   checks: 'checks',
@@ -2304,6 +2393,7 @@ export type GlobalOmitConfig = {
   usageLog?: Prisma.UsageLogOmit
   alert?: Prisma.AlertOmit
   actionLog?: Prisma.ActionLogOmit
+  entityUsage?: Prisma.EntityUsageOmit
   testCase?: Prisma.TestCaseOmit
 }
 

@@ -272,9 +272,23 @@ model ActionLog {
   @@index([reversedAt])
 }
 
+model EntityUsage {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  action     String
+  context    String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId, createdAt])
+  @@index([action, createdAt])
+}
+
 model TestCase {
   id          String    @id @default(cuid())
   promptId    String
+  name        String    @default("Untitled test case")
+  userMessage String    @default("")
   variables   String    @default("{}")
   expectation String?
   checks      String    @default("[]")

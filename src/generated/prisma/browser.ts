@@ -108,6 +108,11 @@ export type Alert = Prisma.AlertModel
  */
 export type ActionLog = Prisma.ActionLogModel
 /**
+ * Model EntityUsage
+ * 
+ */
+export type EntityUsage = Prisma.EntityUsageModel
+/**
  * Model TestCase
  * 
  */

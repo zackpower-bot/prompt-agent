@@ -15,13 +15,16 @@ import type { PromptWithTags } from "@/app/actions/prompt.actions"
 import { createVersion } from "@/app/actions/version.actions"
 import { VersionList } from "@/components/prompts/version-list"
 import { ModuleSuggestions } from "@/components/prompts/module-suggestions"
+import { TestCaseSection } from "@/components/prompts/test-case-section"
 import { submitFeedback } from "@/app/actions/feedback.actions"
+import type { TestCaseDTO } from "@/lib/test-case"
 
 interface Props {
   prompt: PromptWithTags
+  initialTestCases: TestCaseDTO[]
 }
 
-export function PromptDetailClient({ prompt: initialPrompt }: Props) {
+export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: Props) {
   const router = useRouter()
   const [prompt, setPrompt] = useState(initialPrompt)
   const [editing, setEditing] = useState(false)
@@ -220,6 +223,10 @@ export function PromptDetailClient({ prompt: initialPrompt }: Props) {
       <div className="mt-6">
         <h3 className="mb-3 text-sm font-medium">版本历史</h3>
         <VersionList promptId={prompt.id} currentContent={prompt.content} />
+      </div>
+
+      <div className="mt-6">
+        <TestCaseSection promptId={prompt.id} initialTestCases={initialTestCases} />
       </div>
 
       <ModuleSuggestions promptId={prompt.id} promptContent={prompt.content} />

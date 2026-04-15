@@ -1,4 +1,5 @@
 import type { Prompt, TestCase } from "@/generated/prisma/client"
+import { recordEntityUsage } from "@/lib/entity-usage"
 import { prisma } from "@/lib/prisma"
 import { logUsage } from "@/lib/usage"
 import {
@@ -50,6 +51,8 @@ export interface StoredRunResult {
 export interface TestCaseDTO {
   id: string
   promptId: string
+  name: string
+  userMessage: string
   variables: VariablesMap
   expectation: string | null
   checks: Check[]
@@ -162,6 +165,8 @@ export function serializeTestCase(row: TestCase): TestCaseDTO {
   return {
     id: row.id,
     promptId: row.promptId,
+    name: row.name,
+    userMessage: row.userMessage,
     variables: parseVariables(row.variables),
     expectation: row.expectation ?? null,
     checks: parseChecks(row.checks),
@@ -494,6 +499,10 @@ export async function runTestCase(
   }
 
   const assembledPrompt = interpolateVariables(testCase.prompt.content, variables)
+  const resolvedUserMessage = interpolateVariables(testCase.userMessage ?? "", variables).trim()
+  const executionInput = resolvedUserMessage
+    ? `${assembledPrompt}\n\nUser input:\n${resolvedUserMessage}`
+    : assembledPrompt
   const startedAt = new Date()
 
   try {
@@ -503,7 +512,7 @@ export async function runTestCase(
       max_tokens: options?.maxTokens ?? 800,
       messages: [
         { role: "system", content: EXECUTION_SYSTEM_PROMPT },
-        { role: "user", content: assembledPrompt },
+        { role: "user", content: executionInput },
       ],
     })
 
@@ -532,6 +541,19 @@ export async function runTestCase(
 
     if (options?.persistResult !== false) {
       await persistRunResult(testCase.id, testCase.promptId, finishedAt, toStoredRunResult(result))
+    }
+
+    try {
+      await recordEntityUsage({
+        entityType: "prompt",
+        entityId: testCase.promptId,
+        action: "test_run",
+        context: "test_case_run",
+      })
+    } catch (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("recordEntityUsage failed after test case run", error)
+      }
     }
 
     return result

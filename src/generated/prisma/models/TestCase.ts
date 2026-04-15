@@ -27,6 +27,8 @@ export type AggregateTestCase = {
 export type TestCaseMinAggregateOutputType = {
   id: string | null
   promptId: string | null
+  name: string | null
+  userMessage: string | null
   variables: string | null
   expectation: string | null
   checks: string | null
@@ -39,6 +41,8 @@ export type TestCaseMinAggregateOutputType = {
 export type TestCaseMaxAggregateOutputType = {
   id: string | null
   promptId: string | null
+  name: string | null
+  userMessage: string | null
   variables: string | null
   expectation: string | null
   checks: string | null
@@ -51,6 +55,8 @@ export type TestCaseMaxAggregateOutputType = {
 export type TestCaseCountAggregateOutputType = {
   id: number
   promptId: number
+  name: number
+  userMessage: number
   variables: number
   expectation: number
   checks: number
@@ -65,6 +71,8 @@ export type TestCaseCountAggregateOutputType = {
 export type TestCaseMinAggregateInputType = {
   id?: true
   promptId?: true
+  name?: true
+  userMessage?: true
   variables?: true
   expectation?: true
   checks?: true
@@ -77,6 +85,8 @@ export type TestCaseMinAggregateInputType = {
 export type TestCaseMaxAggregateInputType = {
   id?: true
   promptId?: true
+  name?: true
+  userMessage?: true
   variables?: true
   expectation?: true
   checks?: true
@@ -89,6 +99,8 @@ export type TestCaseMaxAggregateInputType = {
 export type TestCaseCountAggregateInputType = {
   id?: true
   promptId?: true
+  name?: true
+  userMessage?: true
   variables?: true
   expectation?: true
   checks?: true
@@ -174,6 +186,8 @@ export type TestCaseGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type TestCaseGroupByOutputType = {
   id: string
   promptId: string
+  name: string
+  userMessage: string
   variables: string
   expectation: string | null
   checks: string
@@ -207,6 +221,8 @@ export type TestCaseWhereInput = {
   NOT?: Prisma.TestCaseWhereInput | Prisma.TestCaseWhereInput[]
   id?: Prisma.StringFilter<"TestCase"> | string
   promptId?: Prisma.StringFilter<"TestCase"> | string
+  name?: Prisma.StringFilter<"TestCase"> | string
+  userMessage?: Prisma.StringFilter<"TestCase"> | string
   variables?: Prisma.StringFilter<"TestCase"> | string
   expectation?: Prisma.StringNullableFilter<"TestCase"> | string | null
   checks?: Prisma.StringFilter<"TestCase"> | string
@@ -220,6 +236,8 @@ export type TestCaseWhereInput = {
 export type TestCaseOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   promptId?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  userMessage?: Prisma.SortOrder
   variables?: Prisma.SortOrder
   expectation?: Prisma.SortOrderInput | Prisma.SortOrder
   checks?: Prisma.SortOrder
@@ -236,6 +254,8 @@ export type TestCaseWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.TestCaseWhereInput[]
   NOT?: Prisma.TestCaseWhereInput | Prisma.TestCaseWhereInput[]
   promptId?: Prisma.StringFilter<"TestCase"> | string
+  name?: Prisma.StringFilter<"TestCase"> | string
+  userMessage?: Prisma.StringFilter<"TestCase"> | string
   variables?: Prisma.StringFilter<"TestCase"> | string
   expectation?: Prisma.StringNullableFilter<"TestCase"> | string | null
   checks?: Prisma.StringFilter<"TestCase"> | string
@@ -249,6 +269,8 @@ export type TestCaseWhereUniqueInput = Prisma.AtLeast<{
 export type TestCaseOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   promptId?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  userMessage?: Prisma.SortOrder
   variables?: Prisma.SortOrder
   expectation?: Prisma.SortOrderInput | Prisma.SortOrder
   checks?: Prisma.SortOrder
@@ -267,6 +289,8 @@ export type TestCaseScalarWhereWithAggregatesInput = {
   NOT?: Prisma.TestCaseScalarWhereWithAggregatesInput | Prisma.TestCaseScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"TestCase"> | string
   promptId?: Prisma.StringWithAggregatesFilter<"TestCase"> | string
+  name?: Prisma.StringWithAggregatesFilter<"TestCase"> | string
+  userMessage?: Prisma.StringWithAggregatesFilter<"TestCase"> | string
   variables?: Prisma.StringWithAggregatesFilter<"TestCase"> | string
   expectation?: Prisma.StringNullableWithAggregatesFilter<"TestCase"> | string | null
   checks?: Prisma.StringWithAggregatesFilter<"TestCase"> | string
@@ -278,6 +302,8 @@ export type TestCaseScalarWhereWithAggregatesInput = {
 
 export type TestCaseCreateInput = {
   id?: string
+  name?: string
+  userMessage?: string
   variables?: string
   expectation?: string | null
   checks?: string
@@ -291,6 +317,8 @@ export type TestCaseCreateInput = {
 export type TestCaseUncheckedCreateInput = {
   id?: string
   promptId: string
+  name?: string
+  userMessage?: string
   variables?: string
   expectation?: string | null
   checks?: string
@@ -302,6 +330,8 @@ export type TestCaseUncheckedCreateInput = {
 
 export type TestCaseUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  userMessage?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.StringFieldUpdateOperationsInput | string
   expectation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checks?: Prisma.StringFieldUpdateOperationsInput | string
@@ -315,6 +345,8 @@ export type TestCaseUpdateInput = {
 export type TestCaseUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   promptId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  userMessage?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.StringFieldUpdateOperationsInput | string
   expectation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checks?: Prisma.StringFieldUpdateOperationsInput | string
@@ -327,6 +359,8 @@ export type TestCaseUncheckedUpdateInput = {
 export type TestCaseCreateManyInput = {
   id?: string
   promptId: string
+  name?: string
+  userMessage?: string
   variables?: string
   expectation?: string | null
   checks?: string
@@ -338,6 +372,8 @@ export type TestCaseCreateManyInput = {
 
 export type TestCaseUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  userMessage?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.StringFieldUpdateOperationsInput | string
   expectation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checks?: Prisma.StringFieldUpdateOperationsInput | string
@@ -350,6 +386,8 @@ export type TestCaseUpdateManyMutationInput = {
 export type TestCaseUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   promptId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  userMessage?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.StringFieldUpdateOperationsInput | string
   expectation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checks?: Prisma.StringFieldUpdateOperationsInput | string
@@ -372,6 +410,8 @@ export type TestCaseOrderByRelationAggregateInput = {
 export type TestCaseCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   promptId?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  userMessage?: Prisma.SortOrder
   variables?: Prisma.SortOrder
   expectation?: Prisma.SortOrder
   checks?: Prisma.SortOrder
@@ -384,6 +424,8 @@ export type TestCaseCountOrderByAggregateInput = {
 export type TestCaseMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   promptId?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  userMessage?: Prisma.SortOrder
   variables?: Prisma.SortOrder
   expectation?: Prisma.SortOrder
   checks?: Prisma.SortOrder
@@ -396,6 +438,8 @@ export type TestCaseMaxOrderByAggregateInput = {
 export type TestCaseMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   promptId?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  userMessage?: Prisma.SortOrder
   variables?: Prisma.SortOrder
   expectation?: Prisma.SortOrder
   checks?: Prisma.SortOrder
@@ -449,6 +493,8 @@ export type TestCaseUncheckedUpdateManyWithoutPromptNestedInput = {
 
 export type TestCaseCreateWithoutPromptInput = {
   id?: string
+  name?: string
+  userMessage?: string
   variables?: string
   expectation?: string | null
   checks?: string
@@ -460,6 +506,8 @@ export type TestCaseCreateWithoutPromptInput = {
 
 export type TestCaseUncheckedCreateWithoutPromptInput = {
   id?: string
+  name?: string
+  userMessage?: string
   variables?: string
   expectation?: string | null
   checks?: string
@@ -500,6 +548,8 @@ export type TestCaseScalarWhereInput = {
   NOT?: Prisma.TestCaseScalarWhereInput | Prisma.TestCaseScalarWhereInput[]
   id?: Prisma.StringFilter<"TestCase"> | string
   promptId?: Prisma.StringFilter<"TestCase"> | string
+  name?: Prisma.StringFilter<"TestCase"> | string
+  userMessage?: Prisma.StringFilter<"TestCase"> | string
   variables?: Prisma.StringFilter<"TestCase"> | string
   expectation?: Prisma.StringNullableFilter<"TestCase"> | string | null
   checks?: Prisma.StringFilter<"TestCase"> | string
@@ -511,6 +561,8 @@ export type TestCaseScalarWhereInput = {
 
 export type TestCaseCreateManyPromptInput = {
   id?: string
+  name?: string
+  userMessage?: string
   variables?: string
   expectation?: string | null
   checks?: string
@@ -522,6 +574,8 @@ export type TestCaseCreateManyPromptInput = {
 
 export type TestCaseUpdateWithoutPromptInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  userMessage?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.StringFieldUpdateOperationsInput | string
   expectation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checks?: Prisma.StringFieldUpdateOperationsInput | string
@@ -533,6 +587,8 @@ export type TestCaseUpdateWithoutPromptInput = {
 
 export type TestCaseUncheckedUpdateWithoutPromptInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  userMessage?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.StringFieldUpdateOperationsInput | string
   expectation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checks?: Prisma.StringFieldUpdateOperationsInput | string
@@ -544,6 +600,8 @@ export type TestCaseUncheckedUpdateWithoutPromptInput = {
 
 export type TestCaseUncheckedUpdateManyWithoutPromptInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  userMessage?: Prisma.StringFieldUpdateOperationsInput | string
   variables?: Prisma.StringFieldUpdateOperationsInput | string
   expectation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checks?: Prisma.StringFieldUpdateOperationsInput | string
@@ -558,6 +616,8 @@ export type TestCaseUncheckedUpdateManyWithoutPromptInput = {
 export type TestCaseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   promptId?: boolean
+  name?: boolean
+  userMessage?: boolean
   variables?: boolean
   expectation?: boolean
   checks?: boolean
@@ -571,6 +631,8 @@ export type TestCaseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type TestCaseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   promptId?: boolean
+  name?: boolean
+  userMessage?: boolean
   variables?: boolean
   expectation?: boolean
   checks?: boolean
@@ -584,6 +646,8 @@ export type TestCaseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type TestCaseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   promptId?: boolean
+  name?: boolean
+  userMessage?: boolean
   variables?: boolean
   expectation?: boolean
   checks?: boolean
@@ -597,6 +661,8 @@ export type TestCaseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type TestCaseSelectScalar = {
   id?: boolean
   promptId?: boolean
+  name?: boolean
+  userMessage?: boolean
   variables?: boolean
   expectation?: boolean
   checks?: boolean
@@ -606,7 +672,7 @@ export type TestCaseSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TestCaseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "promptId" | "variables" | "expectation" | "checks" | "lastRunAt" | "lastResult" | "createdAt" | "updatedAt", ExtArgs["result"]["testCase"]>
+export type TestCaseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "promptId" | "name" | "userMessage" | "variables" | "expectation" | "checks" | "lastRunAt" | "lastResult" | "createdAt" | "updatedAt", ExtArgs["result"]["testCase"]>
 export type TestCaseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   prompt?: boolean | Prisma.PromptDefaultArgs<ExtArgs>
 }
@@ -625,6 +691,8 @@ export type $TestCasePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     promptId: string
+    name: string
+    userMessage: string
     variables: string
     expectation: string | null
     checks: string
@@ -1058,6 +1126,8 @@ export interface Prisma__TestCaseClient<T, Null = never, ExtArgs extends runtime
 export interface TestCaseFieldRefs {
   readonly id: Prisma.FieldRef<"TestCase", 'String'>
   readonly promptId: Prisma.FieldRef<"TestCase", 'String'>
+  readonly name: Prisma.FieldRef<"TestCase", 'String'>
+  readonly userMessage: Prisma.FieldRef<"TestCase", 'String'>
   readonly variables: Prisma.FieldRef<"TestCase", 'String'>
   readonly expectation: Prisma.FieldRef<"TestCase", 'String'>
   readonly checks: Prisma.FieldRef<"TestCase", 'String'>

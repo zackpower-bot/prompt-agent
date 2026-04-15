@@ -69,6 +69,7 @@ export const ModelName = {
   UsageLog: 'UsageLog',
   Alert: 'Alert',
   ActionLog: 'ActionLog',
+  EntityUsage: 'EntityUsage',
   TestCase: 'TestCase'
 } as const
 
@@ -334,9 +335,23 @@ export const ActionLogScalarFieldEnum = {
 export type ActionLogScalarFieldEnum = (typeof ActionLogScalarFieldEnum)[keyof typeof ActionLogScalarFieldEnum]
 
 
+export const EntityUsageScalarFieldEnum = {
+  id: 'id',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  action: 'action',
+  context: 'context',
+  createdAt: 'createdAt'
+} as const
+
+export type EntityUsageScalarFieldEnum = (typeof EntityUsageScalarFieldEnum)[keyof typeof EntityUsageScalarFieldEnum]
+
+
 export const TestCaseScalarFieldEnum = {
   id: 'id',
   promptId: 'promptId',
+  name: 'name',
+  userMessage: 'userMessage',
   variables: 'variables',
   expectation: 'expectation',
   checks: 'checks',
