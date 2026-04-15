@@ -29,7 +29,7 @@ export const PROVIDER_CONFIGS: Record<ProviderName, ProviderConfig> = {
     name: "zhipu",
     label: "智谱",
     baseURL: "https://open.bigmodel.cn/api/paas/v4",
-    defaultModel: "glm-4-plus",
+    defaultModel: "glm-4.5-air",
     envKey: "ZHIPU_API_KEY",
   },
   gemini: {
