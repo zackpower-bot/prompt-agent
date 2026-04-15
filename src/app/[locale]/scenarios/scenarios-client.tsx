@@ -285,7 +285,7 @@ export function ScenariosClient({ initialScenarios }: ScenariosClientProps) {
   return (
     <div className="container-reading">
       <div className="flex flex-col gap-6">
-        <header className="sticky top-0 z-10 border-b border-border/60 bg-background/80 py-3 backdrop-blur">
+        <header className="sticky top-0 z-10 bg-background/80 py-3 backdrop-blur">
           <form onSubmit={handleSearchSubmit} className="flex flex-col gap-3 md:flex-row md:items-center">
             <div className="relative flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -376,7 +376,7 @@ export function ScenariosClient({ initialScenarios }: ScenariosClientProps) {
         )}
 
         {displayScenarios.length > 0 ? (
-          <ul className="list-divider">
+          <ul className="space-y-1">
             {displayScenarios.map((scenario) => (
               <li key={scenario.id}>
                 <Link href={`/scenarios/${scenario.id}`} className="list-row">

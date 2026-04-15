@@ -25,9 +25,7 @@ export function EmptyState({ onTemplateSelect, recentTasksSlot }: EmptyStateProp
 
         <div className="space-y-8">
           <TemplateGrid onSelect={onTemplateSelect} />
-          <div className="section-rule" />
           {recentTasksSlot}
-          <div className="section-rule" />
           <QuickLinks />
         </div>
       </div>

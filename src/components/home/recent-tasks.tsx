@@ -21,7 +21,7 @@ export async function RecentTasksCard() {
           还没有任何提示词资产。运行一次任务并保存结果后会显示在这里。
         </div>
       ) : (
-        <ul className="list-divider">
+        <ul className="space-y-2">
           {prompts.map((prompt) => (
             <li key={prompt.id}>
               <Link href={`/prompts/${prompt.id}`} className="list-row">

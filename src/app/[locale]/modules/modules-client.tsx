@@ -95,7 +95,7 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
 
   return (
     <div className="container-reading">
-      <div className="sticky top-0 z-10 mb-6 border-b border-border/60 bg-background/80 py-3 backdrop-blur">
+      <div className="sticky top-0 z-10 mb-6 bg-background/80 py-3 backdrop-blur">
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="relative flex-1">
@@ -138,7 +138,7 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
         </Card>
       )}
 
-      <ul className="list-divider">
+      <ul className="space-y-1">
         {filtered.map((m) => (
           <li key={m.id} className="list-row">
             <div className="min-w-0 flex-1">

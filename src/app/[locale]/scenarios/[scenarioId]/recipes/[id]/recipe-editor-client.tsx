@@ -552,7 +552,7 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
         </div>
       </div>
 
-      <div className="sticky bottom-0 left-0 right-0 border-t border-border bg-background/95 px-4 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+      <div className="sticky bottom-0 left-0 right-0 bg-background/95 px-4 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/70">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">{t("stickyHint")}</p>
           <div className="flex flex-wrap gap-2">

@@ -137,7 +137,7 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
         <h1 className="text-2xl">使用统计</h1>
       </header>
 
-      <div className="grid grid-cols-2 gap-8 border-b border-border/60 pb-8 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-8 pb-2 md:grid-cols-4 mb-12">
         <div>
           <p className="text-xs uppercase tracking-wide text-muted-foreground">提示词总数</p>
           <p className="mt-1 font-serif text-3xl">{stats.totalPrompts}</p>
@@ -190,8 +190,6 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
         </CardContent>
       </Card>
 
-      <div className="section-rule" />
-
       <section className="space-y-4">
         <h2 className="text-xl">按状态分布</h2>
         <div className="flex flex-wrap gap-3">
@@ -204,9 +202,7 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
         </div>
       </section>
 
-      <div className="section-rule" />
-
-      <section className="space-y-4">
+      <section className="mt-12 space-y-4">
         <h2 className="text-xl">质量分布</h2>
         <Card>
         <CardHeader className="pb-3"><CardTitle className="text-sm">质量分布</CardTitle></CardHeader>
@@ -236,9 +232,7 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
         </Card>
       </section>
 
-      <div className="section-rule" />
-
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="mt-12 grid gap-8 md:grid-cols-2">
         <section className="space-y-4">
           <h2 className="flex items-center gap-2 text-xl"><BarChart3 className="h-4 w-4" />按分类</h2>
           <div className="space-y-3">
@@ -254,9 +248,7 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
         </section>
       </div>
 
-      <div className="section-rule" />
-
-      <Card className="overflow-x-auto">
+      <Card className="mt-12 overflow-x-auto">
         <CardHeader className="pb-3">
           <CardTitle className="text-sm">LLM Provider 用量</CardTitle>
           {!sortedProviders.length && (
@@ -279,7 +271,7 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
               </thead>
               <tbody>
                 {sortedProviders.map((row) => (
-                  <tr key={`${row.provider}-${row.model}`} className="border-t border-border/50">
+                  <tr key={`${row.provider}-${row.model}`}>
                     <td className="py-2 pr-3 font-medium">{row.provider} · {row.model}</td>
                     <td className="py-2 px-3 text-right mono-label">{row.requests.toLocaleString()}</td>
                     <td className="py-2 px-3 text-right mono-label">{row.inputTokens.toLocaleString()}</td>
@@ -294,7 +286,7 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
           ) : fallbackProviders.length > 0 ? (
             <div className="space-y-2">
               {fallbackProviders.map((row) => (
-                <div key={row.provider} className="flex items-center justify-between border-b border-border/50 py-1 text-sm">
+                <div key={row.provider} className="flex items-center justify-between py-1.5 text-sm">
                   <span className="font-medium">{row.provider}</span>
                   <span className="mono-label text-muted-foreground">{row.count.toLocaleString()}</span>
                 </div>
@@ -313,9 +305,7 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
         </CardContent>
       </Card>
 
-      <div className="section-rule" />
-
-      <section className="space-y-4">
+      <section className="mt-12 space-y-4">
         <h2 className="flex items-center gap-2 text-xl"><Clock className="h-4 w-4" />最近活动</h2>
         <div className="space-y-2">
           {stats.recentActivity.map((a) => (

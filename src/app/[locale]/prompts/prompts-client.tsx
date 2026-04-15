@@ -71,7 +71,7 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
 
   return (
     <div className="container-reading">
-      <div className="sticky top-0 z-10 mb-6 border-b border-border/60 bg-background/80 py-3 backdrop-blur">
+      <div className="sticky top-0 z-10 mb-6 bg-background/80 py-3 backdrop-blur">
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative flex-1">
@@ -167,7 +167,7 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
         <div className="mb-4 text-center text-sm text-muted-foreground">加载中...</div>
       )}
 
-      <ul className="list-divider">
+      <ul className="space-y-1">
         {prompts.map((prompt) => (
           <li key={prompt.id}>
             <Link href={`/prompts/${prompt.id}`} className="list-row">

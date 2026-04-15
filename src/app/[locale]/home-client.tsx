@@ -162,7 +162,7 @@ export default function HomeClient({ recentTasksSlot }: HomeClientProps) {
 
 function TaskBanner({ task, status, onReset }: { task: string; status: AgentStatus; onReset: () => void }) {
   return (
-    <div className="sticky top-0 z-10 border-b border-border/60 bg-background/95 backdrop-blur">
+    <div className="sticky top-0 z-10 bg-background/95 backdrop-blur">
       <div className="mx-auto flex max-w-3xl items-start justify-between gap-4 px-6 py-4">
         <div className="space-y-2">
           <p className="text-xs font-medium text-muted-foreground">当前任务</p>
@@ -220,7 +220,7 @@ function ComposerBar({
   showResetButton?: boolean
 }) {
   return (
-    <div className="sticky bottom-0 z-20 border-t border-border/60 bg-background/85 px-4 py-3 backdrop-blur-sm">
+    <div className="sticky bottom-0 z-20 bg-background/85 px-4 py-3 backdrop-blur-sm">
       <div className="mx-auto w-full max-w-3xl px-2 sm:px-0">
         <div className="flex items-end gap-3">
           <div className="min-w-0 flex-1">

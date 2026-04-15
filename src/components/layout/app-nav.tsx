@@ -64,8 +64,8 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
   const path = pathname.replace(/^\/(zh|en)/, "") || "/"
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b border-border/60 px-3 py-4">
+    <div className="flex h-full flex-col border-r border-border/60">
+      <div className="flex items-center justify-between px-3 py-4">
         {!collapsed ? (
           <Link href="/" onClick={onNavigate} className="flex items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border/70 bg-agent/15">
@@ -121,12 +121,12 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
       </nav>
 
       {!collapsed && (
-        <div className="border-t border-border/60 py-3">
+        <div className="py-3">
           <SidebarPrompts onNavigate={onNavigate} />
         </div>
       )}
 
-      <div className="space-y-2 border-t border-border/60 px-3 py-4">
+      <div className="space-y-2 px-3 py-4">
         <div className={cn("flex items-center", collapsed ? "justify-center" : "px-1")}>
           <ThemeToggle />
         </div>
@@ -153,7 +153,7 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
   const path = pathname.replace(/^\/(zh|en)/, "") || "/"
 
   return (
-    <header className="sticky top-0 z-40 h-14 border-b border-border/60 bg-background/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-sm">
       <div className="flex h-14 items-center px-4">
         <button
           onClick={onMenuClick}
