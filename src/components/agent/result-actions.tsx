@@ -42,6 +42,16 @@ function extractClassification(steps: TrajectoryStep[]): Record<string, unknown>
   return {}
 }
 
+function looksLikeMetaSummary(text: string): boolean {
+  const normalized = text.trim().slice(0, 400)
+  if (!normalized) return false
+
+  return (
+    /提示词生成完成|质量评分|核心特点|使用建议/.test(normalized) &&
+    !/#\s*(角色定义|Role)|##\s*(角色定义|Role)/.test(normalized)
+  )
+}
+
 export function ResultActions({
   result,
   steps,
@@ -65,7 +75,7 @@ export function ResultActions({
   }, [outputText])
 
   const saveResult = useCallback(async () => {
-    if (!result?.text) throw new Error("缂哄皯鍙繚瀛樼殑鍐呭")
+    if (!result?.text) throw new Error("缺少可保存的内容")
 
     const classification = extractClassification(steps)
     const response = await fetch("/api/agent/save", {
@@ -81,7 +91,7 @@ export function ResultActions({
       }),
     })
 
-    const parsed = await parseJsonResponseOrThrow<{ promptId: string }>(response, "淇濆瓨澶辫触")
+    const parsed = await parseJsonResponseOrThrow<{ promptId: string }>(response, "保存失败")
     return parsed.promptId as string
 
   }, [result, steps, userMessage])
@@ -149,16 +159,25 @@ export function ResultActions({
 
   const handleSave = useCallback(async () => {
     if (!canSave || saving) return
+    if (!result?.text) return
+
+    if (looksLikeMetaSummary(result.text)) {
+      toast.error("当前结果不是提示词本体，已阻止保存", {
+        description: "这次生成返回的是说明/评分摘要，不是可直接复用的提示词正文。请重新生成后再保存。",
+        duration: 4000,
+      })
+      return
+    }
 
     setSaving(true)
     try {
       const promptId = await saveResult()
       setSavedPromptId(promptId)
       setFeedbackGiven(null)
-      toast.success("宸蹭繚瀛樺埌鎻愮ず璇嶈祫浜у簱", {
+      toast.success("已保存到提示词资产库", {
         duration: 3000,
         action: {
-          label: "鏌ョ湅",
+          label: "查看",
           onClick: () => {
             window.location.assign(`/prompts/${promptId}`)
           },
@@ -184,7 +203,7 @@ export function ResultActions({
       const response = await submitFeedback(savedPromptId, type)
       if (!response.success) {
         setFeedbackGiven(null)
-        toast.error(response.error ?? "鍙嶉鎻愪氦澶辫触", { duration: 3000 })
+        toast.error(response.error ?? "反馈提交失败", { duration: 3000 })
       }
     },
     [feedbackGiven, savedPromptId]
@@ -204,7 +223,7 @@ export function ResultActions({
           size="icon"
           onClick={handleCopy}
           disabled={!outputText.trim()}
-          aria-label="澶嶅埗缁撴灉"
+          aria-label="复制结果"
         >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
         </Button>
@@ -214,7 +233,7 @@ export function ResultActions({
           size="icon"
           onClick={() => handleFeedback("positive")}
           disabled={!savedPromptId || feedbackGiven !== null}
-          aria-label="鐐硅禐褰撳墠缁撴灉"
+          aria-label="点赞当前结果"
         >
           <ThumbsUp className="h-4 w-4" />
         </Button>
@@ -224,7 +243,7 @@ export function ResultActions({
           size="icon"
           onClick={() => handleFeedback("negative")}
           disabled={!savedPromptId || feedbackGiven !== null}
-          aria-label="鐐硅俯褰撳墠缁撴灉"
+          aria-label="点踩当前结果"
         >
           <ThumbsDown className="h-4 w-4" />
         </Button>
