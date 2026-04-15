@@ -91,11 +91,11 @@ export default function HomeClient({ recentTasksSlot }: HomeClientProps) {
   const runningStep = steps.length > 0 ? steps[steps.length - 1] : null
 
   return (
-    <div className="flex min-h-full flex-col" data-testid="home-workspace">
+    <div className="flex h-full min-h-0 flex-col" data-testid="home-workspace">
       {workspaceActive ? (
         <>
           <TaskBanner task={displayTask} status={status} onReset={handleReset} />
-          <section className="flex-1">
+          <section className="min-h-0 flex-1 overflow-y-auto">
             <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-6 py-8">
               {status === "running" && (
                 <RunningTicker stepIndex={Math.max(steps.length, 1)} tool={runningStep?.tool ?? null} />
@@ -141,7 +141,9 @@ export default function HomeClient({ recentTasksSlot }: HomeClientProps) {
         </>
       ) : (
         <>
-          <EmptyState onTemplateSelect={handleTemplateSelect} recentTasksSlot={recentTasksSlot} />
+          <section className="min-h-0 flex-1 overflow-y-auto">
+            <EmptyState onTemplateSelect={handleTemplateSelect} recentTasksSlot={recentTasksSlot} />
+          </section>
           <ComposerBar status={status} value={inputValue} onChange={setInputValue} onSubmit={handleSubmit} onStop={stop} />
         </>
       )}
@@ -218,18 +220,21 @@ function ComposerBar({
   showResetButton?: boolean
 }) {
   return (
-    <div className="border-t border-border/60 bg-background/95 px-4 py-4 backdrop-blur">
-      <div className="mx-auto w-full max-w-3xl space-y-2 px-2 sm:px-0">
+    <div className="sticky bottom-0 z-20 border-t border-border/60 bg-background/85 px-4 py-3 backdrop-blur-sm">
+      <div className="mx-auto w-full max-w-3xl px-2 sm:px-0">
         <div className="flex items-end gap-3">
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <AgentInput status={status} onSubmit={onSubmit} onStop={onStop} initialValue={value} onChange={onChange} />
           </div>
           {showResetButton && onReset && (
-            <Button variant="outline" size="sm" onClick={onReset}>
+            <Button variant="outline" size="sm" onClick={onReset} className="shrink-0">
               重置
             </Button>
           )}
         </div>
+        <p className="mt-1.5 text-center text-[11px] text-muted-foreground/60">
+          Enter 发送 · Shift+Enter 换行
+        </p>
       </div>
     </div>
   )

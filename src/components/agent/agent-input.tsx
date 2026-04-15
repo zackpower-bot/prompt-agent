@@ -57,7 +57,7 @@ export function AgentInput({ status, onSubmit, onStop, initialValue, onChange }:
   return (
     <div
       className={cn(
-        "group relative flex w-full flex-col rounded-2xl border border-input/80 bg-card shadow-xs transition-all",
+        "group relative flex w-full items-end rounded-xl border border-input/80 bg-card shadow-xs transition-all",
         "hover:border-input focus-within:border-ring/60 focus-within:ring-2 focus-within:ring-ring/20 focus-within:shadow-sm",
         isRunning && "opacity-95"
       )}
@@ -68,35 +68,32 @@ export function AgentInput({ status, onSubmit, onStop, initialValue, onChange }:
         onKeyDown={handleKeyDown}
         placeholder={isRunning ? "Agent 正在工作..." : "描述你想要的提示词..."}
         disabled={isRunning}
-        rows={3}
+        rows={1}
         data-testid="agent-input-textarea"
-        className="w-full resize-none border-0 bg-transparent px-5 pt-4 pb-14 text-[15px] leading-relaxed outline-none placeholder:text-muted-foreground/70 disabled:cursor-not-allowed disabled:opacity-60"
+        className="block max-h-[200px] flex-1 resize-none border-0 bg-transparent pl-4 pr-2 py-3 text-[15px] leading-6 outline-none placeholder:text-muted-foreground/70 disabled:cursor-not-allowed disabled:opacity-60 field-sizing-content"
       />
-      <div className="absolute bottom-2.5 right-2.5 flex items-center gap-2">
+      <div className="flex items-center self-end pr-2 pb-2">
         {isRunning ? (
           <Button
             variant="destructive"
             size="icon"
             onClick={onStop}
-            className="h-9 w-9 rounded-lg shadow-xs"
+            className="h-8 w-8 rounded-md shadow-xs"
             aria-label="停止"
           >
-            <Square className="h-4 w-4" />
+            <Square className="h-3.5 w-3.5" />
           </Button>
         ) : (
           <Button
             size="icon"
             onClick={handleSubmit}
             disabled={!value.trim()}
-            className="h-9 w-9 rounded-lg shadow-xs"
+            className="h-8 w-8 rounded-md shadow-xs"
             aria-label="发送"
           >
-            <Send className="h-4 w-4" />
+            <Send className="h-3.5 w-3.5" />
           </Button>
         )}
-      </div>
-      <div className="pointer-events-none absolute bottom-2.5 left-5 select-none text-[11px] text-muted-foreground/70">
-        Enter 发送 · Shift+Enter 换行
       </div>
     </div>
   )
