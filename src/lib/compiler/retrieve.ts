@@ -17,6 +17,19 @@ export interface RetrievalResult {
   bySlot: Record<string, RetrievedModule[]>
 }
 
+export interface RetrievedScenario {
+  id: string
+  name: string
+  description: string
+  recipeCount: number
+  similarity: number
+}
+
+export interface ScenarioRetrievalResult {
+  hasEmbedding: boolean
+  scenarios: RetrievedScenario[]
+}
+
 export async function retrieveModulesForGoal(goal: string, topK = 10): Promise<RetrievalResult> {
   const queryVector = await embed(goal)
   if (!queryVector) {
@@ -58,4 +71,45 @@ export async function retrieveModulesForGoal(goal: string, topK = 10): Promise<R
   }
 
   return { hasEmbedding: true, modules, bySlot }
+}
+
+export async function retrieveScenariosForGoal(
+  goal: string,
+  topK = 3
+): Promise<ScenarioRetrievalResult> {
+  const queryVector = await embed(goal)
+  if (!queryVector) {
+    return { hasEmbedding: false, scenarios: [] }
+  }
+
+  const candidates = await prisma.scenario.findMany({
+    where: { embedding: { not: null } },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      embedding: true,
+      _count: { select: { recipes: true } },
+    },
+  })
+
+  const ranked = candidates
+    .map((scenario) => {
+      if (!scenario.embedding) return null
+      const vector = bytesToFloat32Array(scenario.embedding)
+      const similarity = cosineSimilarity(queryVector, vector)
+      const normalized = Number.isFinite(similarity) ? Math.max(0, Math.min(1, similarity)) : 0
+      return {
+        id: scenario.id,
+        name: scenario.name,
+        description: scenario.description,
+        recipeCount: scenario._count.recipes,
+        similarity: normalized,
+      }
+    })
+    .filter((item): item is RetrievedScenario => Boolean(item))
+    .sort((a, b) => b.similarity - a.similarity)
+    .slice(0, topK)
+
+  return { hasEmbedding: true, scenarios: ranked }
 }

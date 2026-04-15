@@ -17,21 +17,27 @@ interface ResultActionsProps {
   onSimilarPrompts: (items: SimilarPrompt[]) => void
 }
 
-function extractClassification(steps: TrajectoryStep[]) {
-  for (const step of steps) {
-    if (step.phase === "observation" && step.data && (step.data.toolName === "classify_prompt" || typeof step.data.title === "string")) {
-      return step.data
-    }
-
-    if (step.phase === "observation" && step.tool === "classify_prompt") {
-      try {
-        return JSON.parse(step.content) as Record<string, unknown>
-      } catch {
-        return {}
+function extractClassification(steps: TrajectoryStep[]): Record<string, unknown> {
+  // The classify_prompt tool's execute returns JSON.stringify(args), so the
+  // observation step's `content` field IS the classification payload.
+  // Walk steps in reverse so we get the latest classification if the agent
+  // called classify_prompt multiple times.
+  for (let i = steps.length - 1; i >= 0; i--) {
+    const step = steps[i]
+    if (step.phase !== "observation") continue
+    const isClassify =
+      step.tool === "classify_prompt" ||
+      (step.data && (step.data as { toolName?: string }).toolName === "classify_prompt")
+    if (!isClassify) continue
+    try {
+      const parsed = JSON.parse(step.content)
+      if (parsed && typeof parsed === "object") {
+        return parsed as Record<string, unknown>
       }
+    } catch {
+      // fall through to next candidate
     }
   }
-
   return {}
 }
 

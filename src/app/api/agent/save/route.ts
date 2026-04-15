@@ -35,7 +35,10 @@ export async function POST(request: NextRequest) {
     category: classification?.category ?? "general",
     model: classification?.model ?? "universal",
     tags: classification?.tags ?? [],
-    qualityScore: classification?.qualityScore,
+    qualityScore:
+      typeof classification?.qualityScore === "number"
+        ? Math.max(0, Math.min(1, classification.qualityScore))
+        : undefined,
   })
 
   if (!result.success) {

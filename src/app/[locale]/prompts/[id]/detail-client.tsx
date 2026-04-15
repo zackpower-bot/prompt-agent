@@ -15,6 +15,7 @@ import type { PromptWithTags } from "@/app/actions/prompt.actions"
 import { createVersion } from "@/app/actions/version.actions"
 import { VersionList } from "@/components/prompts/version-list"
 import { ModuleSuggestions } from "@/components/prompts/module-suggestions"
+import { ScenarioSuggestions } from "@/components/prompts/scenario-suggestions"
 import { TestCaseSection } from "@/components/prompts/test-case-section"
 import { submitFeedback } from "@/app/actions/feedback.actions"
 import type { TestCaseDTO } from "@/lib/test-case"
@@ -281,7 +282,8 @@ export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: 
       </div>
 
       <ModuleSuggestions promptId={prompt.id} promptContent={prompt.content} />
-      </div>
+      <ScenarioSuggestions promptContent={prompt.content} />
+    </div>
     </div>
   )
 }

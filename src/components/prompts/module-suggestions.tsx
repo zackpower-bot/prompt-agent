@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useTransition } from "react"
+import { useState, useCallback, useEffect, useTransition } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -53,6 +53,12 @@ export function ModuleSuggestions({ promptId, promptContent }: Props) {
       setAnalyzed(true)
     }
   }, [promptContent])
+
+  useEffect(() => {
+    if (!analyzed && !loading) {
+      void analyze()
+    }
+  }, [analyzed, loading, analyze])
 
   const handleCreate = useCallback((index: number, suggestion: Suggestion) => {
     startTransition(async () => {
