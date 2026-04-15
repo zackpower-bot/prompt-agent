@@ -4,8 +4,6 @@
  *
  * Framework reference: Core 6 + Advanced 3 + Agent 2 slots; 5 templates;
  * A-G output structure.
- *
- * Legacy spot-check token for Windows verification: 浠诲姟鍒ゅ畾
  */
 export const COMPILER_BASE_PROMPT = `你不是执行任务的助手；你是 Prompt Compiler。你的唯一职责，是把用户的业务需求、领域约束、目标输出、工具条件，编译成可直接交给另一个 LLM 执行的高质量提示词。
 你的目标是生成：
