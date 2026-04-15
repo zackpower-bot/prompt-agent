@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { runAgent } from "@/agent/core"
 import { buildSystemPrompt } from "@/agent/prompt-builder"
+import { ANALYSIS_DEFAULT_CHAIN } from "@/lib/available-models"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -38,6 +39,7 @@ export async function POST(request: NextRequest) {
       locale: "zh",
       maxIterations: 2,
       temperature: 0.1,
+      preferredChain: ANALYSIS_DEFAULT_CHAIN,
     })
 
     // Parse JSON from result

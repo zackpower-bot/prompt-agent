@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useCallback, useRef } from "react"
+import type { ModelChainEntry } from "@/lib/available-models"
 
 export interface TrajectoryStep {
   step: number
@@ -48,6 +49,7 @@ export function useAgentStream() {
     locale?: "zh" | "en"
     provider?: string
     model?: string
+    preferredChain?: ModelChainEntry[]
   }) => {
     setStatus("running")
     setSteps([])
@@ -72,6 +74,7 @@ export function useAgentStream() {
           locale: options?.locale ?? "zh",
           provider: options?.provider,
           model: options?.model,
+          preferredChain: options?.preferredChain,
           history,
         }),
         signal: controller.signal,

@@ -2,17 +2,19 @@ import { NextRequest } from "next/server"
 
 import { runAgent } from "@/agent/core"
 import { COMPILER_BASE_PROMPT } from "@/lib/compiler/base-prompt"
+import type { ProviderName } from "@/lib/providers"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { goal, locale = "zh", provider, model } = body as {
+  const { goal, locale = "zh", provider, model, preferredChain } = body as {
     goal: string
     locale?: "zh" | "en"
     provider?: string
     model?: string
+    preferredChain?: Array<{ provider: string; model?: string }>
   }
 
   if (!goal?.trim()) {
@@ -39,6 +41,7 @@ export async function POST(request: NextRequest) {
           locale,
           provider: provider as any,
           model,
+          preferredChain: preferredChain as Array<{ provider: ProviderName; model?: string }> | undefined,
           maxIterations: 1,
           temperature: 0.3,
           onToken: (token: string) => send("token", { token }),

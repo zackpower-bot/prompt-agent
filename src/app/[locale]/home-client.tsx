@@ -13,6 +13,7 @@ import {
 } from "@/components/agent/result-details-drawer"
 import { Button } from "@/components/ui/button"
 import { useAgentStream, type AgentStatus, type ConversationTurn } from "@/hooks/use-agent-stream"
+import { useModelChain } from "@/hooks/use-model-chain"
 
 interface HomeClientProps {
   recentTasksSlot: ReactNode
@@ -20,6 +21,7 @@ interface HomeClientProps {
 
 export default function HomeClient({ recentTasksSlot }: HomeClientProps) {
   const { status, steps, result, error, streamingText, turns, run, stop, reset } = useAgentStream()
+  const { chain } = useModelChain()
   const [inputValue, setInputValue] = useState("")
   const [currentTask, setCurrentTask] = useState("")
   const [qualitySignal, setQualitySignal] = useState<ResultQualitySignal | null>(null)
@@ -65,9 +67,9 @@ export default function HomeClient({ recentTasksSlot }: HomeClientProps) {
       if (!trimmed) return
       setCurrentTask(trimmed)
       setInputValue("")
-      run(trimmed)
+      run(trimmed, { preferredChain: chain })
     },
-    [run]
+    [chain, run]
   )
 
   const handleTemplateSelect = useCallback(

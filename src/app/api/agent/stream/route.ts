@@ -3,18 +3,20 @@ import { runAgent } from "@/agent/core"
 import type { AgentTrajectoryStep } from "@/agent/core"
 import { getGenerationTools } from "@/agent/tools"
 import { buildSystemPrompt } from "@/agent/prompt-builder"
+import type { ProviderName } from "@/lib/providers"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { message, locale = "zh", provider, model, history } = body as {
+  const { message, locale = "zh", provider, model, history, preferredChain } = body as {
     message: string
     locale?: "zh" | "en"
     provider?: string
     model?: string
     history?: { role: "user" | "assistant"; content: string }[]
+    preferredChain?: Array<{ provider: string; model?: string }>
   }
 
   if (!message?.trim()) {
@@ -44,6 +46,7 @@ export async function POST(request: NextRequest) {
           locale,
           provider: provider as any,
           model,
+          preferredChain: preferredChain as Array<{ provider: ProviderName; model?: string }> | undefined,
           onStep: (step: AgentTrajectoryStep) => {
             send("step", step)
           },

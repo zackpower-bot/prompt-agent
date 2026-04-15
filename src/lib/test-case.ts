@@ -8,6 +8,7 @@ import {
   getDefaultProvider,
   type ProviderName,
 } from "@/lib/providers"
+import { runAgent } from "@/agent/core"
 
 const EXECUTION_SYSTEM_PROMPT = `You are executing a stored prompt for regression testing.
 The upcoming user content already contains the full instructions with resolved variables.
@@ -77,6 +78,7 @@ export interface RunTestCaseOptions {
   temperature?: number
   maxTokens?: number
   persistResult?: boolean
+  preferredChain?: Array<{ provider: ProviderName; model?: string }>
 }
 
 const DEFAULT_FAILURE_EVALUATION: CheckEvaluation[] = []
@@ -475,8 +477,16 @@ export async function runTestCase(
 ): Promise<TestCaseRunResult> {
   const variables = parseVariables(testCase.variables)
   const checks = parseChecks(testCase.checks)
-  const provider = options?.provider ?? getDefaultProvider()
-  const model = resolveModel(options?.model, testCase.prompt.model, provider)
+  const preferredChain = options?.preferredChain
+  const provider =
+    options?.provider ??
+    preferredChain?.[0]?.provider ??
+    getDefaultProvider()
+  const model = resolveModel(
+    options?.model ?? preferredChain?.[0]?.model,
+    testCase.prompt.model,
+    provider
+  )
   const client = createClient(provider)
 
   if (!client) {
@@ -506,37 +516,36 @@ export async function runTestCase(
   const startedAt = new Date()
 
   try {
-    const completion = await client.chat.completions.create({
+    const agentResult = await runAgent({
+      systemPrompt: EXECUTION_SYSTEM_PROMPT,
+      userMessage: executionInput,
+      provider,
       model,
+      preferredChain,
       temperature: options?.temperature ?? 0,
-      max_tokens: options?.maxTokens ?? 800,
-      messages: [
-        { role: "system", content: EXECUTION_SYSTEM_PROMPT },
-        { role: "user", content: executionInput },
-      ],
+      maxIterations: 1,
     })
 
     const finishedAt = new Date()
-    const output =
-      completion.choices?.[0]?.message?.content?.toString().trim() ?? ""
+    const output = agentResult.text.trim()
     const evaluations = evaluateChecks(output, checks)
     const result = buildResultPayload({
       testCase,
       variables,
       startedAt,
       finishedAt,
-      provider,
-      model,
+      provider: agentResult.provider,
+      model: agentResult.model,
       evaluations,
       output,
     })
 
     await logUsage({
       service: "llm",
-      provider,
-      model,
-      inputTokens: completion.usage?.prompt_tokens ?? undefined,
-      outputTokens: completion.usage?.completion_tokens ?? undefined,
+      provider: agentResult.provider,
+      model: agentResult.model,
+      inputTokens: agentResult.usage.inputTokens,
+      outputTokens: agentResult.usage.outputTokens,
     })
 
     if (options?.persistResult !== false) {

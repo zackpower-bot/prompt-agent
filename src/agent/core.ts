@@ -39,6 +39,7 @@ export interface AgentRunOptions {
   tools?: AgentToolDefinition[]
   provider?: ProviderName
   model?: string
+  preferredChain?: Array<{ provider: ProviderName; model?: string }>
   locale?: NarrationLocale
   maxIterations?: number
   temperature?: number
@@ -143,34 +144,69 @@ async function logLlmFailure(provider: ProviderName, model: string, error: unkno
 }
 
 export async function runAgent(options: AgentRunOptions): Promise<AgentRunResult> {
-  const initialProvider = options.provider ?? getDefaultProvider()
-  const initialModel = options.model ?? PROVIDER_CONFIGS[initialProvider].defaultModel
+  const chain = options.preferredChain ?? []
+  const primaryFromChain = chain[0]
+  const effectiveOptions: AgentRunOptions = primaryFromChain
+    ? {
+        ...options,
+        provider: options.provider ?? primaryFromChain.provider,
+        model: options.model ?? primaryFromChain.model,
+      }
+    : options
+
+  const initialProvider = effectiveOptions.provider ?? getDefaultProvider()
+  const initialModel = effectiveOptions.model ?? PROVIDER_CONFIGS[initialProvider].defaultModel
+  const availableProviders = getAvailableProviders()
+
   try {
-    return await runAgentInternal(options)
+    return await runAgentInternal(effectiveOptions)
   } catch (error) {
     await logLlmFailure(initialProvider, initialModel, error)
-    // On retryable error, try fallback providers
-    if (isRetryableError(error) && !options.provider) {
-      const available = getAvailableProviders()
-      const defaultProvider = getDefaultProvider()
-      const fallbacks = available.filter((p) => p !== defaultProvider)
+    if (isRetryableError(error)) {
+      const fallbacks: Array<{ provider: ProviderName; model?: string }> =
+        chain.length > 1
+          ? chain.slice(1)
+          : availableProviders
+              .filter((provider) => provider !== initialProvider)
+              .map((provider) => ({
+                provider,
+                model: PROVIDER_CONFIGS[provider].defaultModel,
+              }))
       const primaryErrCode = extractErrorCode(error)
-      console.log(`[agent] primary provider '${defaultProvider}' failed (${primaryErrCode}); fallback chain: ${fallbacks.join(" -> ") || "(none)"}`)
+      console.log(
+        `[agent] primary '${initialProvider}/${initialModel}' failed (${primaryErrCode}); fallback chain: ${
+          fallbacks.map((entry) => `${entry.provider}/${entry.model ?? "(default)"}`).join(" -> ") || "(none)"
+        }`
+      )
 
       for (const fallback of fallbacks) {
-        console.log(`[agent] fallback attempt: ${defaultProvider} -> ${fallback}`)
+        const fallbackProvider = fallback.provider
+        const fallbackModel = fallback.model ?? PROVIDER_CONFIGS[fallbackProvider].defaultModel
+        if (!availableProviders.includes(fallbackProvider)) {
+          console.log(`[agent] fallback '${fallbackProvider}' skipped: key not configured`)
+          continue
+        }
+        console.log(
+          `[agent] fallback attempt: ${initialProvider}/${initialModel} -> ${fallbackProvider}/${fallbackModel}`
+        )
         try {
-          const result = await runAgentInternal({ ...options, provider: fallback })
-          console.log(`[agent] fallback SUCCESS on '${fallback}' (primary was '${defaultProvider}', reason: ${primaryErrCode})`)
+          const result = await runAgentInternal({
+            ...effectiveOptions,
+            provider: fallbackProvider,
+            model: fallbackModel,
+          })
+          console.log(
+            `[agent] fallback SUCCESS on '${fallbackProvider}/${fallbackModel}' (primary was '${initialProvider}/${initialModel}', reason: ${primaryErrCode})`
+          )
           return result
         } catch (fallbackError) {
-          await logLlmFailure(fallback, options.model ?? PROVIDER_CONFIGS[fallback].defaultModel, fallbackError)
+          await logLlmFailure(fallbackProvider, fallbackModel, fallbackError)
           const fbCode = extractErrorCode(fallbackError)
-          console.log(`[agent] fallback '${fallback}' failed (${fbCode})`)
+          console.log(`[agent] fallback '${fallbackProvider}/${fallbackModel}' failed (${fbCode})`)
           if (!isRetryableError(fallbackError)) throw fallbackError
         }
       }
-      console.log(`[agent] all fallbacks exhausted; giving up`)
+      console.log("[agent] all fallbacks exhausted")
     }
     throw error
   }

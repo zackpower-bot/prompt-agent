@@ -22,6 +22,7 @@ import { logoutAction } from "@/app/actions/auth.actions"
 import { Link } from "@/i18n/navigation"
 import { cn } from "@/lib/utils"
 
+import { ModelChainPicker } from "@/components/agent/model-chain-picker"
 import { AlertsBell } from "./alerts-bell"
 import { SidebarPrompts } from "./sidebar-prompts"
 import { ThemeToggle } from "./theme-toggle"
@@ -164,6 +165,7 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
         </button>
 
         <div className="ml-auto flex items-center gap-1">
+          <ModelChainPicker />
           <AlertsBell />
           <ThemeToggle />
         </div>

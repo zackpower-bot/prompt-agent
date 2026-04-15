@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/sheet"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { useModelChain } from "@/hooks/use-model-chain"
 import type { Check, TestCaseDTO, TestCaseRunResult, VariablesMap } from "@/lib/test-case"
 
 interface Props {
@@ -81,6 +82,7 @@ function createFormState(testCase?: TestCaseDTO): FormState {
 
 export function TestCaseSection({ promptId, initialTestCases }: Props) {
   const t = useTranslations("prompts.testCases")
+  const { chain } = useModelChain()
   const [testCases, setTestCases] = useState(initialTestCases)
   const [editingId, setEditingId] = useState<string | "new" | null>(null)
   const [formState, setFormState] = useState<FormState>(createFormState())
@@ -123,7 +125,7 @@ export function TestCaseSection({ promptId, initialTestCases }: Props) {
       const response = await fetch("/api/test-cases/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id, preferredChain: chain }),
       })
 
       const payload = await response.json()
@@ -241,9 +243,11 @@ export function TestCaseSection({ promptId, initialTestCases }: Props) {
           <h2 className="font-serif text-xl">{t("sectionTitle")}</h2>
           <Badge variant="secondary">{t("count", { count: testCases.length })}</Badge>
         </div>
-        <Button size="sm" onClick={openCreate}>
-          {t("newButton")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" onClick={openCreate}>
+            {t("newButton")}
+          </Button>
+        </div>
       </div>
 
       {testCases.length === 0 ? (

@@ -16,6 +16,7 @@ import { createScenario } from "@/app/actions/scenario.actions"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useModelChain } from "@/hooks/use-model-chain"
 import { useRouter } from "@/i18n/navigation"
 import { PROVIDER_CONFIGS, getDefaultProvider, type ProviderName } from "@/lib/providers"
 import { SLOT_LABELS, SLOTS, isValidSlot } from "@/lib/slots"
@@ -64,6 +65,7 @@ function deriveRecipeDescription(goal: string, output: string) {
 export function CompileClient() {
   const t = useTranslations("compile")
   const router = useRouter()
+  const { chain } = useModelChain()
   const [goal, setGoal] = useState("")
   const [output, setOutput] = useState("")
   const [compileStatus, setCompileStatus] = useState<CompileStatus>("idle")
@@ -145,6 +147,7 @@ export function CompileClient() {
           locale: "zh",
           provider,
           model: model.trim() || undefined,
+          preferredChain: chain,
         }),
         signal: controller.signal,
       })
@@ -201,7 +204,7 @@ export function CompileClient() {
       setCompileError(`${t("errorPrefix")} ${(error as Error).message}`)
       setCompileStatus("error")
     }
-  }, [goal, model, provider, runRetrieval, t])
+  }, [chain, goal, model, provider, runRetrieval, t])
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLTextAreaElement>) => {

@@ -6,6 +6,7 @@
 import { runAgent } from "@/agent/core"
 import { getAnalysisTools } from "@/agent/tools"
 import { buildSystemPrompt } from "@/agent/prompt-builder"
+import type { ProviderName } from "@/lib/providers"
 
 const QUALITY_THRESHOLD = 0.7
 
@@ -17,7 +18,11 @@ export interface QualityAssessment {
   classification: Record<string, unknown>
 }
 
-export async function assessQuality(content: string, title?: string): Promise<QualityAssessment> {
+export async function assessQuality(
+  content: string,
+  title?: string,
+  opts?: { preferredChain?: Array<{ provider: ProviderName; model?: string }> }
+): Promise<QualityAssessment> {
   try {
     const systemPrompt = await buildSystemPrompt("analysis", content)
 
@@ -28,6 +33,7 @@ export async function assessQuality(content: string, title?: string): Promise<Qu
       locale: "zh",
       maxIterations: 3,
       temperature: 0.1,
+      preferredChain: opts?.preferredChain,
     })
 
     // Extract classification from trajectory

@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { ArrowLeft, Check, Loader2, Sparkles } from "lucide-react"
 import { updatePrompt } from "@/app/actions/prompt.actions"
 import type { PromptWithTags } from "@/app/actions/prompt.actions"
+import { useModelChain } from "@/hooks/use-model-chain"
 
 interface Suggestion {
   id: string
@@ -23,6 +24,7 @@ interface Suggestion {
 }
 
 export function CleanupClient({ prompts }: { prompts: PromptWithTags[] }) {
+  const { chain } = useModelChain()
   const [suggestions, setSuggestions] = useState<Map<string, Suggestion>>(new Map())
   const [analyzing, setAnalyzing] = useState(false)
   const [current, setCurrent] = useState(0)
@@ -39,6 +41,7 @@ export function CleanupClient({ prompts }: { prompts: PromptWithTags[] }) {
           content: prompt.content,
           tags: prompt.tags,
           category: prompt.category,
+          preferredChain: chain,
         }),
       })
 
@@ -62,7 +65,7 @@ export function CleanupClient({ prompts }: { prompts: PromptWithTags[] }) {
     } catch (e) {
       return { id: prompt.id, status: "error", error: (e as Error).message }
     }
-  }, [])
+  }, [chain])
 
   const startBatchAnalysis = useCallback(async () => {
     setAnalyzing(true)

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { runAgent } from "@/agent/core"
 import { getAnalysisTools } from "@/agent/tools"
 import { buildSystemPrompt } from "@/agent/prompt-builder"
+import type { ProviderName } from "@/lib/providers"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -17,12 +18,13 @@ Content:
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { id, title, content, tags, category } = body as {
+  const { id, title, content, tags, category, preferredChain } = body as {
     id: string
     title: string
     content: string
     tags: string[]
     category: string
+    preferredChain?: Array<{ provider: string; model?: string }>
   }
 
   if (!content?.trim()) {
@@ -44,6 +46,7 @@ export async function POST(request: NextRequest) {
       tools: getAnalysisTools(),
       locale: "zh",
       maxIterations: 4,
+      preferredChain: preferredChain as Array<{ provider: ProviderName; model?: string }> | undefined,
     })
 
     // Extract classification from trajectory
