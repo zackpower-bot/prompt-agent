@@ -101,6 +101,7 @@ export function CleanupClient({ prompts }: { prompts: PromptWithTags[] }) {
         ...(suggestion.description && { description: suggestion.description }),
         ...(suggestion.category && { category: suggestion.category }),
         ...(suggestion.tags && { tags: suggestion.tags }),
+        ...(typeof suggestion.qualityScore === "number" && { qualityScore: suggestion.qualityScore }),
       })
       if (result.success) {
         setSuggestions(prev => {
