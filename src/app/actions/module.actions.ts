@@ -4,12 +4,14 @@ import type { Prisma } from "@/generated/prisma/client"
 import { prisma } from "@/lib/prisma"
 import { embedModuleAsync } from "@/lib/embedding"
 import { recordAction } from "@/lib/action-log"
+import { isValidSlot, type Slot } from "@/lib/slots"
 
 export interface ModuleWithMeta {
   id: string
   title: string
   content: string
   type: string
+  slot: string | null
   tags: string[]
   createdAt: string
   updatedAt: string
@@ -31,6 +33,7 @@ function serializeModule(row: any): ModuleWithMeta {
     title: row.title,
     content: row.content,
     type: row.type,
+    slot: row.slot ?? null,
     tags: Array.isArray(row.tags) ? row.tags.map((t: any) => t.tag?.name ?? "").filter(Boolean) : [],
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
@@ -138,6 +141,7 @@ export async function createModule(input: {
   title: string
   content: string
   type: string
+  slot?: Slot | null
   tags?: string[]
 }): Promise<{ success: true; data: ModuleWithMeta } | { success: false; error: string }> {
   try {
@@ -149,6 +153,7 @@ export async function createModule(input: {
           title: input.title,
           content: input.content,
           type: input.type,
+          slot: input.slot ?? null,
           tags: tags.length
             ? {
                 create: tags.map((tag) => ({
@@ -169,7 +174,7 @@ export async function createModule(input: {
 
 export async function updateModule(
   id: string,
-  input: Partial<{ title: string; content: string; type: string; tags: string[] }>
+  input: Partial<{ title: string; content: string; type: string; slot: Slot | null; tags: string[] }>
 ): Promise<{ success: true; data: ModuleWithMeta } | { success: false; error: string }> {
   try {
     const result = await prisma.$transaction(async (tx) => {
@@ -188,6 +193,7 @@ export async function updateModule(
       if (input.title !== undefined) data.title = input.title
       if (input.content !== undefined) data.content = input.content
       if (input.type !== undefined) data.type = input.type
+      if (input.slot !== undefined) data.slot = input.slot
 
       if (Object.keys(data).length) {
         await tx.module.update({ where: { id }, data })
@@ -251,4 +257,8 @@ export async function deleteModule(
   } catch (e) {
     return { success: false, error: (e as Error).message }
   }
+}
+
+export function normalizeModuleSlot(value: string | null | undefined): Slot | null {
+  return isValidSlot(value) ? value : null
 }

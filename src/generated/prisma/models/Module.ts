@@ -29,6 +29,7 @@ export type ModuleMinAggregateOutputType = {
   title: string | null
   content: string | null
   type: string | null
+  slot: string | null
   embedding: runtime.Bytes | null
   embeddingModel: string | null
   embeddingUpdatedAt: Date | null
@@ -42,6 +43,7 @@ export type ModuleMaxAggregateOutputType = {
   title: string | null
   content: string | null
   type: string | null
+  slot: string | null
   embedding: runtime.Bytes | null
   embeddingModel: string | null
   embeddingUpdatedAt: Date | null
@@ -55,6 +57,7 @@ export type ModuleCountAggregateOutputType = {
   title: number
   content: number
   type: number
+  slot: number
   embedding: number
   embeddingModel: number
   embeddingUpdatedAt: number
@@ -70,6 +73,7 @@ export type ModuleMinAggregateInputType = {
   title?: true
   content?: true
   type?: true
+  slot?: true
   embedding?: true
   embeddingModel?: true
   embeddingUpdatedAt?: true
@@ -83,6 +87,7 @@ export type ModuleMaxAggregateInputType = {
   title?: true
   content?: true
   type?: true
+  slot?: true
   embedding?: true
   embeddingModel?: true
   embeddingUpdatedAt?: true
@@ -96,6 +101,7 @@ export type ModuleCountAggregateInputType = {
   title?: true
   content?: true
   type?: true
+  slot?: true
   embedding?: true
   embeddingModel?: true
   embeddingUpdatedAt?: true
@@ -182,6 +188,7 @@ export type ModuleGroupByOutputType = {
   title: string
   content: string
   type: string
+  slot: string | null
   embedding: runtime.Bytes | null
   embeddingModel: string | null
   embeddingUpdatedAt: Date | null
@@ -216,6 +223,7 @@ export type ModuleWhereInput = {
   title?: Prisma.StringFilter<"Module"> | string
   content?: Prisma.StringFilter<"Module"> | string
   type?: Prisma.StringFilter<"Module"> | string
+  slot?: Prisma.StringNullableFilter<"Module"> | string | null
   embedding?: Prisma.BytesNullableFilter<"Module"> | runtime.Bytes | null
   embeddingModel?: Prisma.StringNullableFilter<"Module"> | string | null
   embeddingUpdatedAt?: Prisma.DateTimeNullableFilter<"Module"> | Date | string | null
@@ -232,6 +240,7 @@ export type ModuleOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  slot?: Prisma.SortOrderInput | Prisma.SortOrder
   embedding?: Prisma.SortOrderInput | Prisma.SortOrder
   embeddingModel?: Prisma.SortOrderInput | Prisma.SortOrder
   embeddingUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -251,6 +260,7 @@ export type ModuleWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Module"> | string
   content?: Prisma.StringFilter<"Module"> | string
   type?: Prisma.StringFilter<"Module"> | string
+  slot?: Prisma.StringNullableFilter<"Module"> | string | null
   embedding?: Prisma.BytesNullableFilter<"Module"> | runtime.Bytes | null
   embeddingModel?: Prisma.StringNullableFilter<"Module"> | string | null
   embeddingUpdatedAt?: Prisma.DateTimeNullableFilter<"Module"> | Date | string | null
@@ -267,6 +277,7 @@ export type ModuleOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  slot?: Prisma.SortOrderInput | Prisma.SortOrder
   embedding?: Prisma.SortOrderInput | Prisma.SortOrder
   embeddingModel?: Prisma.SortOrderInput | Prisma.SortOrder
   embeddingUpdatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -286,6 +297,7 @@ export type ModuleScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"Module"> | string
   content?: Prisma.StringWithAggregatesFilter<"Module"> | string
   type?: Prisma.StringWithAggregatesFilter<"Module"> | string
+  slot?: Prisma.StringNullableWithAggregatesFilter<"Module"> | string | null
   embedding?: Prisma.BytesNullableWithAggregatesFilter<"Module"> | runtime.Bytes | null
   embeddingModel?: Prisma.StringNullableWithAggregatesFilter<"Module"> | string | null
   embeddingUpdatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Module"> | Date | string | null
@@ -299,6 +311,7 @@ export type ModuleCreateInput = {
   title: string
   content: string
   type?: string
+  slot?: string | null
   embedding?: runtime.Bytes | null
   embeddingModel?: string | null
   embeddingUpdatedAt?: Date | string | null
@@ -315,6 +328,7 @@ export type ModuleUncheckedCreateInput = {
   title: string
   content: string
   type?: string
+  slot?: string | null
   embedding?: runtime.Bytes | null
   embeddingModel?: string | null
   embeddingUpdatedAt?: Date | string | null
@@ -331,6 +345,7 @@ export type ModuleUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  slot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
   embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -347,6 +362,7 @@ export type ModuleUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  slot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
   embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -363,6 +379,7 @@ export type ModuleCreateManyInput = {
   title: string
   content: string
   type?: string
+  slot?: string | null
   embedding?: runtime.Bytes | null
   embeddingModel?: string | null
   embeddingUpdatedAt?: Date | string | null
@@ -376,6 +393,7 @@ export type ModuleUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  slot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
   embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -389,6 +407,7 @@ export type ModuleUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  slot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
   embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -402,6 +421,7 @@ export type ModuleCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  slot?: Prisma.SortOrder
   embedding?: Prisma.SortOrder
   embeddingModel?: Prisma.SortOrder
   embeddingUpdatedAt?: Prisma.SortOrder
@@ -415,6 +435,7 @@ export type ModuleMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  slot?: Prisma.SortOrder
   embedding?: Prisma.SortOrder
   embeddingModel?: Prisma.SortOrder
   embeddingUpdatedAt?: Prisma.SortOrder
@@ -428,6 +449,7 @@ export type ModuleMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  slot?: Prisma.SortOrder
   embedding?: Prisma.SortOrder
   embeddingModel?: Prisma.SortOrder
   embeddingUpdatedAt?: Prisma.SortOrder
@@ -446,12 +468,12 @@ export type ModuleNullableScalarRelationFilter = {
   isNot?: Prisma.ModuleWhereInput | null
 }
 
-export type NullableBytesFieldUpdateOperationsInput = {
-  set?: runtime.Bytes | null
-}
-
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableBytesFieldUpdateOperationsInput = {
+  set?: runtime.Bytes | null
 }
 
 export type ModuleCreateNestedOneWithoutTagsInput = {
@@ -503,6 +525,7 @@ export type ModuleCreateWithoutTagsInput = {
   title: string
   content: string
   type?: string
+  slot?: string | null
   embedding?: runtime.Bytes | null
   embeddingModel?: string | null
   embeddingUpdatedAt?: Date | string | null
@@ -518,6 +541,7 @@ export type ModuleUncheckedCreateWithoutTagsInput = {
   title: string
   content: string
   type?: string
+  slot?: string | null
   embedding?: runtime.Bytes | null
   embeddingModel?: string | null
   embeddingUpdatedAt?: Date | string | null
@@ -549,6 +573,7 @@ export type ModuleUpdateWithoutTagsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  slot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
   embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -564,6 +589,7 @@ export type ModuleUncheckedUpdateWithoutTagsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  slot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
   embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -579,6 +605,7 @@ export type ModuleCreateWithoutStepsInput = {
   title: string
   content: string
   type?: string
+  slot?: string | null
   embedding?: runtime.Bytes | null
   embeddingModel?: string | null
   embeddingUpdatedAt?: Date | string | null
@@ -594,6 +621,7 @@ export type ModuleUncheckedCreateWithoutStepsInput = {
   title: string
   content: string
   type?: string
+  slot?: string | null
   embedding?: runtime.Bytes | null
   embeddingModel?: string | null
   embeddingUpdatedAt?: Date | string | null
@@ -625,6 +653,7 @@ export type ModuleUpdateWithoutStepsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  slot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
   embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -640,6 +669,7 @@ export type ModuleUncheckedUpdateWithoutStepsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  slot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
   embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -655,6 +685,7 @@ export type ModuleCreateWithoutUsesInput = {
   title: string
   content: string
   type?: string
+  slot?: string | null
   embedding?: runtime.Bytes | null
   embeddingModel?: string | null
   embeddingUpdatedAt?: Date | string | null
@@ -670,6 +701,7 @@ export type ModuleUncheckedCreateWithoutUsesInput = {
   title: string
   content: string
   type?: string
+  slot?: string | null
   embedding?: runtime.Bytes | null
   embeddingModel?: string | null
   embeddingUpdatedAt?: Date | string | null
@@ -701,6 +733,7 @@ export type ModuleUpdateWithoutUsesInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  slot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
   embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -716,6 +749,7 @@ export type ModuleUncheckedUpdateWithoutUsesInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  slot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embedding?: Prisma.NullableBytesFieldUpdateOperationsInput | runtime.Bytes | null
   embeddingModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   embeddingUpdatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -780,6 +814,7 @@ export type ModuleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   title?: boolean
   content?: boolean
   type?: boolean
+  slot?: boolean
   embedding?: boolean
   embeddingModel?: boolean
   embeddingUpdatedAt?: boolean
@@ -797,6 +832,7 @@ export type ModuleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   title?: boolean
   content?: boolean
   type?: boolean
+  slot?: boolean
   embedding?: boolean
   embeddingModel?: boolean
   embeddingUpdatedAt?: boolean
@@ -810,6 +846,7 @@ export type ModuleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   title?: boolean
   content?: boolean
   type?: boolean
+  slot?: boolean
   embedding?: boolean
   embeddingModel?: boolean
   embeddingUpdatedAt?: boolean
@@ -823,6 +860,7 @@ export type ModuleSelectScalar = {
   title?: boolean
   content?: boolean
   type?: boolean
+  slot?: boolean
   embedding?: boolean
   embeddingModel?: boolean
   embeddingUpdatedAt?: boolean
@@ -831,7 +869,7 @@ export type ModuleSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ModuleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "content" | "type" | "embedding" | "embeddingModel" | "embeddingUpdatedAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["module"]>
+export type ModuleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "content" | "type" | "slot" | "embedding" | "embeddingModel" | "embeddingUpdatedAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["module"]>
 export type ModuleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tags?: boolean | Prisma.Module$tagsArgs<ExtArgs>
   steps?: boolean | Prisma.Module$stepsArgs<ExtArgs>
@@ -853,6 +891,7 @@ export type $ModulePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     title: string
     content: string
     type: string
+    slot: string | null
     embedding: runtime.Bytes | null
     embeddingModel: string | null
     embeddingUpdatedAt: Date | null
@@ -1289,6 +1328,7 @@ export interface ModuleFieldRefs {
   readonly title: Prisma.FieldRef<"Module", 'String'>
   readonly content: Prisma.FieldRef<"Module", 'String'>
   readonly type: Prisma.FieldRef<"Module", 'String'>
+  readonly slot: Prisma.FieldRef<"Module", 'String'>
   readonly embedding: Prisma.FieldRef<"Module", 'Bytes'>
   readonly embeddingModel: Prisma.FieldRef<"Module", 'String'>
   readonly embeddingUpdatedAt: Prisma.FieldRef<"Module", 'DateTime'>

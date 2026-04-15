@@ -18,7 +18,8 @@
     "modules": "模块",
     "cleanup": "清洗",
     "stats": "统计",
-    "activity": "活动"
+    "activity": "活动",
+    "recipes": "全部配方"
   },
   "agent": {
     "thinking": "思考中...",
@@ -112,7 +113,12 @@
       "output_format": "输出格式",
       "style": "风格",
       "self_check": "自检"
-    }
+    },
+    "slotLabel": "插槽",
+    "slotPlaceholder": "选择插槽（可选）",
+    "slotGroupCore": "核心 6",
+    "slotGroupAdvanced": "增强 3",
+    "slotGroupAgent": "Agent 2"
   },
   "stats": {
     "title": "使用统计",
@@ -201,7 +207,7 @@
     "newRecipe": "新建配方",
     "createError": "新建配方失败",
     "untitledRecipe": "未命名配方",
-    "inlinePlaceholder": "在这里填写配方指令",
+    "inlinePlaceholder": "在这里填写这一步的内联指令...",
     "updatedAt": "更新于 {value}",
     "emptyRecipes": "还没有配方",
     "edit": "编辑",
@@ -214,7 +220,7 @@
     "back": "返回",
     "backToScenario": "返回 {name}",
     "namePlaceholder": "配方名称",
-    "descriptionPlaceholder": "描述这个配方最终要组装什么",
+    "descriptionPlaceholder": "描述这个配方最终要组装成什么",
     "scenarioLabel": "场景：",
     "qualityLabel": "质量 {grade}",
     "stepsHeading": "步骤",
@@ -228,16 +234,16 @@
     "moveDown": "下移步骤",
     "deleteStep": "删除步骤",
     "moduleFieldLabel": "模块步骤",
-    "moduleSelectPlaceholder": "搜索或选择模块",
+    "moduleSelectPlaceholder": "选择或搜索模块",
     "moduleSearchPlaceholder": "搜索模块...",
     "moduleSearchEmpty": "没有找到匹配的模块",
     "modulePreviewPlaceholder": "尚未选择模块",
     "inlineFieldLabel": "内联步骤",
     "emptyStepsTitle": "还没有步骤",
-    "emptyStepsDescription": "添加模块或内联步骤，用来组装配方",
+    "emptyStepsDescription": "添加模块或内联步骤，用来组装这个配方。",
     "addStep": "添加步骤",
-    "assembledPreview": "拼装预览",
-    "stickyHint": "先保存配方，或者组装一个预览结果",
+    "assembledPreview": "组装预览",
+    "stickyHint": "先保存配方，或先组装一个预览结果。",
     "assemble": "组装",
     "hidePreview": "收起预览",
     "saveError": "保存配方失败",
@@ -249,6 +255,19 @@
       "C": "C 档",
       "D": "D 档"
     },
-    "save": "保存"
+    "save": "保存",
+    "templateTypeLabel": "模板类型",
+    "templateTypePlaceholder": "选择模板类型...",
+    "templateTypeUnclassified": "未分类",
+    "healthHealthy": "完整",
+    "healthPartial": "待补全",
+    "healthDraft": "草稿",
+    "healthUnclassified": "未分类",
+    "missingCoreSlots": "缺少核心插槽：{slots}",
+    "allTitle": "全部配方",
+    "filterByTemplate": "按模板筛选",
+    "allTemplates": "全部模板",
+    "empty": "还没有配方。先到「场景配方」里创建一个场景，然后给它添加第一个可组装的配方。",
+    "fromScenario": "来自 {scenario}"
   }
 }

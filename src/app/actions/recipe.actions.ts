@@ -1,13 +1,15 @@
 "use server"
 
 import { prisma } from "@/lib/prisma"
+import { evaluateRecipeHealth, type RecipeHealth } from "@/lib/recipe-health"
+import { isValidTemplateType, type TemplateType } from "@/lib/templates"
 
 export interface RecipeStepRecord {
   id: string
   order: number
   moduleId: string | null
   inline: string | null
-  module?: { id: string; title: string; content: string }
+  module?: { id: string; title: string; content: string; type: string; slot: string | null }
 }
 
 export interface RecipeRecord {
@@ -15,6 +17,7 @@ export interface RecipeRecord {
   scenarioId: string
   name: string
   description: string
+  templateType: string | null
   assembled: string | null
   quality: number | null
   createdAt: string
@@ -29,6 +32,18 @@ export interface RecipeWithScenario extends RecipeWithSteps {
   scenario: { id: string; name: string }
 }
 
+export interface RecipeListRecord {
+  id: string
+  name: string
+  description: string
+  scenarioId: string
+  scenarioName: string
+  templateType: string | null
+  stepCount: number
+  health: RecipeHealth
+  updatedAt: string
+}
+
 type StepInput = { moduleId?: string; inline?: string; order?: number }
 type NormalizedStep = { moduleId: string | null; inline: string | null; order: number }
 
@@ -38,6 +53,7 @@ function serializeRecipe(row: any): RecipeRecord {
     scenarioId: row.scenarioId,
     name: row.name,
     description: row.description,
+    templateType: row.templateType ?? null,
     assembled: row.assembled ?? null,
     quality: row.quality ?? null,
     createdAt: row.createdAt.toISOString(),
@@ -56,6 +72,8 @@ function serializeStep(row: any): RecipeStepRecord {
           id: row.module.id,
           title: row.module.title,
           content: row.module.content,
+          type: row.module.type,
+          slot: row.module.slot ?? null,
         }
       : undefined,
   }
@@ -78,6 +96,30 @@ function serializeRecipeWithScenario(row: any): RecipeWithScenario {
   }
 }
 
+function toRecipeHealth(row: any): RecipeHealth {
+  return evaluateRecipeHealth({
+    templateType: row.templateType ?? null,
+    steps: (row.steps ?? []).map((step: any) => ({
+      moduleSlot: step.module?.slot ?? null,
+      isInline: Boolean(step.inline),
+    })),
+  })
+}
+
+function serializeRecipeListRecord(row: any): RecipeListRecord {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    scenarioId: row.scenarioId,
+    scenarioName: row.scenario?.name ?? "",
+    templateType: row.templateType ?? null,
+    stepCount: row._count?.steps ?? row.steps?.length ?? 0,
+    health: toRecipeHealth(row),
+    updatedAt: row.updatedAt.toISOString(),
+  }
+}
+
 function normalizeSteps(steps?: StepInput[]): NormalizedStep[] {
   if (!steps?.length) return []
   return steps.map((step, index) => ({
@@ -91,6 +133,7 @@ export async function createRecipe(input: {
   scenarioId: string
   name: string
   description?: string
+  templateType?: TemplateType | null
   steps?: StepInput[]
 }): Promise<{ success: true; data: RecipeWithSteps } | { success: false; error: string }> {
   try {
@@ -101,6 +144,7 @@ export async function createRecipe(input: {
           scenarioId: input.scenarioId,
           name: input.name,
           description: input.description ?? "",
+          templateType: input.templateType ?? null,
         },
       })
       if (normalizedSteps.length) {
@@ -132,17 +176,22 @@ export async function createRecipe(input: {
 
 export async function updateRecipe(
   id: string,
-  input: Partial<{ name: string; description: string; steps: StepInput[] }>
+  input: Partial<{ name: string; description: string; templateType: TemplateType | null; steps: StepInput[] }>
 ): Promise<{ success: true; data: RecipeWithSteps } | { success: false; error: string }> {
   try {
     const normalizedSteps = normalizeSteps(input.steps)
     const row = await prisma.$transaction(async (tx) => {
-      if (input.name !== undefined || input.description !== undefined) {
+      if (
+        input.name !== undefined ||
+        input.description !== undefined ||
+        input.templateType !== undefined
+      ) {
         await tx.recipe.update({
           where: { id },
           data: {
             ...(input.name !== undefined && { name: input.name }),
             ...(input.description !== undefined && { description: input.description }),
+            ...(input.templateType !== undefined && { templateType: input.templateType }),
           },
         })
       }
@@ -212,6 +261,42 @@ export async function getRecipeById(
     })
     if (!row) return { success: false, error: "Recipe not found" }
     return { success: true, data: serializeRecipeWithScenario(row) }
+  } catch (e) {
+    return { success: false, error: (e as Error).message }
+  }
+}
+
+export async function getAllRecipes(filters?: {
+  templateType?: string
+  limit?: number
+  offset?: number
+}): Promise<{ success: true; data: RecipeListRecord[]; total: number } | { success: false; error: string }> {
+  try {
+    const where: any = {}
+    if (filters?.templateType && isValidTemplateType(filters.templateType)) {
+      where.templateType = filters.templateType
+    }
+
+    const [rows, total] = await Promise.all([
+      prisma.recipe.findMany({
+        where,
+        orderBy: { updatedAt: "desc" },
+        take: filters?.limit ?? 50,
+        skip: filters?.offset ?? 0,
+        include: {
+          scenario: { select: { name: true } },
+          _count: { select: { steps: true } },
+          steps: {
+            include: {
+              module: { select: { slot: true } },
+            },
+          },
+        },
+      }),
+      prisma.recipe.count({ where }),
+    ])
+
+    return { success: true, data: rows.map(serializeRecipeListRecord), total }
   } catch (e) {
     return { success: false, error: (e as Error).message }
   }

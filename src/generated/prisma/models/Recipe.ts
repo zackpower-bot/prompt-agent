@@ -39,6 +39,7 @@ export type RecipeMinAggregateOutputType = {
   scenarioId: string | null
   name: string | null
   description: string | null
+  templateType: string | null
   assembled: string | null
   quality: number | null
   createdAt: Date | null
@@ -50,6 +51,7 @@ export type RecipeMaxAggregateOutputType = {
   scenarioId: string | null
   name: string | null
   description: string | null
+  templateType: string | null
   assembled: string | null
   quality: number | null
   createdAt: Date | null
@@ -61,6 +63,7 @@ export type RecipeCountAggregateOutputType = {
   scenarioId: number
   name: number
   description: number
+  templateType: number
   assembled: number
   quality: number
   createdAt: number
@@ -82,6 +85,7 @@ export type RecipeMinAggregateInputType = {
   scenarioId?: true
   name?: true
   description?: true
+  templateType?: true
   assembled?: true
   quality?: true
   createdAt?: true
@@ -93,6 +97,7 @@ export type RecipeMaxAggregateInputType = {
   scenarioId?: true
   name?: true
   description?: true
+  templateType?: true
   assembled?: true
   quality?: true
   createdAt?: true
@@ -104,6 +109,7 @@ export type RecipeCountAggregateInputType = {
   scenarioId?: true
   name?: true
   description?: true
+  templateType?: true
   assembled?: true
   quality?: true
   createdAt?: true
@@ -202,6 +208,7 @@ export type RecipeGroupByOutputType = {
   scenarioId: string
   name: string
   description: string
+  templateType: string | null
   assembled: string | null
   quality: number | null
   createdAt: Date
@@ -236,6 +243,7 @@ export type RecipeWhereInput = {
   scenarioId?: Prisma.StringFilter<"Recipe"> | string
   name?: Prisma.StringFilter<"Recipe"> | string
   description?: Prisma.StringFilter<"Recipe"> | string
+  templateType?: Prisma.StringNullableFilter<"Recipe"> | string | null
   assembled?: Prisma.StringNullableFilter<"Recipe"> | string | null
   quality?: Prisma.FloatNullableFilter<"Recipe"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Recipe"> | Date | string
@@ -249,6 +257,7 @@ export type RecipeOrderByWithRelationInput = {
   scenarioId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  templateType?: Prisma.SortOrderInput | Prisma.SortOrder
   assembled?: Prisma.SortOrderInput | Prisma.SortOrder
   quality?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -265,6 +274,7 @@ export type RecipeWhereUniqueInput = Prisma.AtLeast<{
   scenarioId?: Prisma.StringFilter<"Recipe"> | string
   name?: Prisma.StringFilter<"Recipe"> | string
   description?: Prisma.StringFilter<"Recipe"> | string
+  templateType?: Prisma.StringNullableFilter<"Recipe"> | string | null
   assembled?: Prisma.StringNullableFilter<"Recipe"> | string | null
   quality?: Prisma.FloatNullableFilter<"Recipe"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Recipe"> | Date | string
@@ -278,6 +288,7 @@ export type RecipeOrderByWithAggregationInput = {
   scenarioId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  templateType?: Prisma.SortOrderInput | Prisma.SortOrder
   assembled?: Prisma.SortOrderInput | Prisma.SortOrder
   quality?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -297,6 +308,7 @@ export type RecipeScalarWhereWithAggregatesInput = {
   scenarioId?: Prisma.StringWithAggregatesFilter<"Recipe"> | string
   name?: Prisma.StringWithAggregatesFilter<"Recipe"> | string
   description?: Prisma.StringWithAggregatesFilter<"Recipe"> | string
+  templateType?: Prisma.StringNullableWithAggregatesFilter<"Recipe"> | string | null
   assembled?: Prisma.StringNullableWithAggregatesFilter<"Recipe"> | string | null
   quality?: Prisma.FloatNullableWithAggregatesFilter<"Recipe"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Recipe"> | Date | string
@@ -307,6 +319,7 @@ export type RecipeCreateInput = {
   id?: string
   name: string
   description?: string
+  templateType?: string | null
   assembled?: string | null
   quality?: number | null
   createdAt?: Date | string
@@ -320,6 +333,7 @@ export type RecipeUncheckedCreateInput = {
   scenarioId: string
   name: string
   description?: string
+  templateType?: string | null
   assembled?: string | null
   quality?: number | null
   createdAt?: Date | string
@@ -331,6 +345,7 @@ export type RecipeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  templateType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assembled?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quality?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -344,6 +359,7 @@ export type RecipeUncheckedUpdateInput = {
   scenarioId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  templateType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assembled?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quality?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -356,6 +372,7 @@ export type RecipeCreateManyInput = {
   scenarioId: string
   name: string
   description?: string
+  templateType?: string | null
   assembled?: string | null
   quality?: number | null
   createdAt?: Date | string
@@ -366,6 +383,7 @@ export type RecipeUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  templateType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assembled?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quality?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -377,6 +395,7 @@ export type RecipeUncheckedUpdateManyInput = {
   scenarioId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  templateType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assembled?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quality?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -398,6 +417,7 @@ export type RecipeCountOrderByAggregateInput = {
   scenarioId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  templateType?: Prisma.SortOrder
   assembled?: Prisma.SortOrder
   quality?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -413,6 +433,7 @@ export type RecipeMaxOrderByAggregateInput = {
   scenarioId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  templateType?: Prisma.SortOrder
   assembled?: Prisma.SortOrder
   quality?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -424,6 +445,7 @@ export type RecipeMinOrderByAggregateInput = {
   scenarioId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  templateType?: Prisma.SortOrder
   assembled?: Prisma.SortOrder
   quality?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -499,6 +521,7 @@ export type RecipeCreateWithoutScenarioInput = {
   id?: string
   name: string
   description?: string
+  templateType?: string | null
   assembled?: string | null
   quality?: number | null
   createdAt?: Date | string
@@ -510,6 +533,7 @@ export type RecipeUncheckedCreateWithoutScenarioInput = {
   id?: string
   name: string
   description?: string
+  templateType?: string | null
   assembled?: string | null
   quality?: number | null
   createdAt?: Date | string
@@ -550,6 +574,7 @@ export type RecipeScalarWhereInput = {
   scenarioId?: Prisma.StringFilter<"Recipe"> | string
   name?: Prisma.StringFilter<"Recipe"> | string
   description?: Prisma.StringFilter<"Recipe"> | string
+  templateType?: Prisma.StringNullableFilter<"Recipe"> | string | null
   assembled?: Prisma.StringNullableFilter<"Recipe"> | string | null
   quality?: Prisma.FloatNullableFilter<"Recipe"> | number | null
   createdAt?: Prisma.DateTimeFilter<"Recipe"> | Date | string
@@ -560,6 +585,7 @@ export type RecipeCreateWithoutStepsInput = {
   id?: string
   name: string
   description?: string
+  templateType?: string | null
   assembled?: string | null
   quality?: number | null
   createdAt?: Date | string
@@ -572,6 +598,7 @@ export type RecipeUncheckedCreateWithoutStepsInput = {
   scenarioId: string
   name: string
   description?: string
+  templateType?: string | null
   assembled?: string | null
   quality?: number | null
   createdAt?: Date | string
@@ -598,6 +625,7 @@ export type RecipeUpdateWithoutStepsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  templateType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assembled?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quality?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -610,6 +638,7 @@ export type RecipeUncheckedUpdateWithoutStepsInput = {
   scenarioId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  templateType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assembled?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quality?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -620,6 +649,7 @@ export type RecipeCreateManyScenarioInput = {
   id?: string
   name: string
   description?: string
+  templateType?: string | null
   assembled?: string | null
   quality?: number | null
   createdAt?: Date | string
@@ -630,6 +660,7 @@ export type RecipeUpdateWithoutScenarioInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  templateType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assembled?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quality?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -641,6 +672,7 @@ export type RecipeUncheckedUpdateWithoutScenarioInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  templateType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assembled?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quality?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -652,6 +684,7 @@ export type RecipeUncheckedUpdateManyWithoutScenarioInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  templateType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assembled?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quality?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -694,6 +727,7 @@ export type RecipeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   scenarioId?: boolean
   name?: boolean
   description?: boolean
+  templateType?: boolean
   assembled?: boolean
   quality?: boolean
   createdAt?: boolean
@@ -708,6 +742,7 @@ export type RecipeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   scenarioId?: boolean
   name?: boolean
   description?: boolean
+  templateType?: boolean
   assembled?: boolean
   quality?: boolean
   createdAt?: boolean
@@ -720,6 +755,7 @@ export type RecipeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   scenarioId?: boolean
   name?: boolean
   description?: boolean
+  templateType?: boolean
   assembled?: boolean
   quality?: boolean
   createdAt?: boolean
@@ -732,13 +768,14 @@ export type RecipeSelectScalar = {
   scenarioId?: boolean
   name?: boolean
   description?: boolean
+  templateType?: boolean
   assembled?: boolean
   quality?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type RecipeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "scenarioId" | "name" | "description" | "assembled" | "quality" | "createdAt" | "updatedAt", ExtArgs["result"]["recipe"]>
+export type RecipeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "scenarioId" | "name" | "description" | "templateType" | "assembled" | "quality" | "createdAt" | "updatedAt", ExtArgs["result"]["recipe"]>
 export type RecipeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   scenario?: boolean | Prisma.ScenarioDefaultArgs<ExtArgs>
   steps?: boolean | Prisma.Recipe$stepsArgs<ExtArgs>
@@ -762,6 +799,7 @@ export type $RecipePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     scenarioId: string
     name: string
     description: string
+    templateType: string | null
     assembled: string | null
     quality: number | null
     createdAt: Date
@@ -1195,6 +1233,7 @@ export interface RecipeFieldRefs {
   readonly scenarioId: Prisma.FieldRef<"Recipe", 'String'>
   readonly name: Prisma.FieldRef<"Recipe", 'String'>
   readonly description: Prisma.FieldRef<"Recipe", 'String'>
+  readonly templateType: Prisma.FieldRef<"Recipe", 'String'>
   readonly assembled: Prisma.FieldRef<"Recipe", 'String'>
   readonly quality: Prisma.FieldRef<"Recipe", 'Float'>
   readonly createdAt: Prisma.FieldRef<"Recipe", 'DateTime'>

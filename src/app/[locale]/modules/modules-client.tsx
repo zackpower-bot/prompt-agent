@@ -8,12 +8,20 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Search, Plus, Pencil, Trash2, Save, X, Check } from "lucide-react"
 import {
-  getModulesPaginated,
   createModule,
-  updateModule,
   deleteModule,
+  getModulesPaginated,
+  normalizeModuleSlot,
+  updateModule,
 } from "@/app/actions/module.actions"
 import type { ModuleWithMeta } from "@/app/actions/module.actions"
+import {
+  AGENT_SLOTS,
+  ADVANCED_SLOTS,
+  CORE_SLOTS,
+  SLOT_LABELS,
+  type Slot,
+} from "@/lib/slots"
 
 const MODULE_TYPES = [
   { value: "role", label: "角色" },
@@ -22,6 +30,12 @@ const MODULE_TYPES = [
   { value: "output_format", label: "输出格式" },
   { value: "style", label: "风格" },
   { value: "self_check", label: "自检" },
+]
+
+const SLOT_GROUPS: Array<{ label: string; slots: readonly Slot[] }> = [
+  { label: "核心 6", slots: CORE_SLOTS },
+  { label: "增强 3", slots: ADVANCED_SLOTS },
+  { label: "Agent 2", slots: AGENT_SLOTS },
 ]
 
 interface ModulesClientProps {
@@ -48,10 +62,12 @@ export function ModulesClient({
   const [newTitle, setNewTitle] = useState("")
   const [newContent, setNewContent] = useState("")
   const [newType, setNewType] = useState("role")
+  const [newSlot, setNewSlot] = useState<string>("")
 
   const [editTitle, setEditTitle] = useState("")
   const [editContent, setEditContent] = useState("")
   const [editType, setEditType] = useState("")
+  const [editSlot, setEditSlot] = useState<string>("")
 
   const loadPage = useCallback(
     (offset = 0, mode: "replace" | "append" = "replace") => {
@@ -68,9 +84,7 @@ export function ModulesClient({
         setTotal(result.total)
         setHasMore(result.data.length === pageSize)
         setAllLoaded(offset > 0 && result.data.length < pageSize)
-        if (mode === "replace") {
-          setAllLoaded(false)
-        }
+        if (mode === "replace") setAllLoaded(false)
       })
     },
     [pageSize, search, typeFilter]
@@ -84,25 +98,36 @@ export function ModulesClient({
     loadPage(modules.length, "append")
   }, [loadPage, modules.length])
 
+  const resetCreateForm = () => {
+    setCreating(false)
+    setNewTitle("")
+    setNewContent("")
+    setNewType("role")
+    setNewSlot("")
+  }
+
   const handleCreate = useCallback(() => {
     if (!newTitle.trim() || !newContent.trim()) return
     startTransition(async () => {
-      const result = await createModule({ title: newTitle, content: newContent, type: newType })
+      const result = await createModule({
+        title: newTitle,
+        content: newContent,
+        type: newType,
+        slot: normalizeModuleSlot(newSlot),
+      })
       if (result.success) {
-        setCreating(false)
-        setNewTitle("")
-        setNewContent("")
-        setNewType("role")
+        resetCreateForm()
         loadPage(0, "replace")
       }
     })
-  }, [loadPage, newContent, newTitle, newType])
+  }, [loadPage, newContent, newSlot, newTitle, newType])
 
   const startEdit = (module: ModuleWithMeta) => {
     setEditingId(module.id)
     setEditTitle(module.title)
     setEditContent(module.content)
     setEditType(module.type)
+    setEditSlot(module.slot ?? "")
   }
 
   const handleUpdate = useCallback(() => {
@@ -112,13 +137,14 @@ export function ModulesClient({
         title: editTitle,
         content: editContent,
         type: editType,
+        slot: normalizeModuleSlot(editSlot),
       })
       if (result.success) {
         setEditingId(null)
         loadPage(0, "replace")
       }
     })
-  }, [editContent, editTitle, editType, editingId, loadPage])
+  }, [editContent, editSlot, editTitle, editType, editingId, loadPage])
 
   const handleDelete = useCallback(
     (id: string) => {
@@ -136,6 +162,31 @@ export function ModulesClient({
     new Date(date).toLocaleDateString("zh-CN", { month: "short", day: "numeric" })
 
   const empty = useMemo(() => modules.length === 0 && !isPending, [isPending, modules.length])
+
+  const SlotSelect = ({
+    value,
+    onChange,
+  }: {
+    value: string
+    onChange: (value: string) => void
+  }) => (
+    <select
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      className="w-full rounded-md border px-3 py-2 text-sm"
+    >
+      <option value="">选择插槽（可选）</option>
+      {SLOT_GROUPS.map((group) => (
+        <optgroup key={group.label} label={group.label}>
+          {group.slots.map((slot) => (
+            <option key={slot} value={slot}>
+              {SLOT_LABELS[slot]}
+            </option>
+          ))}
+        </optgroup>
+      ))}
+    </select>
+  )
 
   return (
     <div className="container-reading">
@@ -181,7 +232,7 @@ export function ModulesClient({
 
       {creating && (
         <Card className="mb-4">
-          <CardContent className="space-y-3 pt-4">
+          <CardContent className="flex flex-col gap-3 pt-4">
             <Input
               placeholder="模块标题"
               value={newTitle}
@@ -198,6 +249,7 @@ export function ModulesClient({
                 </option>
               ))}
             </select>
+            <SlotSelect value={newSlot} onChange={setNewSlot} />
             <Textarea
               placeholder="模块内容..."
               value={newContent}
@@ -209,7 +261,7 @@ export function ModulesClient({
                 <Save className="mr-1 h-3 w-3" />
                 保存
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => setCreating(false)}>
+              <Button size="sm" variant="ghost" onClick={resetCreateForm}>
                 <X className="mr-1 h-3 w-3" />
                 取消
               </Button>
@@ -236,6 +288,7 @@ export function ModulesClient({
                       </option>
                     ))}
                   </select>
+                  <SlotSelect value={editSlot} onChange={setEditSlot} />
                   <Textarea
                     value={editContent}
                     onChange={(event) => setEditContent(event.target.value)}
@@ -252,6 +305,11 @@ export function ModulesClient({
                     <Badge variant="outline" className="mono-label">
                       {MODULE_TYPES.find((type) => type.value === module.type)?.label ?? module.type}
                     </Badge>
+                    {module.slot && (
+                      <Badge variant="warm" className="text-[10px]">
+                        {SLOT_LABELS[module.slot as Slot]}
+                      </Badge>
+                    )}
                     {module.tags.map((tag) => (
                       <Badge key={tag} variant="outline" className="text-[10px]">
                         {tag}

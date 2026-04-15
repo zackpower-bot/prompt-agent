@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation"
 import {
   BarChart3,
   Blocks,
+  BookOpen,
   Bot,
   History,
   Library,
@@ -32,6 +33,7 @@ const navGroups = [
       { href: "/prompts", label: "提示词库", icon: Library },
       { href: "/modules", label: "模块", icon: Blocks },
       { href: "/scenarios", label: "场景配方", icon: Layers },
+      { href: "/recipes", label: "全部配方", icon: BookOpen },
       { href: "/cleanup", label: "清洗", icon: Wrench },
     ],
   },

@@ -52,6 +52,7 @@ model Module {
   title              String
   content            String
   type               String    @default("role")
+  slot               String?
   embedding          Bytes?
   embeddingModel     String?
   embeddingUpdatedAt DateTime?
@@ -64,6 +65,7 @@ model Module {
   uses  PromptModuleUse[]
 
   @@index([deletedAt])
+  @@index([slot])
 }
 
 model ModuleTag {
@@ -95,6 +97,7 @@ model Recipe {
   scenarioId  String
   name        String
   description String   @default("")
+  templateType String?
   assembled   String?
   quality     Float?
   createdAt   DateTime @default(now())

@@ -10,7 +10,6 @@ import {
   ChevronUp,
   Loader2,
   Plus,
-  Search,
   Trash,
 } from "lucide-react"
 import { toast } from "sonner"
@@ -22,12 +21,22 @@ import {
   type RecipeWithScenario,
 } from "@/app/actions/recipe.actions"
 import { type ModuleWithMeta } from "@/app/actions/module.actions"
-import { Link, useRouter } from "@/i18n/navigation"
+import { ModulePicker } from "@/components/recipes/module-picker"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { Link, useRouter } from "@/i18n/navigation"
+import { evaluateRecipeHealth, type RecipeHealth } from "@/lib/recipe-health"
+import { SLOT_LABELS, isValidSlot } from "@/lib/slots"
+import {
+  TEMPLATES,
+  TEMPLATE_DESCRIPTIONS,
+  TEMPLATE_LABELS,
+  isValidTemplateType,
+  type TemplateType,
+} from "@/lib/templates"
 import { summarizeText } from "@/lib/utils"
 
 type StepKind = "module" | "inline"
@@ -39,8 +48,6 @@ type EditableStep = {
   inline?: string
   order: number
 }
-
-type ModuleSearchState = Record<string, string>
 
 const generateLocalId = (): string => {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -66,19 +73,6 @@ const toEditableSteps = (steps: RecipeStepRecord[]): EditableStep[] => {
 const withSequentialOrder = (steps: EditableStep[]): EditableStep[] =>
   steps.map((step, index) => ({ ...step, order: index }))
 
-const moduleDisplayLabel = (module: ModuleWithMeta) => `${module.title} [${module.type}]`
-
-const normalizeSearch = (value: string) => value.trim().toLowerCase()
-
-const filterModules = (modules: ModuleWithMeta[], query: string) => {
-  const needle = normalizeSearch(query)
-  if (!needle) return modules
-  return modules.filter((module) => {
-    const haystack = [module.title, module.type, ...module.tags, module.content].join(" ").toLowerCase()
-    return haystack.includes(needle)
-  })
-}
-
 const qualityToGrade = (value: number | null | undefined): string | null => {
   if (value === null || value === undefined) return null
   const clamped = Math.max(0, Math.min(1, value))
@@ -98,20 +92,20 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
   const router = useRouter()
   const [name, setName] = useState(initialRecipe.name)
   const [description, setDescription] = useState(initialRecipe.description ?? "")
+  const [templateType, setTemplateType] = useState(initialRecipe.templateType ?? "")
   const [steps, setSteps] = useState<EditableStep[]>(() => toEditableSteps(initialRecipe.steps))
   const [assembledPreview, setAssembledPreview] = useState(initialRecipe.assembled ?? "")
   const [previewOpen, setPreviewOpen] = useState(Boolean(initialRecipe.assembled?.trim()))
-  const [moduleSearchByStep, setModuleSearchByStep] = useState<ModuleSearchState>({})
   const [isSaving, startSaveTransition] = useTransition()
   const [isAssembling, startAssembleTransition] = useTransition()
 
   useEffect(() => {
     setName(initialRecipe.name)
     setDescription(initialRecipe.description ?? "")
+    setTemplateType(initialRecipe.templateType ?? "")
     setSteps(toEditableSteps(initialRecipe.steps))
     setAssembledPreview(initialRecipe.assembled ?? "")
     setPreviewOpen(Boolean(initialRecipe.assembled?.trim()))
-    setModuleSearchByStep({})
   }, [initialRecipe])
 
   const modulesById = useMemo(() => {
@@ -153,70 +147,31 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
       updateSteps((prev) => {
         const next = [...prev]
         if (!next[index] || next[index].type === type) return prev
-        const nextStep: EditableStep = {
+        next[index] = {
           ...next[index],
           type,
           moduleId: type === "module" ? next[index].moduleId ?? modules[0]?.id ?? undefined : undefined,
           inline: type === "inline" ? next[index].inline ?? "" : undefined,
         }
-        next[index] = nextStep
-        if (type === "module") {
-          const selected = nextStep.moduleId ? modulesById.get(nextStep.moduleId) : undefined
-          setModuleSearchByStep((current) => ({
-            ...current,
-            [nextStep.localId]: selected ? moduleDisplayLabel(selected) : "",
-          }))
-        } else {
-          setModuleSearchByStep((current) => {
-            const nextSearch = { ...current }
-            delete nextSearch[nextStep.localId]
-            return nextSearch
-          })
-        }
         return next
       })
     },
-    [modules, modulesById, updateSteps]
+    [modules, updateSteps]
   )
 
   const handleModuleChange = useCallback(
-    (index: number, moduleId: string) => {
+    (index: number, moduleId: string | null) => {
       updateSteps((prev) => {
         const next = [...prev]
         if (!next[index]) return prev
         next[index] = {
           ...next[index],
-          moduleId: moduleId || undefined,
+          moduleId: moduleId ?? undefined,
         }
-        const selected = moduleId ? modulesById.get(moduleId) : undefined
-        setModuleSearchByStep((current) => ({
-          ...current,
-          [next[index].localId]: selected ? moduleDisplayLabel(selected) : "",
-        }))
         return next
       })
     },
-    [modulesById, updateSteps]
-  )
-
-  const handleModuleSearchChange = useCallback((stepId: string, value: string) => {
-    setModuleSearchByStep((current) => ({
-      ...current,
-      [stepId]: value,
-    }))
-  }, [])
-
-  const handleModuleSearchFocus = useCallback(
-    (stepId: string, currentModuleId?: string) => {
-      if (!currentModuleId) return
-      const selected = modulesById.get(currentModuleId)
-      if (!selected) return
-      setModuleSearchByStep((current) => ({
-        ...current,
-        [stepId]: moduleDisplayLabel(selected),
-      }))
-    },
-    [modulesById]
+    [updateSteps]
   )
 
   const handleInlineChange = useCallback(
@@ -234,11 +189,52 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
     [updateSteps]
   )
 
+  const recipeHealth = useMemo<RecipeHealth>(
+    () =>
+      evaluateRecipeHealth({
+        templateType,
+        steps: steps.map((step) => ({
+          moduleSlot:
+            step.type === "module" && step.moduleId
+              ? modulesById.get(step.moduleId)?.slot ?? null
+              : null,
+          isInline: step.type === "inline",
+        })),
+      }),
+    [modulesById, steps, templateType]
+  )
+
+  const missingCoreSlotsLabel = useMemo(() => {
+    if (recipeHealth.status === "healthy" || recipeHealth.missingCoreSlots.length === 0) return null
+    return t("missingCoreSlots", {
+      slots: recipeHealth.missingCoreSlots.map((slot) => SLOT_LABELS[slot]).join(" / "),
+    })
+  }, [recipeHealth, t])
+
+  const healthBadge = useMemo(() => {
+    switch (recipeHealth.status) {
+      case "healthy":
+        return <Badge variant="warm">{t("healthHealthy")}</Badge>
+      case "partial":
+        return <Badge variant="outline">{t("healthPartial")}</Badge>
+      case "draft":
+        return <Badge variant="secondary">{t("healthDraft")}</Badge>
+      case "unclassified":
+      default:
+        return <Badge variant="outline">{t("healthUnclassified")}</Badge>
+    }
+  }, [recipeHealth.status, t])
+
+  const templateDescription = isValidTemplateType(templateType)
+    ? TEMPLATE_DESCRIPTIONS[templateType]
+    : t("templateTypeUnclassified")
+
   const handleSave = useCallback(() => {
     startSaveTransition(async () => {
       const result = await updateRecipe(initialRecipe.id, {
         name: name.trim(),
         description: description.trim(),
+        templateType: isValidTemplateType(templateType) ? templateType : null,
         steps: steps.map((step, index) =>
           step.type === "module"
             ? { order: index, moduleId: step.moduleId }
@@ -254,12 +250,13 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
       setSteps(toEditableSteps(result.data.steps))
       setName(result.data.name)
       setDescription(result.data.description ?? "")
+      setTemplateType(result.data.templateType ?? "")
       setAssembledPreview(result.data.assembled ?? "")
       setPreviewOpen(Boolean(result.data.assembled?.trim()))
       toast.success(t("savedToast"))
       router.refresh()
     })
-  }, [description, initialRecipe.id, name, router, steps, t])
+  }, [description, initialRecipe.id, name, router, steps, t, templateType])
 
   const qualityGrade = qualityToGrade(initialRecipe.quality)
   const hasSteps = steps.length > 0
@@ -317,7 +314,7 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
           <div className="min-w-0 space-y-6">
             <section className="space-y-5 rounded-2xl border border-border bg-card p-5 shadow-sm">
               <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="space-y-2">
+                <div className="min-w-0 flex-1 space-y-4">
                   <Input
                     value={name}
                     onChange={(event) => setName(event.target.value)}
@@ -332,12 +329,37 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
                     className="min-h-[120px]"
                     disabled={isSaving}
                   />
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium" htmlFor="recipe-template-type">
+                      {t("templateTypeLabel")}
+                    </label>
+                    <select
+                      id="recipe-template-type"
+                      value={templateType}
+                      onChange={(event) => setTemplateType(event.target.value)}
+                      disabled={isSaving}
+                      className="h-10 w-full rounded-md border border-input/80 bg-card px-3 py-1 text-sm shadow-xs transition-all outline-none hover:border-input focus-visible:border-ring/60 focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:shadow-sm"
+                    >
+                      <option value="">{t("templateTypePlaceholder")}</option>
+                      {TEMPLATES.map((template) => (
+                        <option key={template} value={template}>
+                          {TEMPLATE_LABELS[template]}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{templateDescription}</p>
+                  </div>
                 </div>
-                {qualityGrade ? (
-                  <Badge variant="outline" className="shrink-0 text-xs uppercase tracking-wide">
-                    {t("qualityLabel", { grade: qualityGrade })}
-                  </Badge>
-                ) : null}
+
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
+                  {qualityGrade ? (
+                    <Badge variant="outline">{t("qualityLabel", { grade: qualityGrade })}</Badge>
+                  ) : null}
+                  {isValidTemplateType(templateType) ? (
+                    <Badge variant="secondary">{TEMPLATE_LABELS[templateType]}</Badge>
+                  ) : null}
+                  {healthBadge}
+                </div>
               </div>
             </section>
 
@@ -346,13 +368,18 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
                 <h2 className="text-lg font-semibold">{t("stepsHeading")}</h2>
               </div>
 
+              {missingCoreSlotsLabel ? (
+                <p className="text-sm text-muted-foreground">{missingCoreSlotsLabel}</p>
+              ) : null}
+
               {hasSteps ? (
                 <div className="space-y-4">
                   {steps.map((step, index) => {
                     const moduleInfo = step.moduleId ? modulesById.get(step.moduleId) : undefined
-                    const moduleSearchValue =
-                      moduleSearchByStep[step.localId] ?? (moduleInfo ? moduleDisplayLabel(moduleInfo) : "")
-                    const filteredModules = filterModules(modules, moduleSearchValue)
+                    const slotLabel =
+                      moduleInfo?.slot && isValidSlot(moduleInfo.slot)
+                        ? SLOT_LABELS[moduleInfo.slot]
+                        : null
 
                     return (
                       <Card key={step.localId} className="border border-border/70 shadow-sm">
@@ -423,62 +450,44 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
                         <CardContent className="space-y-3">
                           {step.type === "module" ? (
                             <div className="space-y-2">
-                              <label className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                              <label className="block text-xs font-medium text-muted-foreground">
                                 {t("moduleFieldLabel")}
                               </label>
-                              <div className="space-y-2">
-                                <div className="relative">
-                                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                                  <Input
-                                    value={moduleSearchValue}
-                                    onChange={(event) =>
-                                      handleModuleSearchChange(step.localId, event.target.value)
-                                    }
-                                    onFocus={() => handleModuleSearchFocus(step.localId, step.moduleId)}
-                                    placeholder={t("moduleSelectPlaceholder")}
-                                    className="h-11 pl-9"
-                                    disabled={isSaving || modules.length === 0}
-                                  />
-                                </div>
-                                <div className="max-h-56 overflow-y-auto rounded-xl border border-border bg-muted/20 p-1">
-                                  {filteredModules.length ? (
-                                    filteredModules.map((module) => {
-                                      const active = module.id === step.moduleId
-                                      return (
-                                        <Button
-                                          key={module.id}
-                                          type="button"
-                                          variant={active ? "secondary" : "ghost"}
-                                          className="flex h-auto w-full flex-col items-start gap-1 px-3 py-2 text-left"
-                                          onClick={() => handleModuleChange(index, module.id)}
-                                          disabled={isSaving}
-                                        >
-                                          <span className="font-medium">{module.title}</span>
-                                          <span className="text-xs text-muted-foreground">
-                                            {module.type}
-                                            {module.tags.length ? ` | ${module.tags.join(", ")}` : ""}
-                                          </span>
-                                        </Button>
-                                      )
-                                    })
+                              <ModulePicker
+                                value={step.moduleId ?? null}
+                                options={modules.map((module) => ({
+                                  id: module.id,
+                                  title: module.title,
+                                  type: module.type,
+                                  slot: module.slot,
+                                }))}
+                                onChange={(moduleId) => handleModuleChange(index, moduleId)}
+                                placeholder={t("moduleSelectPlaceholder")}
+                              />
+                              <div className="rounded-xl border border-border/60 bg-muted/20 p-3">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  {moduleInfo ? (
+                                    <>
+                                      <span className="text-sm font-medium">{moduleInfo.title}</span>
+                                      <Badge variant="outline">{moduleInfo.type}</Badge>
+                                      {slotLabel ? <Badge variant="warm">{slotLabel}</Badge> : null}
+                                    </>
                                   ) : (
-                                    <p className="px-3 py-4 text-sm text-muted-foreground">
-                                      {modules.length === 0
-                                        ? t("modulePreviewPlaceholder")
-                                        : t("moduleSearchEmpty")}
-                                    </p>
+                                    <span className="text-sm text-muted-foreground">
+                                      {t("modulePreviewPlaceholder")}
+                                    </span>
                                   )}
                                 </div>
+                                <p className="mt-2 text-xs text-muted-foreground">
+                                  {moduleInfo
+                                    ? summarizeText(moduleInfo.content, 240)
+                                    : t("modulePreviewPlaceholder")}
+                                </p>
                               </div>
-                              <p className="text-xs text-muted-foreground">
-                                {moduleInfo
-                                  ? summarizeText(moduleInfo.content, 240)
-                                  : t("modulePreviewPlaceholder")}
-                              </p>
                             </div>
                           ) : (
                             <div className="space-y-2">
-                              <label className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                              <label className="block text-xs font-medium text-muted-foreground">
                                 {t("inlineFieldLabel")}
                               </label>
                               <Textarea
