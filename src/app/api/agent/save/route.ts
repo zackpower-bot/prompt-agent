@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createPrompt, saveAgentHistory } from "@/app/actions/prompt.actions"
+import { recordEntityUsage } from "@/lib/entity-usage"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -52,6 +53,15 @@ export async function POST(request: NextRequest) {
       model: model ?? "unknown",
     })
   }
+
+  try {
+    await recordEntityUsage({
+      entityType: "prompt",
+      entityId: result.data.id,
+      action: "execute",
+      context: "home_save",
+    })
+  } catch {}
 
   return NextResponse.json({ promptId: result.data.id, prompt: result.data })
 }

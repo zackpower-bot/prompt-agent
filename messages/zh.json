@@ -76,7 +76,10 @@
       "expand": "展开",
       "collapse": "收起",
       "validationJsonError": "JSON 格式错误：{error}"
-    }
+    },
+    "usageBadge": "使用 {count} 次",
+    "usageStats": "累计使用 {total} 次",
+    "lastUsed": "上次 {time}"
   },
   "detail": {
     "edit": "编辑",

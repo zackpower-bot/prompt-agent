@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 
 export type EntityType = "prompt" | "module" | "recipe"
-export type UsageAction = "execute" | "test_run" | "assemble" | "copy" | "reference"
+export type UsageAction = "execute" | "test_run" | "assemble" | "copy" | "reference" | "view"
 
 export interface UsageStats {
   total: number
@@ -17,6 +17,13 @@ export interface TopEntity {
   entityId: string
   count: number
   lastUsedAt: string
+}
+
+export interface BatchUsageStats {
+  [entityId: string]: {
+    total: number
+    lastUsedAt: string | null
+  }
 }
 
 export async function recordEntityUsage(input: {
@@ -103,4 +110,30 @@ export async function getTopUsedEntities(
       count: row._count._all,
       lastUsedAt: row._max.createdAt!.toISOString(),
     }))
+}
+
+export async function getUsageForEntities(
+  entityType: EntityType,
+  entityIds: string[]
+): Promise<BatchUsageStats> {
+  const ids = [...new Set(entityIds.filter(Boolean))]
+  if (ids.length === 0) return {}
+
+  const grouped = await prisma.entityUsage.groupBy({
+    by: ["entityId"],
+    where: {
+      entityType,
+      entityId: { in: ids },
+    },
+    _count: { _all: true },
+    _max: { createdAt: true },
+  })
+
+  return grouped.reduce<BatchUsageStats>((acc, row) => {
+    acc[row.entityId] = {
+      total: row._count._all,
+      lastUsedAt: row._max.createdAt?.toISOString() ?? null,
+    }
+    return acc
+  }, {})
 }

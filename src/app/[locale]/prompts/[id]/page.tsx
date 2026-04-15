@@ -1,5 +1,6 @@
 import { getPromptById } from "@/app/actions/prompt.actions"
 import { getTestCasesByPrompt } from "@/app/actions/test-case.actions"
+import { recordEntityUsage } from "@/lib/entity-usage"
 import { PromptDetailClient } from "./detail-client"
 import { notFound } from "next/navigation"
 
@@ -10,6 +11,14 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ i
     getTestCasesByPrompt(id),
   ])
   if (!promptResult.success) notFound()
+
+  void recordEntityUsage({
+    entityType: "prompt",
+    entityId: id,
+    action: "view",
+    context: "detail_view",
+  }).catch(() => {})
+
   return (
     <PromptDetailClient
       prompt={promptResult.data}

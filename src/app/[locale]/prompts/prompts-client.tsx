@@ -21,6 +21,7 @@ interface PromptsClientProps {
 
 export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
   const [prompts, setPrompts] = useState(initialData.prompts)
+  const [usageMap, setUsageMap] = useState<Record<string, number>>({})
   const [total, setTotal] = useState(initialData.total)
   const [page, setPage] = useState(initialData.page)
   const [pageSize] = useState(initialData.pageSize)
@@ -57,6 +58,31 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
   }, [pageSize, debouncedSearch, selectedTag, selectedStatus])
 
   useEffect(() => { fetchPrompts(1) }, [fetchPrompts])
+
+  useEffect(() => {
+    const ids = prompts.map((prompt) => prompt.id)
+    if (ids.length === 0) {
+      setUsageMap({})
+      return
+    }
+
+    let active = true
+    fetch(`/api/usage/entity?type=prompt&ids=${ids.join(",")}`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        if (!active || !payload?.counts) return
+        const next: Record<string, number> = {}
+        for (const [id, stats] of Object.entries(payload.counts as Record<string, { total?: number }>)) {
+          next[id] = typeof stats.total === "number" ? stats.total : 0
+        }
+        setUsageMap(next)
+      })
+      .catch(() => {})
+
+    return () => {
+      active = false
+    }
+  }, [prompts])
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("zh-CN", { month: "short", day: "numeric" })
@@ -197,6 +223,11 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
                 {prompt.qualityScore !== null && (
                   <Badge className={getQualityBadgeClass(prompt.qualityScore)}>
                     {Math.round(prompt.qualityScore * 100)}%
+                  </Badge>
+                )}
+                {usageMap[prompt.id] !== undefined && usageMap[prompt.id] > 0 && (
+                  <Badge variant="warm" className="text-[10px]">
+                    使用 {usageMap[prompt.id]} 次
                   </Badge>
                 )}
                 <time className="flex items-center gap-1 text-xs text-muted-foreground">

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useTransition } from "react"
+import { useState, useCallback, useEffect, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Link } from "@/i18n/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -24,6 +24,11 @@ interface Props {
   initialTestCases: TestCaseDTO[]
 }
 
+interface PromptUsageStats {
+  total: number
+  lastUsedAt: string | null
+}
+
 export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: Props) {
   const router = useRouter()
   const [prompt, setPrompt] = useState(initialPrompt)
@@ -32,6 +37,7 @@ export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: 
   const [isPending, startTransition] = useTransition()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [feedbackGiven, setFeedbackGiven] = useState<"positive" | "negative" | null>(null)
+  const [usageStats, setUsageStats] = useState<PromptUsageStats | null>(null)
 
   const [title, setTitle] = useState(prompt.title)
   const [description, setDescription] = useState(prompt.description)
@@ -44,7 +50,35 @@ export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: 
     await navigator.clipboard.writeText(prompt.content)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+    fetch("/api/usage/entity/record", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        entityType: "prompt",
+        entityId: prompt.id,
+        action: "copy",
+        context: "detail_copy",
+      }),
+    }).catch(() => {})
   }, [prompt.content])
+
+  useEffect(() => {
+    let active = true
+    fetch(`/api/usage/entity?type=prompt&id=${prompt.id}`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        if (!active || !payload) return
+        setUsageStats({
+          total: typeof payload.total === "number" ? payload.total : 0,
+          lastUsedAt: typeof payload.lastUsedAt === "string" ? payload.lastUsedAt : null,
+        })
+      })
+      .catch(() => {})
+
+    return () => {
+      active = false
+    }
+  }, [prompt.id])
 
   const handleSave = useCallback(() => {
     startTransition(async () => {
@@ -95,6 +129,16 @@ export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: 
       hour: "2-digit", minute: "2-digit",
     })
 
+  const formatRelative = (value: string) => {
+    const diff = Date.now() - new Date(value).getTime()
+    const minute = 60 * 1000
+    const hour = 60 * minute
+    const day = 24 * hour
+    if (diff < hour) return `${Math.max(1, Math.round(diff / minute))} 分钟前`
+    if (diff < day) return `${Math.max(1, Math.round(diff / hour))} 小时前`
+    return `${Math.max(1, Math.round(diff / day))} 天前`
+  }
+
   return (
     <div className="container-reading">
       <div>
@@ -117,6 +161,13 @@ export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: 
           <Input value={description} onChange={e => setDescription(e.target.value)} placeholder="描述..." className="mt-2" />
         ) : prompt.description ? (
           <p className="mt-2 text-muted-foreground">{prompt.description}</p>
+        ) : null}
+
+        {usageStats ? (
+          <p className="mt-2 text-sm text-muted-foreground">
+            累计使用 {usageStats.total} 次
+            {usageStats.lastUsedAt ? ` · 上次 ${formatRelative(usageStats.lastUsedAt)}` : ""}
+          </p>
         ) : null}
 
         {editing ? (
