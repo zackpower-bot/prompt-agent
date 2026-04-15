@@ -8,6 +8,11 @@ interface ProviderConfig {
   baseURL: string
   defaultModel: string
   envKey: string
+  // When false, this provider is excluded from chat-completion fallback chain
+  // even if its env key is configured. Useful when a key is scoped to only a
+  // subset of the provider's APIs (e.g., Gemini key limited to embedding API
+  // by its owner project). Embedding path is independent and unaffected.
+  chatEnabled?: boolean
 }
 
 export const PROVIDER_CONFIGS: Record<ProviderName, ProviderConfig> = {
@@ -38,6 +43,10 @@ export const PROVIDER_CONFIGS: Record<ProviderName, ProviderConfig> = {
     baseURL: "https://generativelanguage.googleapis.com/v1beta/openai",
     defaultModel: "gemini-2.0-flash",
     envKey: "GEMINI_API_KEY",
+    // Key is scoped to embedding API by user's setup; chat fallback kept
+    // producing 0% success from Google's chat endpoint. Exclude from chat
+    // chain until a chat-capable Gemini key is provisioned.
+    chatEnabled: false,
   },
   kimi: {
     name: "kimi",
@@ -68,9 +77,12 @@ export function createClient(provider: ProviderName, timeout = 45_000): OpenAI |
 }
 
 export function getAvailableProviders(): ProviderName[] {
-  return (Object.keys(PROVIDER_CONFIGS) as ProviderName[]).filter(
-    (name) => !!process.env[PROVIDER_CONFIGS[name].envKey]
-  )
+  return (Object.keys(PROVIDER_CONFIGS) as ProviderName[]).filter((name) => {
+    const cfg = PROVIDER_CONFIGS[name]
+    const hasKey = !!process.env[cfg.envKey]
+    const chatOk = cfg.chatEnabled !== false // default true when undefined
+    return hasKey && chatOk
+  })
 }
 
 export function getDefaultProvider(): ProviderName {
