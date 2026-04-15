@@ -109,10 +109,15 @@ export function parseThinkingContent(text: string): { thinking: string; output: 
 }
 
 function isRetryableError(error: unknown): boolean {
-  if (error instanceof Error) {
-    const msg = error.message
-    return msg.includes("529") || msg.includes("429") || msg.includes("overloaded") || msg.includes("rate limit")
-  }
+  if (!(error instanceof Error)) return false
+  const msg = error.message
+  // Provider overload / rate limit (MiniMax 529, OpenAI 429, generic text indicators)
+  if (/\b(429|529)\b/.test(msg)) return true
+  if (/\b(overloaded|rate[- _]?limit|too many requests)\b/i.test(msg)) return true
+  // Provider-side 5xx (internal / bad gateway / service unavailable / gateway timeout)
+  if (/\b(500|502|503|504)\b/.test(msg)) return true
+  // Network-level (timeouts, DNS, connection reset/refused, generic fetch failures)
+  if (/\b(timed?[-_ ]?out|ETIMEDOUT|ECONNRESET|ECONNREFUSED|ENOTFOUND|EAI_AGAIN|fetch failed|network error)\b/i.test(msg)) return true
   return false
 }
 
@@ -149,16 +154,23 @@ export async function runAgent(options: AgentRunOptions): Promise<AgentRunResult
       const available = getAvailableProviders()
       const defaultProvider = getDefaultProvider()
       const fallbacks = available.filter((p) => p !== defaultProvider)
+      const primaryErrCode = extractErrorCode(error)
+      console.log(`[agent] primary provider '${defaultProvider}' failed (${primaryErrCode}); fallback chain: ${fallbacks.join(" -> ") || "(none)"}`)
 
       for (const fallback of fallbacks) {
+        console.log(`[agent] fallback attempt: ${defaultProvider} -> ${fallback}`)
         try {
           const result = await runAgentInternal({ ...options, provider: fallback })
+          console.log(`[agent] fallback SUCCESS on '${fallback}' (primary was '${defaultProvider}', reason: ${primaryErrCode})`)
           return result
         } catch (fallbackError) {
           await logLlmFailure(fallback, options.model ?? PROVIDER_CONFIGS[fallback].defaultModel, fallbackError)
+          const fbCode = extractErrorCode(fallbackError)
+          console.log(`[agent] fallback '${fallback}' failed (${fbCode})`)
           if (!isRetryableError(fallbackError)) throw fallbackError
         }
       }
+      console.log(`[agent] all fallbacks exhausted; giving up`)
     }
     throw error
   }
