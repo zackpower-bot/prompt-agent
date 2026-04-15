@@ -17,7 +17,15 @@ Content:
 {content}`
 
 export async function POST(request: NextRequest) {
-  const body = await request.json()
+  // Parse body defensively so malformed JSON never escapes as Next's default HTML error page.
+  let body: Record<string, unknown>
+  try {
+    body = await request.json() as Record<string, unknown>
+  } catch (parseError) {
+    const msg = parseError instanceof Error ? parseError.message : "Invalid JSON body"
+    return NextResponse.json({ error: `Invalid request body: ${msg}` }, { status: 400 })
+  }
+
   const { id, title, content, tags, category, preferredChain } = body as {
     id: string
     title: string

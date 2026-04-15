@@ -45,6 +45,18 @@ export function CleanupClient({ prompts }: { prompts: PromptWithTags[] }) {
         }),
       })
 
+      // Robust parsing: upstream (Nginx / Next error page / container restart) may return HTML
+      // instead of our expected JSON. Check content-type before JSON.parse to surface a useful error.
+      const contentType = res.headers.get("content-type") ?? ""
+      if (!contentType.includes("application/json")) {
+        const preview = (await res.text()).slice(0, 200)
+        return {
+          id: prompt.id,
+          status: "error",
+          error: `非 JSON 响应（HTTP ${res.status}，${contentType || "无 content-type"}）：${preview}`,
+        }
+      }
+
       if (!res.ok) {
         const data = await res.json()
         return { id: prompt.id, status: "error", error: data.error || `HTTP ${res.status}` }
