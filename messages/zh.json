@@ -19,7 +19,8 @@
     "cleanup": "清洗",
     "stats": "统计",
     "activity": "活动",
-    "recipes": "全部配方"
+    "recipes": "全部配方",
+    "compile": "编译"
   },
   "agent": {
     "thinking": "思考中...",
@@ -269,5 +270,24 @@
     "allTemplates": "全部模板",
     "empty": "还没有配方。先到「场景配方」里创建一个场景，然后给它添加第一个可组装的配方。",
     "fromScenario": "来自 {scenario}"
+  },
+  "compile": {
+    "pageTitle": "提示词编译器",
+    "subtitle": "描述你要做什么。系统会编译成可直接执行的 prompt + 推荐你库里能用的零件。",
+    "goalPlaceholder": "比如：帮我写一个能根据用户简历分析其求职竞争力的提示词...",
+    "compileButton": "编译",
+    "compiling": "编译中...",
+    "outputHeading": "编译结果",
+    "recommendedHeading": "推荐零件",
+    "retrieving": "召回中...",
+    "saveAsPrompt": "保存为 Prompt 入库",
+    "assembleAsRecipe": "用召回模块组装 Recipe",
+    "recompile": "重新编译",
+    "noEmbeddingService": "embedding 服务暂时不可用，跳过召回",
+    "noMatchingModules": "你的库里还没有匹配的模块。先去模块页建几个",
+    "unclassifiedHeading": "未分类",
+    "savedToast": "已保存为 Prompt",
+    "recipeCreatedToast": "已创建 Scenario 与 Recipe，正在跳转编辑...",
+    "errorPrefix": "编译失败："
   }
 }

@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation"
 import {
   BarChart3,
   Blocks,
+  BrainCircuit,
   BookOpen,
   Bot,
   History,
@@ -29,6 +30,7 @@ const navGroups = [
   {
     label: "工作",
     items: [
+      { href: "/compile", label: "编译", icon: BrainCircuit },
       { href: "/", label: "生成", icon: Sparkles },
       { href: "/prompts", label: "提示词库", icon: Library },
       { href: "/modules", label: "模块", icon: Blocks },
