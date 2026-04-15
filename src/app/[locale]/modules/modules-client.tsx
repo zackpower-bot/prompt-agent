@@ -11,7 +11,6 @@ import {
   createModule,
   deleteModule,
   getModulesPaginated,
-  normalizeModuleSlot,
   updateModule,
 } from "@/app/actions/module.actions"
 import type { ModuleWithMeta } from "@/app/actions/module.actions"
@@ -20,6 +19,7 @@ import {
   ADVANCED_SLOTS,
   CORE_SLOTS,
   SLOT_LABELS,
+  normalizeModuleSlot,
   type Slot,
 } from "@/lib/slots"
 

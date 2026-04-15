@@ -57,3 +57,7 @@ export const SLOT_GROUP: Record<Slot, "core" | "advanced" | "agent"> = {
 export function isValidSlot(s: string | null | undefined): s is Slot {
   return !!s && (SLOTS as readonly string[]).includes(s)
 }
+
+export function normalizeModuleSlot(value: string | null | undefined): Slot | null {
+  return isValidSlot(value) ? value : null
+}

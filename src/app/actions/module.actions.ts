@@ -4,7 +4,7 @@ import type { Prisma } from "@/generated/prisma/client"
 import { prisma } from "@/lib/prisma"
 import { embedModuleAsync } from "@/lib/embedding"
 import { recordAction } from "@/lib/action-log"
-import { isValidSlot, type Slot } from "@/lib/slots"
+import type { Slot } from "@/lib/slots"
 
 export interface ModuleWithMeta {
   id: string
@@ -257,8 +257,4 @@ export async function deleteModule(
   } catch (e) {
     return { success: false, error: (e as Error).message }
   }
-}
-
-export function normalizeModuleSlot(value: string | null | undefined): Slot | null {
-  return isValidSlot(value) ? value : null
 }
