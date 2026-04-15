@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useModelChain } from "@/hooks/use-model-chain"
 import { useRouter } from "@/i18n/navigation"
-import { PROVIDER_CONFIGS, getDefaultProvider, type ProviderName } from "@/lib/providers"
 import { SLOT_LABELS, SLOTS, isValidSlot } from "@/lib/slots"
 
 type CompileStatus = "idle" | "streaming" | "done" | "error"
@@ -37,8 +36,6 @@ interface RetrievalResult {
   modules: RetrievedModule[]
   bySlot: Record<string, RetrievedModule[]>
 }
-
-const PROVIDERS = Object.values(PROVIDER_CONFIGS)
 
 function derivePromptTitle(goal: string, output: string) {
   const firstNonEmptyLine =
@@ -72,8 +69,8 @@ export function CompileClient() {
   const [compileError, setCompileError] = useState<string | null>(null)
   const [retrieval, setRetrieval] = useState<RetrievalResult | null>(null)
   const [retrieving, setRetrieving] = useState(false)
-  const [provider, setProvider] = useState<ProviderName>(getDefaultProvider())
-  const [model, setModel] = useState(PROVIDER_CONFIGS[getDefaultProvider()].defaultModel)
+  const [lastProvider, setLastProvider] = useState<string | null>(null)
+  const [lastModel, setLastModel] = useState<string | null>(null)
   const [isSavingPrompt, setIsSavingPrompt] = useState(false)
   const [isCreatingRecipe, setIsCreatingRecipe] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
@@ -145,8 +142,6 @@ export function CompileClient() {
         body: JSON.stringify({
           goal: trimmedGoal,
           locale: "zh",
-          provider,
-          model: model.trim() || undefined,
           preferredChain: chain,
         }),
         signal: controller.signal,
@@ -163,6 +158,7 @@ export function CompileClient() {
 
       const decoder = new TextDecoder()
       let buffer = ""
+      let eventType = ""  // persist across chunks so events split across reads aren't dropped (same fix as b4b6157)
 
       while (true) {
         const { done, value } = await reader.read()
@@ -172,7 +168,6 @@ export function CompileClient() {
         const lines = buffer.split("\n")
         buffer = lines.pop() ?? ""
 
-        let eventType = ""
         for (const line of lines) {
           if (line.startsWith("event: ")) {
             eventType = line.slice(7).trim()
@@ -182,9 +177,13 @@ export function CompileClient() {
               case "token":
                 setOutput((prev) => prev + ((data as { token: string }).token ?? ""))
                 break
-              case "result":
-                setOutput((data as { text: string }).text ?? "")
+              case "result": {
+                const resultData = data as { text?: string; provider?: string; model?: string }
+                setOutput(resultData.text ?? "")
+                if (resultData.provider) setLastProvider(resultData.provider)
+                if (resultData.model) setLastModel(resultData.model)
                 break
+              }
               case "done":
                 setCompileStatus("done")
                 break
@@ -204,7 +203,7 @@ export function CompileClient() {
       setCompileError(`${t("errorPrefix")} ${(error as Error).message}`)
       setCompileStatus("error")
     }
-  }, [chain, goal, model, provider, runRetrieval, t])
+  }, [chain, goal, runRetrieval, t])
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -235,8 +234,8 @@ export function CompileClient() {
           },
           trajectory: [],
           userMessage: goal,
-          provider,
-          model,
+          provider: lastProvider ?? undefined,
+          model: lastModel ?? undefined,
         }),
       })
 
@@ -252,7 +251,7 @@ export function CompileClient() {
     } finally {
       setIsSavingPrompt(false)
     }
-  }, [canActOnResult, goal, model, output, provider, router, t])
+  }, [canActOnResult, goal, lastModel, lastProvider, output, router, t])
 
   const handleAssembleRecipe = useCallback(async () => {
     if (!canActOnResult) return
@@ -320,32 +319,7 @@ export function CompileClient() {
                     className="min-h-[140px] max-h-[300px] w-full resize-none rounded-xl border border-input/80 bg-card px-4 py-3 text-[15px] leading-relaxed shadow-xs outline-none transition-all placeholder:text-muted-foreground/70 hover:border-input focus-visible:border-ring/60 focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:shadow-sm"
                   />
 
-                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                    <div className="flex flex-col gap-3 sm:flex-row">
-                      <select
-                        value={provider}
-                        onChange={(event) => {
-                          const nextProvider = event.target.value as ProviderName
-                          setProvider(nextProvider)
-                          setModel(PROVIDER_CONFIGS[nextProvider].defaultModel)
-                        }}
-                        className="h-10 rounded-md border border-input/80 bg-card px-3 py-1 text-sm shadow-xs transition-all outline-none hover:border-input focus-visible:border-ring/60 focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:shadow-sm"
-                      >
-                        {PROVIDERS.map((item) => (
-                          <option key={item.name} value={item.name}>
-                            {item.label}
-                          </option>
-                        ))}
-                      </select>
-
-                      <input
-                        value={model}
-                        onChange={(event) => setModel(event.target.value)}
-                        className="h-10 min-w-[220px] rounded-md border border-input/80 bg-card px-3 py-1 text-sm shadow-xs transition-all outline-none placeholder:text-muted-foreground/70 hover:border-input focus-visible:border-ring/60 focus-visible:ring-2 focus-visible:ring-ring/20 focus-visible:shadow-sm"
-                        placeholder={PROVIDER_CONFIGS[provider].defaultModel}
-                      />
-                    </div>
-
+                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-end">
                     <Button onClick={() => void handleCompile()} disabled={!canSubmit}>
                       {compileStatus === "streaming" ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
