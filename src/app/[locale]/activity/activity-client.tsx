@@ -10,29 +10,52 @@ import { fetchActivityLogs, reverseActionById } from "@/app/actions/activity.act
 
 interface ActivityClientProps {
   initialActions: ActionLogRow[]
+  pageSize: number
 }
 
 type TranslateFn = ReturnType<typeof useTranslations>
 
-export function ActivityClient({ initialActions }: ActivityClientProps) {
+export function ActivityClient({ initialActions, pageSize }: ActivityClientProps) {
   const t = useTranslations("activity")
+  const tCommon = useTranslations("common")
   const formatter = useFormatter()
   const [actions, setActions] = useState(initialActions)
   const [undoingId, setUndoingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isRefreshing, startTransition] = useTransition()
+  const [loadedCount, setLoadedCount] = useState(initialActions.length)
+  const [hasMore, setHasMore] = useState(initialActions.length === pageSize)
+  const [allLoaded, setAllLoaded] = useState(false)
 
   const refresh = useCallback(() => {
     startTransition(async () => {
-      const result = await fetchActivityLogs({ limit: 50 })
+      const result = await fetchActivityLogs({ limit: pageSize, offset: 0 })
       if (result.success) {
         setActions(result.data)
+        setLoadedCount(result.data.length)
+        setHasMore(result.data.length === pageSize)
+        setAllLoaded(false)
         setError(null)
       } else {
         setError(result.error)
       }
     })
-  }, [])
+  }, [pageSize])
+
+  const handleLoadMore = useCallback(() => {
+    startTransition(async () => {
+      const result = await fetchActivityLogs({ limit: pageSize, offset: actions.length })
+      if (!result.success) {
+        setError(result.error)
+        return
+      }
+      setActions((prev) => [...prev, ...result.data])
+      setLoadedCount((prev) => prev + result.data.length)
+      setHasMore(result.data.length === pageSize)
+      setAllLoaded(result.data.length < pageSize)
+      setError(null)
+    })
+  }, [actions.length, pageSize, startTransition])
 
   useEffect(() => {
     function handleFocus() {
@@ -124,9 +147,19 @@ export function ActivityClient({ initialActions }: ActivityClientProps) {
             </Card>
           )
         })}
+        {actions.length === loadedCount && hasMore ? (
+          <div className="flex justify-center pt-2">
+            <Button variant="outline" size="sm" onClick={handleLoadMore} disabled={isRefreshing}>
+              {isRefreshing ? tCommon("loading") : tCommon("loadMore")}
+            </Button>
+          </div>
+        ) : null}
+        {allLoaded && actions.length > 0 ? (
+          <p className="pt-2 text-center text-sm text-muted-foreground">{tCommon("allLoaded")}</p>
+        ) : null}
       </div>
     )
-  }, [actions, formatter, handleUndo, t, undoingId])
+  }, [actions, allLoaded, formatter, handleLoadMore, handleUndo, hasMore, isRefreshing, loadedCount, t, tCommon, undoingId])
 
   return (
     <div className="container-reading">

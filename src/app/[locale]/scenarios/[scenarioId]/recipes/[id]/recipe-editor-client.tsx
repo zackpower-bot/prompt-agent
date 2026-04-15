@@ -321,7 +321,7 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
                   <Input
                     value={name}
                     onChange={(event) => setName(event.target.value)}
-                    placeholder={t("namePlaceholder")}
+                    placeholder="为这个配方起个名字..."
                     className="h-12 text-2xl font-semibold"
                     disabled={isSaving}
                   />
@@ -344,7 +344,6 @@ export function RecipeEditorClient({ initialRecipe, modules }: RecipeEditorClien
             <section className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold">{t("stepsHeading")}</h2>
-                <p className="text-sm text-muted-foreground">{t("stepCount", { count: steps.length })}</p>
               </div>
 
               {hasSteps ? (

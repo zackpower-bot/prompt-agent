@@ -87,6 +87,53 @@ export async function getModules(filters?: {
   }
 }
 
+export async function getModulesPaginated(params?: {
+  type?: string
+  search?: string
+  includeTrashed?: boolean
+  limit?: number
+  offset?: number
+}): Promise<
+  | { success: true; data: ModuleWithMeta[]; total: number; limit: number; offset: number }
+  | { success: false; error: string }
+> {
+  try {
+    const where: Prisma.ModuleWhereInput = {}
+    if (!params?.includeTrashed) where.deletedAt = null
+    if (params?.type && params.type !== "all") where.type = params.type
+    if (params?.search) {
+      where.OR = [
+        { title: { contains: params.search } },
+        { content: { contains: params.search } },
+      ]
+    }
+
+    const limit = params?.limit ?? 50
+    const offset = params?.offset ?? 0
+
+    const [rows, total] = await Promise.all([
+      prisma.module.findMany({
+        where,
+        orderBy: { updatedAt: "desc" },
+        include: moduleWithTagsInclude,
+        take: limit,
+        skip: offset,
+      }),
+      prisma.module.count({ where }),
+    ])
+
+    return {
+      success: true,
+      data: rows.map(serializeModule),
+      total,
+      limit,
+      offset,
+    }
+  } catch (e) {
+    return { success: false, error: (e as Error).message }
+  }
+}
+
 export async function createModule(input: {
   title: string
   content: string

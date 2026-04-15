@@ -1,13 +1,18 @@
 "use client"
 
-import { useState, useCallback, useTransition } from "react"
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Search, Plus, Pencil, Trash2, Save, X, Check } from "lucide-react"
-import { getModules, createModule, updateModule, deleteModule } from "@/app/actions/module.actions"
+import {
+  getModulesPaginated,
+  createModule,
+  updateModule,
+  deleteModule,
+} from "@/app/actions/module.actions"
 import type { ModuleWithMeta } from "@/app/actions/module.actions"
 
 const MODULE_TYPES = [
@@ -19,13 +24,26 @@ const MODULE_TYPES = [
   { value: "self_check", label: "自检" },
 ]
 
-export function ModulesClient({ initialModules }: { initialModules: ModuleWithMeta[] }) {
+interface ModulesClientProps {
+  initialModules: ModuleWithMeta[]
+  initialTotal: number
+  pageSize: number
+}
+
+export function ModulesClient({
+  initialModules,
+  initialTotal,
+  pageSize,
+}: ModulesClientProps) {
   const [modules, setModules] = useState(initialModules)
+  const [total, setTotal] = useState(initialTotal)
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState("all")
   const [creating, setCreating] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [hasMore, setHasMore] = useState(initialModules.length === pageSize)
+  const [allLoaded, setAllLoaded] = useState(false)
 
   const [newTitle, setNewTitle] = useState("")
   const [newContent, setNewContent] = useState("")
@@ -35,12 +53,36 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
   const [editContent, setEditContent] = useState("")
   const [editType, setEditType] = useState("")
 
-  const refresh = useCallback(() => {
-    startTransition(async () => {
-      const result = await getModules({ type: typeFilter !== "all" ? typeFilter : undefined, search: search || undefined })
-      if (result.success) setModules(result.data)
-    })
-  }, [typeFilter, search])
+  const loadPage = useCallback(
+    (offset = 0, mode: "replace" | "append" = "replace") => {
+      startTransition(async () => {
+        const result = await getModulesPaginated({
+          type: typeFilter !== "all" ? typeFilter : undefined,
+          search: search || undefined,
+          limit: pageSize,
+          offset,
+        })
+        if (!result.success) return
+
+        setModules((prev) => (mode === "append" ? [...prev, ...result.data] : result.data))
+        setTotal(result.total)
+        setHasMore(result.data.length === pageSize)
+        setAllLoaded(offset > 0 && result.data.length < pageSize)
+        if (mode === "replace") {
+          setAllLoaded(false)
+        }
+      })
+    },
+    [pageSize, search, typeFilter]
+  )
+
+  useEffect(() => {
+    loadPage(0, "replace")
+  }, [loadPage])
+
+  const handleLoadMore = useCallback(() => {
+    loadPage(modules.length, "append")
+  }, [loadPage, modules.length])
 
   const handleCreate = useCallback(() => {
     if (!newTitle.trim() || !newContent.trim()) return
@@ -51,47 +93,49 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
         setNewTitle("")
         setNewContent("")
         setNewType("role")
-        refresh()
+        loadPage(0, "replace")
       }
     })
-  }, [newTitle, newContent, newType, refresh])
+  }, [loadPage, newContent, newTitle, newType])
 
-  const startEdit = (m: ModuleWithMeta) => {
-    setEditingId(m.id)
-    setEditTitle(m.title)
-    setEditContent(m.content)
-    setEditType(m.type)
+  const startEdit = (module: ModuleWithMeta) => {
+    setEditingId(module.id)
+    setEditTitle(module.title)
+    setEditContent(module.content)
+    setEditType(module.type)
   }
 
   const handleUpdate = useCallback(() => {
     if (!editingId) return
     startTransition(async () => {
-      const result = await updateModule(editingId, { title: editTitle, content: editContent, type: editType })
+      const result = await updateModule(editingId, {
+        title: editTitle,
+        content: editContent,
+        type: editType,
+      })
       if (result.success) {
         setEditingId(null)
-        refresh()
+        loadPage(0, "replace")
       }
     })
-  }, [editingId, editTitle, editContent, editType, refresh])
+  }, [editContent, editTitle, editType, editingId, loadPage])
 
-  const handleDelete = useCallback((id: string) => {
-    startTransition(async () => {
-      const result = await deleteModule(id)
-      if (result.success) refresh()
-    })
-  }, [refresh])
-
-  const filtered = modules.filter((m) => {
-    if (typeFilter !== "all" && m.type !== typeFilter) return false
-    if (search) {
-      const q = search.toLowerCase()
-      return m.title.toLowerCase().includes(q) || m.content.toLowerCase().includes(q)
-    }
-    return true
-  })
+  const handleDelete = useCallback(
+    (id: string) => {
+      startTransition(async () => {
+        const result = await deleteModule(id)
+        if (result.success) {
+          loadPage(0, "replace")
+        }
+      })
+    },
+    [loadPage]
+  )
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("zh-CN", { month: "short", day: "numeric" })
+
+  const empty = useMemo(() => modules.length === 0 && !isPending, [isPending, modules.length])
 
   return (
     <div className="container-reading">
@@ -103,7 +147,7 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
               <Input
                 placeholder="搜索模块..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(event) => setSearch(event.target.value)}
                 className="pl-10"
               />
             </div>
@@ -113,10 +157,23 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
             </Button>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <p className="mr-2 text-sm text-muted-foreground">{modules.length} 个模块</p>
-            <Button variant={typeFilter === "all" ? "default" : "secondary"} size="sm" onClick={() => setTypeFilter("all")}>全部</Button>
-            {MODULE_TYPES.map((t) => (
-              <Button key={t.value} variant={typeFilter === t.value ? "default" : "secondary"} size="sm" onClick={() => setTypeFilter(t.value)}>{t.label}</Button>
+            <p className="mr-2 text-sm text-muted-foreground">{total} 个模块</p>
+            <Button
+              variant={typeFilter === "all" ? "default" : "secondary"}
+              size="sm"
+              onClick={() => setTypeFilter("all")}
+            >
+              全部
+            </Button>
+            {MODULE_TYPES.map((type) => (
+              <Button
+                key={type.value}
+                variant={typeFilter === type.value ? "default" : "secondary"}
+                size="sm"
+                onClick={() => setTypeFilter(type.value)}
+              >
+                {type.label}
+              </Button>
             ))}
           </div>
         </div>
@@ -124,40 +181,81 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
 
       {creating && (
         <Card className="mb-4">
-          <CardContent className="pt-4 space-y-3">
-            <Input placeholder="模块标题" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
-            <select value={newType} onChange={(e) => setNewType(e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm">
-              {MODULE_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+          <CardContent className="space-y-3 pt-4">
+            <Input
+              placeholder="模块标题"
+              value={newTitle}
+              onChange={(event) => setNewTitle(event.target.value)}
+            />
+            <select
+              value={newType}
+              onChange={(event) => setNewType(event.target.value)}
+              className="w-full rounded-md border px-3 py-2 text-sm"
+            >
+              {MODULE_TYPES.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
             </select>
-            <Textarea placeholder="模块内容..." value={newContent} onChange={(e) => setNewContent(e.target.value)} className="min-h-[120px] font-mono text-sm" />
+            <Textarea
+              placeholder="模块内容..."
+              value={newContent}
+              onChange={(event) => setNewContent(event.target.value)}
+              className="min-h-[120px] font-mono text-sm"
+            />
             <div className="flex gap-2">
-              <Button size="sm" onClick={handleCreate} disabled={isPending}><Save className="mr-1 h-3 w-3" />保存</Button>
-              <Button size="sm" variant="ghost" onClick={() => setCreating(false)}><X className="mr-1 h-3 w-3" />取消</Button>
+              <Button size="sm" onClick={handleCreate} disabled={isPending}>
+                <Save className="mr-1 h-3 w-3" />
+                保存
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setCreating(false)}>
+                <X className="mr-1 h-3 w-3" />
+                取消
+              </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
       <ul className="space-y-1">
-        {filtered.map((m) => (
-          <li key={m.id} className="list-row">
+        {modules.map((module) => (
+          <li key={module.id} className="list-row">
             <div className="min-w-0 flex-1">
-              {editingId === m.id ? (
+              {editingId === module.id ? (
                 <div className="space-y-3">
-                  <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
-                  <select value={editType} onChange={(e) => setEditType(e.target.value)} className="rounded-md border px-3 py-1.5 text-sm">
-                    {MODULE_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  <Input value={editTitle} onChange={(event) => setEditTitle(event.target.value)} />
+                  <select
+                    value={editType}
+                    onChange={(event) => setEditType(event.target.value)}
+                    className="rounded-md border px-3 py-1.5 text-sm"
+                  >
+                    {MODULE_TYPES.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
                   </select>
-                  <Textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} className="min-h-[100px] font-mono text-sm" />
+                  <Textarea
+                    value={editContent}
+                    onChange={(event) => setEditContent(event.target.value)}
+                    className="min-h-[100px] font-mono text-sm"
+                  />
                 </div>
               ) : (
                 <>
-                  <h3 className="font-serif text-base">{m.title}</h3>
-                  <p className="mt-1 line-clamp-2 whitespace-pre-wrap text-sm text-muted-foreground">{m.content}</p>
+                  <h3 className="font-serif text-base">{module.title}</h3>
+                  <p className="mt-1 line-clamp-2 whitespace-pre-wrap text-sm text-muted-foreground">
+                    {module.content}
+                  </p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <Badge variant="outline" className="mono-label">{MODULE_TYPES.find((t) => t.value === m.type)?.label ?? m.type}</Badge>
-                    {m.tags.map((tag) => (
-                      <Badge key={tag} variant="outline" className="text-[10px]">{tag}</Badge>
+                    <Badge variant="outline" className="mono-label">
+                      {MODULE_TYPES.find((type) => type.value === module.type)?.label ?? module.type}
+                    </Badge>
+                    {module.tags.map((tag) => (
+                      <Badge key={tag} variant="outline" className="text-[10px]">
+                        {tag}
+                      </Badge>
                     ))}
                   </div>
                 </>
@@ -165,17 +263,46 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
             </div>
             <div className="flex shrink-0 items-start gap-3">
               <div className="flex flex-col items-end gap-2">
-                {editingId === m.id ? (
+                {editingId === module.id ? (
                   <div className="flex items-center gap-1">
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={handleUpdate} disabled={isPending}><Check className="h-3 w-3" /></Button>
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => setEditingId(null)}><X className="h-3 w-3" /></Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0"
+                      onClick={handleUpdate}
+                      disabled={isPending}
+                    >
+                      <Check className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0"
+                      onClick={() => setEditingId(null)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
                   </div>
                 ) : (
                   <>
-                    <time className="text-xs text-muted-foreground">{formatDate(m.updatedAt)}</time>
+                    <time className="text-xs text-muted-foreground">{formatDate(module.updatedAt)}</time>
                     <div className="flex items-center gap-1">
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={() => startEdit(m)}><Pencil className="h-3 w-3" /></Button>
-                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDelete(m.id)}><Trash2 className="h-3 w-3" /></Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 w-8 p-0"
+                        onClick={() => startEdit(module)}
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 w-7 p-0 text-destructive"
+                        onClick={() => handleDelete(module.id)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
                     </div>
                   </>
                 )}
@@ -184,7 +311,20 @@ export function ModulesClient({ initialModules }: { initialModules: ModuleWithMe
           </li>
         ))}
       </ul>
-      {filtered.length === 0 && !isPending && (
+
+      {modules.length > 0 && hasMore && (
+        <div className="mt-4 flex justify-center">
+          <Button variant="outline" size="sm" onClick={handleLoadMore} disabled={isPending}>
+            {isPending ? "加载中..." : "加载更多"}
+          </Button>
+        </div>
+      )}
+
+      {modules.length > 0 && allLoaded && (
+        <p className="mt-4 text-center text-sm text-muted-foreground">已显示全部</p>
+      )}
+
+      {empty && (
         <div className="rounded-2xl border border-dashed border-border bg-card/50 px-6 py-14 text-center">
           <h2 className="text-xl">还没有整理好的模块</h2>
           <p className="mx-auto mt-3 max-w-[38rem] text-sm leading-7 text-muted-foreground">

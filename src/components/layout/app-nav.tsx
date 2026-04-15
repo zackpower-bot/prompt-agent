@@ -6,8 +6,8 @@ import {
   Blocks,
   Bot,
   History,
-  Layers,
   Library,
+  Layers,
   LogOut,
   PanelLeft,
   PanelLeftClose,
@@ -48,11 +48,6 @@ const navGroups = [
   },
 ] as const
 
-const topNavShortcuts = [
-  { href: "/", label: "生成", icon: Sparkles },
-  { href: "/prompts", label: "提示词库", icon: Library },
-]
-
 interface SidebarProps {
   collapsed: boolean
   onToggle: () => void
@@ -90,7 +85,12 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
         {navGroups.map((group, groupIndex) => (
           <div key={group.label}>
             {!collapsed && (
-              <p className={cn("mb-1 px-3 text-[11px] uppercase tracking-wide text-muted-foreground/70", groupIndex === 0 ? "mt-2" : "mt-5")}>
+              <p
+                className={cn(
+                  "mb-1 px-3 text-[11px] uppercase tracking-wide text-muted-foreground/70",
+                  groupIndex === 0 ? "mt-2" : "mt-5"
+                )}
+              >
                 {group.label}
               </p>
             )}
@@ -149,9 +149,6 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
 }
 
 export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
-  const pathname = usePathname()
-  const path = pathname.replace(/^\/(zh|en)/, "") || "/"
-
   return (
     <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-sm">
       <div className="flex h-14 items-center px-4">
@@ -161,35 +158,6 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
         >
           <PanelLeft className="h-4 w-4" />
         </button>
-
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border/70 bg-agent/15">
-            <Bot className="h-4 w-4 text-agent" />
-          </div>
-          <span className="font-serif text-lg tracking-tight">Prompt Agent</span>
-        </Link>
-
-        <nav className="ml-6 hidden items-center gap-1 md:flex">
-          {topNavShortcuts.map((item) => {
-            const isActive = item.href === "/" ? path === "/" : path.startsWith(item.href)
-            const Icon = item.icon
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-sm transition-colors",
-                  isActive
-                    ? "bg-muted/70 font-medium text-foreground"
-                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                )}
-              >
-                <Icon className="h-3.5 w-3.5" />
-                {item.label}
-              </Link>
-            )
-          })}
-        </nav>
 
         <div className="ml-auto flex items-center gap-1">
           <AlertsBell />

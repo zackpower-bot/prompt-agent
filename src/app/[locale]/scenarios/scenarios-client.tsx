@@ -14,7 +14,11 @@ import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { Search, Plus, Loader2 } from "lucide-react"
 
-import { createScenario, type ScenarioRecord } from "@/app/actions/scenario.actions"
+import {
+  createScenario,
+  getScenariosPaginated,
+  type ScenarioRecord,
+} from "@/app/actions/scenario.actions"
 import { Link } from "@/i18n/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -57,6 +61,8 @@ type DisplayScenario = {
 
 interface ScenariosClientProps {
   initialScenarios: ScenarioRecord[]
+  initialTotal: number
+  pageSize: number
 }
 
 const SEARCH_DEBOUNCE_MS = 500
@@ -68,11 +74,12 @@ function sortByUpdatedAt(records: ScenarioRecord[]): ScenarioRecord[] {
   )
 }
 
-export function ScenariosClient({ initialScenarios }: ScenariosClientProps) {
+export function ScenariosClient({ initialScenarios, initialTotal, pageSize }: ScenariosClientProps) {
   const tScenarios = useTranslations("scenarios")
   const tCommon = useTranslations("common")
 
   const [scenarios, setScenarios] = useState(() => sortByUpdatedAt(initialScenarios))
+  const [total, setTotal] = useState(initialTotal)
   const [searchValue, setSearchValue] = useState("")
   const [searchState, setSearchState] = useState<SearchState>({ status: "idle" })
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -80,13 +87,19 @@ export function ScenariosClient({ initialScenarios }: ScenariosClientProps) {
   const [description, setDescription] = useState("")
   const [formError, setFormError] = useState<string | null>(null)
   const [isCreating, startTransition] = useTransition()
+  const [isPaging, startPagingTransition] = useTransition()
+  const [hasMore, setHasMore] = useState(initialScenarios.length === pageSize)
+  const [allLoaded, setAllLoaded] = useState(false)
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const controllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
     setScenarios(sortByUpdatedAt(initialScenarios))
-  }, [initialScenarios])
+    setTotal(initialTotal)
+    setHasMore(initialScenarios.length === pageSize)
+    setAllLoaded(false)
+  }, [initialScenarios, initialTotal, pageSize])
 
   useEffect(() => {
     return () => {
@@ -196,7 +209,22 @@ export function ScenariosClient({ initialScenarios }: ScenariosClientProps) {
       const next = [record, ...prev.filter((scenario) => scenario.id !== record.id)]
       return sortByUpdatedAt(next)
     })
+    setTotal((prev) => prev + 1)
   }, [])
+
+  const handleLoadMore = useCallback(() => {
+    startPagingTransition(async () => {
+      const result = await getScenariosPaginated({ limit: pageSize, offset: scenarios.length })
+      if (!result.success) {
+        toast.error(result.error || tScenarios("searchError"))
+        return
+      }
+      setScenarios((prev) => sortByUpdatedAt([...prev, ...result.data]))
+      setTotal(result.total)
+      setHasMore(result.data.length === pageSize)
+      setAllLoaded(result.data.length < pageSize)
+    })
+  }, [pageSize, scenarios.length, tScenarios])
 
   const handleCreateScenario = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
@@ -229,6 +257,7 @@ export function ScenariosClient({ initialScenarios }: ScenariosClientProps) {
   const sortedScenarios = useMemo(() => sortByUpdatedAt(scenarios), [scenarios])
   const isShowingMatches =
     searchState.status === "success" && searchState.hasEmbedding && searchState.matches.length > 0
+  const paginationEnabled = searchState.status === "idle" && !searchValue.trim()
 
   const displayScenarios: DisplayScenario[] = useMemo(() => {
     if (isShowingMatches && searchState.status === "success") {
@@ -323,6 +352,10 @@ export function ScenariosClient({ initialScenarios }: ScenariosClientProps) {
           <p className="text-sm text-muted-foreground">{searchIndicator}</p>
         )}
 
+        {paginationEnabled && (
+          <p className="text-sm text-muted-foreground">{total} 个场景</p>
+        )}
+
         {showCreateForm && (
           <form
             onSubmit={handleCreateScenario}
@@ -376,35 +409,45 @@ export function ScenariosClient({ initialScenarios }: ScenariosClientProps) {
         )}
 
         {displayScenarios.length > 0 ? (
-          <ul className="space-y-1">
-            {displayScenarios.map((scenario) => (
-              <li key={scenario.id}>
-                <Link href={`/scenarios/${scenario.id}`} className="list-row">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-serif text-base">{scenario.name}</h3>
-                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                      {renderDescription(scenario.description)}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-3">
-                    {scenario.similarity !== null && (
-                      <Badge className="bg-agent/15 text-agent">
-                        {formatSimilarity(scenario.similarity)}
+          <>
+            <ul className="space-y-1">
+              {displayScenarios.map((scenario) => (
+                <li key={scenario.id}>
+                  <Link href={`/scenarios/${scenario.id}`} className="list-row">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-serif text-base">{scenario.name}</h3>
+                      <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                        {renderDescription(scenario.description)}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-3">
+                      {scenario.similarity !== null && (
+                        <Badge variant="warm">{formatSimilarity(scenario.similarity)}</Badge>
+                      )}
+                      <Badge variant="secondary" className="text-[11px]">
+                        {tScenarios("recipeCount", { count: scenario.recipeCount })}
                       </Badge>
-                    )}
-                    <Badge variant="secondary" className="text-[11px]">
-                      {tScenarios("recipeCount", { count: scenario.recipeCount })}
-                    </Badge>
-                    <time className="text-xs text-muted-foreground">
-                      {sortedScenarios.find((item) => item.id === scenario.id)?.updatedAt
-                        ? new Date(sortedScenarios.find((item) => item.id === scenario.id)!.updatedAt).toLocaleDateString("zh-CN", { month: "short", day: "numeric" })
-                        : ""}
-                    </time>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+                      <time className="text-xs text-muted-foreground">
+                        {sortedScenarios.find((item) => item.id === scenario.id)?.updatedAt
+                          ? new Date(sortedScenarios.find((item) => item.id === scenario.id)!.updatedAt).toLocaleDateString("zh-CN", { month: "short", day: "numeric" })
+                          : ""}
+                      </time>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            {paginationEnabled && displayScenarios.length === scenarios.length && hasMore ? (
+              <div className="flex justify-center pt-3">
+                <Button variant="outline" size="sm" onClick={handleLoadMore} disabled={isPaging}>
+                  {isPaging ? tCommon("loading") : tCommon("loadMore")}
+                </Button>
+              </div>
+            ) : null}
+            {paginationEnabled && allLoaded && scenarios.length > 0 ? (
+              <p className="pt-3 text-center text-sm text-muted-foreground">{tCommon("allLoaded")}</p>
+            ) : null}
+          </>
         ) : (
           <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border bg-card/50 px-6 py-16 text-center">
             <h2 className="text-xl">{tScenarios("title")}</h2>

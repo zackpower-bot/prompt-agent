@@ -1,5 +1,6 @@
 "use server"
 
+import type { Prisma } from "@/generated/prisma/client"
 import { prisma } from "@/lib/prisma"
 import { embedScenarioAsync } from "@/lib/embedding"
 
@@ -116,6 +117,49 @@ export async function getScenarios(filters?: {
       },
     })
     return { success: true, data: rows.map(serializeScenario) }
+  } catch (e) {
+    return { success: false, error: (e as Error).message }
+  }
+}
+
+export async function getScenariosPaginated(params?: {
+  search?: string
+  limit?: number
+  offset?: number
+}): Promise<
+  | { success: true; data: ScenarioRecord[]; total: number; limit: number; offset: number }
+  | { success: false; error: string }
+> {
+  try {
+    const where: Prisma.ScenarioWhereInput = {}
+    if (params?.search) {
+      const search = params.search
+      where.OR = [{ name: { contains: search } }, { description: { contains: search } }]
+    }
+
+    const limit = params?.limit ?? 50
+    const offset = params?.offset ?? 0
+
+    const [rows, total] = await Promise.all([
+      prisma.scenario.findMany({
+        where,
+        orderBy: { updatedAt: "desc" },
+        include: {
+          _count: { select: { recipes: true } },
+        },
+        take: limit,
+        skip: offset,
+      }),
+      prisma.scenario.count({ where }),
+    ])
+
+    return {
+      success: true,
+      data: rows.map(serializeScenario),
+      total,
+      limit,
+      offset,
+    }
   } catch (e) {
     return { success: false, error: (e as Error).message }
   }

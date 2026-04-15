@@ -139,7 +139,7 @@ export function ScenarioDetailClient({ scenario, locale }: ScenarioDetailClientP
     startRecipeTransition(async () => {
       const result = await createRecipe({
         scenarioId: scenarioState.id,
-        name: "Untitled recipe",
+        name: "未命名配方",
         description: "",
         steps: [],
       })
