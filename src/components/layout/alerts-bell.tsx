@@ -1,9 +1,10 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Bell, BellRing } from "lucide-react"
+import { Bell, BellRing, Check } from "lucide-react"
 import { useTranslations, useFormatter } from "next-intl"
-import { Badge } from "@/components/ui/badge"
+
+import { Button } from "@/components/ui/button"
 
 type AlertRecord = {
   id: string
@@ -104,32 +105,30 @@ export function AlertsBell() {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="relative inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+        className="relative h-9 w-9 rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
         aria-label={bellTitle}
         aria-expanded={open}
       >
-        <Icon className="h-4 w-4" />
-        {unackCount > 0 && (
-          <Badge
-            variant="destructive"
-            className="absolute -right-1 -top-1 h-4 min-w-[1rem] justify-center px-1 text-[10px] leading-none"
-          >
-            {unackCount > 9 ? "9+" : unackCount}
-          </Badge>
-        )}
+        <span className="flex h-full w-full items-center justify-center">
+          <Icon className="h-4 w-4" />
+        </span>
+        {unackCount > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive" aria-hidden />}
       </button>
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-80 rounded-md border bg-popover text-popover-foreground shadow-lg">
+        <div className="absolute right-0 z-50 mt-2 w-80 rounded-xl border border-border/60 bg-card p-2 text-card-foreground shadow-md">
           {alerts.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-muted-foreground">{t("empty")}</p>
+            <div className="px-4 py-6 text-center">
+              <h3 className="font-serif text-base">暂无告警</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{t("empty")}</p>
+            </div>
           ) : (
-            <ul className="max-h-80 divide-y overflow-y-auto">
+            <ul className="max-h-80 space-y-2 overflow-y-auto">
               {alerts.map((alert) => {
                 const typeLabel = getAlertTypeLabel(alert.type, t)
                 const severityLabel = getSeverityLabel(alert.severity, t)
                 const metadataLine = getAlertMetadataLine(alert, t, formatter)
                 return (
-                  <li key={alert.id} className="px-4 py-3 text-sm">
+                  <li key={alert.id} className="rounded-md px-3 py-2 text-sm transition-colors hover:bg-muted/40">
                     <div className="flex items-start gap-3">
                       <span
                         className={`mt-1 h-2.5 w-2.5 rounded-full ${severityColors[alert.severity]}`}
@@ -138,27 +137,26 @@ export function AlertsBell() {
                       <div className="flex-1 space-y-2">
                         <div className="flex items-start justify-between gap-2">
                           <div>
-                            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                              {severityLabel}
-                            </p>
-                            <p className="text-sm font-semibold">{typeLabel}</p>
+                            <p className="text-sm font-medium">{typeLabel}</p>
+                            <p className="text-xs text-muted-foreground">{severityLabel}</p>
                           </div>
-                          <span className="shrink-0 text-xs text-muted-foreground">
-                            {formatRelativeTime(alert.createdAt, formatter)}
-                          </span>
+                          {!alert.acknowledged && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              onClick={() => acknowledge(alert.id)}
+                              disabled={ackLoading === alert.id}
+                              aria-label={t("acknowledge")}
+                            >
+                              <Check className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
                         </div>
-                        <p className="text-sm text-card-foreground">{alert.message}</p>
+                        <p className="text-sm font-medium">{alert.message}</p>
                         {metadataLine}
-                        {!alert.acknowledged && (
-                          <button
-                            type="button"
-                            onClick={() => acknowledge(alert.id)}
-                            className="text-xs font-medium text-primary hover:underline disabled:opacity-50"
-                            disabled={ackLoading === alert.id}
-                          >
-                            {t("acknowledge")}
-                          </button>
-                        )}
+                        <p className="text-xs text-muted-foreground">{formatRelativeTime(alert.createdAt, formatter)}</p>
                       </div>
                     </div>
                   </li>
