@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Blocks, Loader2, Sparkles, Check, Plus } from "lucide-react"
 import { createModule } from "@/app/actions/module.actions"
+import { parseJsonResponseOrThrow } from "@/lib/utils"
 
 const TYPE_LABELS: Record<string, string> = {
   role: "角色",
@@ -42,7 +43,7 @@ export function ModuleSuggestions({ promptId, promptContent }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: promptContent }),
       })
-      const data = await res.json()
+      const data = await parseJsonResponseOrThrow<{ suggestions?: Suggestion[] }>(res, "模块建议失败")
       if (data.suggestions) {
         setSuggestions(data.suggestions)
       }

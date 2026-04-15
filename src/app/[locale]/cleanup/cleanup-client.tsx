@@ -10,6 +10,7 @@ import { ArrowLeft, Check, Loader2, Sparkles } from "lucide-react"
 import { updatePrompt } from "@/app/actions/prompt.actions"
 import type { PromptWithTags } from "@/app/actions/prompt.actions"
 import { useModelChain } from "@/hooks/use-model-chain"
+import { parseJsonResponseOrThrow } from "@/lib/utils"
 
 interface Suggestion {
   id: string
@@ -45,6 +46,19 @@ export function CleanupClient({ prompts }: { prompts: PromptWithTags[] }) {
         }),
       })
 
+      const parsed = await parseJsonResponseOrThrow<Record<string, unknown>>(res, "分析失败")
+      const classification = (parsed.classification as Record<string, unknown> | undefined) ?? {}
+      return {
+        id: prompt.id,
+        title: classification.title as string | undefined,
+        description: classification.description as string | undefined,
+        category: classification.category as string | undefined,
+        tags: classification.tags as string[] | undefined,
+        qualityScore: classification.qualityScore as number | undefined,
+        riskLevel: classification.riskLevel as string | undefined,
+        status: "done",
+      }
+
       // Robust parsing: upstream (Nginx / Next error page / container restart) may return HTML
       // instead of our expected JSON. Check content-type before JSON.parse to surface a useful error.
       const contentType = res.headers.get("content-type") ?? ""
@@ -57,23 +71,6 @@ export function CleanupClient({ prompts }: { prompts: PromptWithTags[] }) {
         }
       }
 
-      if (!res.ok) {
-        const data = await res.json()
-        return { id: prompt.id, status: "error", error: data.error || `HTTP ${res.status}` }
-      }
-
-      const data = await res.json()
-      const c = data.classification || {}
-      return {
-        id: prompt.id,
-        title: c.title as string | undefined,
-        description: c.description as string | undefined,
-        category: c.category as string | undefined,
-        tags: c.tags as string[] | undefined,
-        qualityScore: c.qualityScore as number | undefined,
-        riskLevel: c.riskLevel as string | undefined,
-        status: "done",
-      }
     } catch (e) {
       return { id: prompt.id, status: "error", error: (e as Error).message }
     }

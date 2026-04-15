@@ -19,6 +19,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useModelChain } from "@/hooks/use-model-chain"
 import { useRouter } from "@/i18n/navigation"
 import { SLOT_LABELS, SLOTS, isValidSlot } from "@/lib/slots"
+import { parseJsonResponseOrThrow, readErrorResponse } from "@/lib/utils"
 
 type CompileStatus = "idle" | "streaming" | "done" | "error"
 
@@ -109,11 +110,7 @@ export function CompileClient() {
         body: JSON.stringify({ goal: nextGoal, topK: 10 }),
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`)
-      }
-
-      const data = (await response.json()) as RetrievalResult
+      const data = await parseJsonResponseOrThrow<RetrievalResult>(response, "检索失败")
       setRetrieval(data)
     } catch {
       setRetrieval({ hasEmbedding: false, modules: [], bySlot: {} })
@@ -148,7 +145,7 @@ export function CompileClient() {
       })
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`)
+        throw new Error(await readErrorResponse(response, `HTTP ${response.status}`))
       }
 
       const reader = response.body?.getReader()
@@ -239,11 +236,7 @@ export function CompileClient() {
         }),
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`)
-      }
-
-      const data = (await response.json()) as { promptId: string }
+      const data = await parseJsonResponseOrThrow<{ promptId: string }>(response, "保存失败")
       toast.success(t("savedToast"))
       router.push(`/prompts/${data.promptId}`)
     } catch (error) {

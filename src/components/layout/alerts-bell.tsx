@@ -5,6 +5,7 @@ import { Bell, BellRing, Check } from "lucide-react"
 import { useTranslations, useFormatter } from "next-intl"
 
 import { Button } from "@/components/ui/button"
+import { parseJsonResponseOrThrow, readErrorResponse } from "@/lib/utils"
 
 type AlertRecord = {
   id: string
@@ -38,8 +39,10 @@ export function AlertsBell() {
   const loadAlerts = useCallback(async () => {
     try {
       const res = await fetch("/api/alerts", { cache: "no-store" })
-      if (!res.ok) throw new Error(`Failed to load alerts: ${res.status}`)
-      const data = (await res.json()) as { alerts?: AlertRecord[]; unackCount?: number }
+      const data = await parseJsonResponseOrThrow<{ alerts?: AlertRecord[]; unackCount?: number }>(
+        res,
+        `Failed to load alerts: ${res.status}`,
+      )
       const records = Array.isArray(data.alerts) ? data.alerts : []
       setAlerts(records)
       setUnackCount(
@@ -85,7 +88,7 @@ export function AlertsBell() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ acknowledged: true }),
         })
-        if (!res.ok) throw new Error(`Failed to acknowledge alert ${id}`)
+        if (!res.ok) throw new Error(await readErrorResponse(res, `Failed to acknowledge alert ${id}`))
         await loadAlerts()
       } catch (error) {
         console.warn("[alerts-bell]", error)

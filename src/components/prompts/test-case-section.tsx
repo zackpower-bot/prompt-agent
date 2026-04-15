@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useModelChain } from "@/hooks/use-model-chain"
 import type { Check, TestCaseDTO, TestCaseRunResult, VariablesMap } from "@/lib/test-case"
+import { parseJsonResponseOrThrow } from "@/lib/utils"
 
 interface Props {
   promptId: string
@@ -128,10 +129,7 @@ export function TestCaseSection({ promptId, initialTestCases }: Props) {
         body: JSON.stringify({ id, preferredChain: chain }),
       })
 
-      const payload = await response.json()
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Run failed")
-      }
+      const payload = await parseJsonResponseOrThrow<TestCaseRunResult>(response, "Run failed")
 
       setRunResults((current) => ({ ...current, [id]: payload as TestCaseRunResult }))
       setExpandedIds((current) => ({ ...current, [id]: true }))

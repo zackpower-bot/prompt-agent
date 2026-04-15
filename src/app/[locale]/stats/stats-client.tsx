@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { BarChart3, Tag, Clock } from "lucide-react"
 import type { UsageStats } from "@/app/actions/stats.actions"
+import { parseJsonResponseOrThrow } from "@/lib/utils"
 
 type UsageApiSnapshot = {
   llm: {
@@ -68,8 +69,7 @@ export function StatsClient({ stats, usage }: { stats: UsageStats | null; usage:
       try {
         setUsageLoading(true)
         const res = await fetch("/api/usage", { cache: "no-store" })
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        const payload = (await res.json()) as UsageApiSnapshot
+        const payload = await parseJsonResponseOrThrow<UsageApiSnapshot>(res, "加载用量统计失败")
         if (cancelled) return
         setUsageSnapshot(payload)
         setUsageError(null)

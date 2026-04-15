@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from "react"
 import type { ModelChainEntry } from "@/lib/available-models"
+import { readErrorResponse } from "@/lib/utils"
 
 export interface TrajectoryStep {
   step: number
@@ -80,7 +81,9 @@ export function useAgentStream() {
         signal: controller.signal,
       })
 
-      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      if (!response.ok) {
+        throw new Error(await readErrorResponse(response, `HTTP ${response.status}`))
+      }
 
       const reader = response.body?.getReader()
       if (!reader) throw new Error("No response body")

@@ -6,6 +6,7 @@ import { Layers, Loader2 } from "lucide-react"
 import { Link } from "@/i18n/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { parseJsonResponseOrThrow } from "@/lib/utils"
 
 interface ScenarioOption {
   id: string
@@ -32,7 +33,7 @@ export function ScenarioSuggestions({ promptContent }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: promptContent, topK: 3 }),
       })
-      const data = await res.json()
+      const data = await parseJsonResponseOrThrow<{ scenarios?: ScenarioOption[] }>(res, "场景建议失败")
       if (Array.isArray(data.scenarios)) {
         setScenarios(data.scenarios)
       }

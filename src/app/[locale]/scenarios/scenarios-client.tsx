@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { parseJsonResponseOrThrow } from "@/lib/utils"
 
 interface SuggestMatch {
   scenario: {
@@ -142,8 +143,7 @@ export function ScenariosClient({ initialScenarios, initialTotal, pageSize }: Sc
             body: JSON.stringify({ description: query, topK: SEARCH_TOP_K }),
             signal: controller.signal,
           })
-          if (!response.ok) throw new Error("Failed to fetch suggestions")
-          const data = (await response.json()) as SuggestResponse
+          const data = await parseJsonResponseOrThrow<SuggestResponse>(response, "Failed to fetch suggestions")
           setSearchState({
             status: "success",
             query,

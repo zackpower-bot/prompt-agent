@@ -136,15 +136,10 @@ export const DEFAULT_CHAIN: ModelChainEntry[] = [
   { provider: "zhipu", model: "glm-4.5-air" },
 ]
 
-// Strict free-only: no paid fallback here. If both free models fail, the
-// background analysis task fails gracefully (quality check returns null,
-// module suggestion returns empty). This prevents auto-triggered flows
-// (save-time quality, detail-page module extraction) from ever burning
-// user premium tokens. The user's picker chain is the only path to paid
-// models, by explicit opt-in.
 export const ANALYSIS_DEFAULT_CHAIN: ModelChainEntry[] = [
   { provider: "zhipu", model: "glm-4.7-flash" },
   { provider: "zhipu", model: "glm-4.5-flash" },
+  { provider: "minimax", model: "MiniMax-M2.7" },
 ]
 
 export const TIER_LABEL: Record<ModelTier, string> = {

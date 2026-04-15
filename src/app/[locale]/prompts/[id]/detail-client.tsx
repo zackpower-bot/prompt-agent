@@ -19,6 +19,7 @@ import { ScenarioSuggestions } from "@/components/prompts/scenario-suggestions"
 import { TestCaseSection } from "@/components/prompts/test-case-section"
 import { submitFeedback } from "@/app/actions/feedback.actions"
 import type { TestCaseDTO } from "@/lib/test-case"
+import { parseJsonResponseOrThrow } from "@/lib/utils"
 
 interface Props {
   prompt: PromptWithTags
@@ -65,16 +66,20 @@ export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: 
 
   useEffect(() => {
     let active = true
-    fetch(`/api/usage/entity?type=prompt&id=${prompt.id}`)
-      .then((response) => (response.ok ? response.json() : null))
-      .then((payload) => {
-        if (!active || !payload) return
+    void (async () => {
+      try {
+        const response = await fetch(`/api/usage/entity?type=prompt&id=${prompt.id}`)
+        const payload = await parseJsonResponseOrThrow<{ total?: number; lastUsedAt?: string | null }>(
+          response,
+          "加载使用统计失败",
+        )
+        if (!active) return
         setUsageStats({
           total: typeof payload.total === "number" ? payload.total : 0,
           lastUsedAt: typeof payload.lastUsedAt === "string" ? payload.lastUsedAt : null,
         })
-      })
-      .catch(() => {})
+      } catch {}
+    })()
 
     return () => {
       active = false

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Search, Clock, ChevronLeft, ChevronRight } from "lucide-react"
 import { getPromptsPaginated } from "@/app/actions/prompt.actions"
 import type { PromptWithTags } from "@/app/actions/prompt.actions"
+import { parseJsonResponseOrThrow } from "@/lib/utils"
 
 interface PromptsClientProps {
   initialData: {
@@ -67,17 +68,20 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
     }
 
     let active = true
-    fetch(`/api/usage/entity?type=prompt&ids=${ids.join(",")}`)
-      .then((response) => (response.ok ? response.json() : null))
-      .then((payload) => {
+    void (async () => {
+      try {
+        const response = await fetch(`/api/usage/entity?type=prompt&ids=${ids.join(",")}`)
+        const payload = await parseJsonResponseOrThrow<{
+          counts?: Record<string, { total?: number }>
+        }>(response, "加载使用统计失败")
         if (!active || !payload?.counts) return
         const next: Record<string, number> = {}
-        for (const [id, stats] of Object.entries(payload.counts as Record<string, { total?: number }>)) {
+        for (const [id, stats] of Object.entries(payload.counts)) {
           next[id] = typeof stats.total === "number" ? stats.total : 0
         }
         setUsageMap(next)
-      })
-      .catch(() => {})
+      } catch {}
+    })()
 
     return () => {
       active = false
@@ -132,7 +136,7 @@ export function PromptsClient({ initialData, allTags }: PromptsClientProps) {
                       headers: { "Content-Type": "application/json" },
                       body: text,
                     })
-                    const data = await res.json()
+                    const data = await parseJsonResponseOrThrow<{ imported?: number }>(res, "导入失败")
                     if (data.imported) {
                       fetchPrompts(1)
                     }
