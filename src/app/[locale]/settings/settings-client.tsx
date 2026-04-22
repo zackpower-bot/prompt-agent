@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback, useTransition } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -108,35 +108,27 @@ export function SettingsClient({ initialProfiles }: { initialProfiles: ProfileEn
                 <p className="text-sm text-muted-foreground">{config.description}</p>
               </div>
               <Card>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="text-sm">{config.label}</CardTitle>
-                      <p className="mt-1 text-xs text-muted-foreground">{config.description}</p>
+                {existing && (
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => handleToggle(config.key, isActive)}
+                        className="text-muted-foreground transition-colors hover:text-foreground"
+                        title={isActive ? "已启用" : "已禁用"}
+                        disabled={isPending}
+                      >
+                        {isActive ? (
+                          <ToggleRight className="h-5 w-5 text-agent" />
+                        ) : (
+                          <ToggleLeft className="h-5 w-5" />
+                        )}
+                      </button>
+                      <Badge variant="outline">
+                        {isActive ? "启用" : "禁用"}
+                      </Badge>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {existing && (
-                        <button
-                          onClick={() => handleToggle(config.key, isActive)}
-                          className="text-muted-foreground transition-colors hover:text-foreground"
-                          title={isActive ? "已启用" : "已禁用"}
-                          disabled={isPending}
-                        >
-                          {isActive ? (
-                            <ToggleRight className="h-5 w-5 text-agent" />
-                          ) : (
-                            <ToggleLeft className="h-5 w-5" />
-                          )}
-                        </button>
-                      )}
-                      {existing && (
-                        <Badge variant="outline">
-                          {isActive ? "启用" : "禁用"}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
+                  </CardHeader>
+                )}
                 <CardContent>
                   <Textarea
                     value={draft}
