@@ -4,7 +4,6 @@ import { useActionState } from "react"
 import { loginAction } from "@/app/actions/auth.actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Bot, Eye, EyeOff } from "lucide-react"
 import { useState } from "react"
 
@@ -13,17 +12,25 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
 
   return (
-    <div className="container-reading flex min-h-screen items-center justify-center py-12">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <div className="mb-2 flex justify-center">
-            <Bot className="h-10 w-10" />
+    <div className="flex min-h-screen items-center justify-center bg-background px-6 py-12">
+      <div className="w-full max-w-[380px] rounded-[20px] border border-border bg-card px-8 py-8 shadow-[0_20px_48px_-20px_rgba(71,55,38,0.15)]">
+        <div className="mb-5 flex items-center justify-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border/70 bg-agent/15">
+            <Bot className="h-4 w-4 text-agent" />
           </div>
-          <CardTitle>Prompt Agent</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form action={formAction} className="space-y-4">
-            <input type="text" name="username" autoComplete="username" className="sr-only" defaultValue="user" tabIndex={-1} />
+          <span className="font-serif text-base tracking-[-0.01em] text-foreground">Prompt Agent</span>
+        </div>
+
+        <header className="mb-6 text-center">
+          <h1 className="font-serif text-[28px] font-medium tracking-[-0.02em] text-foreground">欢迎回来</h1>
+          <p className="mt-1 text-sm text-muted-foreground">登录后继续管理你的提示词资产。</p>
+        </header>
+
+        <form action={formAction} className="space-y-4">
+          <input type="text" name="username" autoComplete="username" className="sr-only" defaultValue="user" tabIndex={-1} />
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-foreground">密码</label>
             <div className="relative">
               <Input
                 name="password"
@@ -42,15 +49,15 @@ export default function LoginPage() {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {state?.error && (
-              <p className="text-sm text-destructive">{state.error}</p>
-            )}
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "登录中..." : "登录"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          </div>
+
+          {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
+
+          <Button type="submit" className="mt-2 w-full" disabled={isPending}>
+            {isPending ? "登录中..." : "登录"}
+          </Button>
+        </form>
+      </div>
     </div>
   )
 }
