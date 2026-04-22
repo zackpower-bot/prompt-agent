@@ -59,7 +59,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           )}
           <div
             className={cn(
-              "fixed left-0 top-0 z-50 h-full w-64 bg-background shadow-lg transition-transform duration-200",
+              "fixed left-0 top-0 z-50 h-full w-48 bg-sidebar shadow-lg transition-transform duration-200",
               mobileOpen ? "translate-x-0" : "-translate-x-full"
             )}
           >
@@ -75,8 +75,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {!isMobile && (
         <aside
           className={cn(
-            "hidden h-screen shrink-0 bg-background md:block",
-            desktopCollapsed ? "w-14" : "w-60"
+            "hidden h-screen shrink-0 bg-sidebar md:block",
+            desktopCollapsed ? "w-12" : "w-48"
           )}
         >
           <Sidebar collapsed={desktopCollapsed} onToggle={toggleDesktop} />

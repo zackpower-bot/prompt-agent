@@ -1,16 +1,18 @@
 "use client"
 
+import { useMemo } from "react"
 import { usePathname } from "next/navigation"
 import {
   BarChart3,
   Blocks,
-  BrainCircuit,
   BookOpen,
   Bot,
+  BrainCircuit,
+  ChevronRight,
   History,
   Library,
-  Layers,
   LogOut,
+  Menu,
   PanelLeft,
   PanelLeftClose,
   Settings,
@@ -35,7 +37,7 @@ const navGroups = [
       { href: "/", label: "生成", icon: Sparkles },
       { href: "/prompts", label: "提示词库", icon: Library },
       { href: "/modules", label: "模块", icon: Blocks },
-      { href: "/scenarios", label: "场景配方", icon: Layers },
+      { href: "/scenarios", label: "场景配方", icon: BookOpen },
       { href: "/recipes", label: "全部配方", icon: BookOpen },
       { href: "/cleanup", label: "清洗", icon: Wrench },
     ],
@@ -53,6 +55,19 @@ const navGroups = [
   },
 ] as const
 
+const routeLabels: Array<{ prefix: string; label: string }> = [
+  { prefix: "/compile", label: "编译" },
+  { prefix: "/prompts", label: "提示词库" },
+  { prefix: "/modules", label: "模块" },
+  { prefix: "/scenarios", label: "场景配方" },
+  { prefix: "/recipes", label: "全部配方" },
+  { prefix: "/cleanup", label: "清洗" },
+  { prefix: "/stats", label: "统计" },
+  { prefix: "/activity", label: "活动" },
+  { prefix: "/settings", label: "设置" },
+  { prefix: "/login", label: "登录" },
+]
+
 interface SidebarProps {
   collapsed: boolean
   onToggle: () => void
@@ -64,42 +79,42 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
   const path = pathname.replace(/^\/(zh|en)/, "") || "/"
 
   return (
-    <div className="flex h-full flex-col border-r border-border/60">
-      <div className="flex items-center justify-between px-3 py-4">
-        {!collapsed ? (
-          <Link href="/" onClick={onNavigate} className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md border border-border/70 bg-agent/15">
-              <Bot className="h-4 w-4 text-agent" />
-            </div>
-            <span className="font-serif text-base text-foreground">Prompt Agent</span>
-          </Link>
-        ) : (
-          <div className="mx-auto flex h-7 w-7 items-center justify-center rounded-md border border-border/70 bg-agent/15">
-            <Bot className="h-4 w-4 text-agent" />
-          </div>
-        )}
-        <button
-          onClick={onToggle}
-          className="hidden rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground md:inline-flex"
+    <div className="flex h-full flex-col border-r border-border/60 bg-sidebar px-1.5 py-2">
+      <div className={cn("flex items-center gap-2 px-1.5 pb-3", collapsed && "justify-center")}>
+        <Link
+          href="/"
+          onClick={onNavigate}
+          className={cn(
+            "flex min-w-0 items-center gap-2 rounded-md px-1.5 py-1 transition-colors hover:bg-muted/50",
+            collapsed && "justify-center px-0"
+          )}
         >
-          {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-        </button>
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-border/70 bg-agent/15">
+            <Bot className="h-3.5 w-3.5 text-agent" />
+          </div>
+          {!collapsed && <span className="truncate font-serif text-sm text-foreground">Prompt Agent</span>}
+        </Link>
+        {!collapsed && (
+          <button
+            type="button"
+            onClick={onToggle}
+            className="ml-auto hidden h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground md:inline-flex"
+            aria-label="折叠侧栏"
+          >
+            <PanelLeftClose className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
+      <nav className="flex-1 overflow-y-auto px-1">
         {navGroups.map((group, groupIndex) => (
-          <div key={group.label}>
+          <div key={group.label} className={cn(groupIndex > 0 && "mt-4")}>
             {!collapsed && (
-              <p
-                className={cn(
-                  "mb-1 px-3 text-[11px] uppercase tracking-wide text-muted-foreground/70",
-                  groupIndex === 0 ? "mt-2" : "mt-5"
-                )}
-              >
+              <p className="px-2.5 pb-1 pt-2 text-[9px] font-medium uppercase tracking-[0.12em] text-muted-foreground/80">
                 {group.label}
               </p>
             )}
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {group.items.map((item) => {
                 const isActive = item.href === "/" ? path === "/" : path.startsWith(item.href)
                 const Icon = item.icon
@@ -109,14 +124,14 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
                     href={item.href}
                     onClick={onNavigate}
                     className={cn(
-                      "flex items-center gap-3 rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground",
-                      collapsed && "justify-center px-2.5",
-                      isActive && "bg-muted/70 font-medium text-foreground"
+                      "flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground",
+                      collapsed && "justify-center px-1.5",
+                      isActive && "bg-muted/90 font-medium text-foreground"
                     )}
                     title={collapsed ? item.label : undefined}
                   >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    {!collapsed && <span>{item.label}</span>}
+                    <Icon className="h-[13px] w-[13px] shrink-0" />
+                    {!collapsed && <span className="truncate">{item.label}</span>}
                   </Link>
                 )
               })}
@@ -126,49 +141,86 @@ export function Sidebar({ collapsed, onToggle, onNavigate }: SidebarProps) {
       </nav>
 
       {!collapsed && (
-        <div className="py-3">
+        <div className="border-t border-border/60 px-1 pt-3">
           <SidebarPrompts onNavigate={onNavigate} />
         </div>
       )}
 
-      <div className="space-y-2 px-3 py-4">
-        <div className={cn("flex items-center", collapsed ? "justify-center" : "px-1")}>
-          <ThemeToggle />
-        </div>
-        <form action={logoutAction}>
+      {collapsed && (
+        <div className="mt-auto px-1 pt-2">
           <button
-            type="submit"
-            className={cn(
-              "flex w-full items-center gap-3 rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground",
-              collapsed && "justify-center px-2.5"
-            )}
-            title={collapsed ? "退出" : undefined}
+            type="button"
+            onClick={onToggle}
+            className="hidden h-7 w-full items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground md:inline-flex"
+            aria-label="展开侧栏"
           >
-            <LogOut className="h-4 w-4 shrink-0" />
-            {!collapsed && <span>退出</span>}
+            <PanelLeft className="h-3.5 w-3.5" />
           </button>
-        </form>
-      </div>
+        </div>
+      )}
     </div>
   )
 }
 
 export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
-  return (
-    <header className="sticky top-0 z-40 h-14 bg-background/80 backdrop-blur-sm">
-      <div className="flex h-14 items-center px-4">
-        <button
-          onClick={onMenuClick}
-          className="mr-3 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground md:hidden"
-        >
-          <PanelLeft className="h-4 w-4" />
-        </button>
+  const pathname = usePathname()
+  const path = pathname.replace(/^\/(zh|en)/, "") || "/"
 
-        <div className="ml-auto flex items-center gap-1">
-          <ModelChainPicker />
-          <AlertsBell />
-          <ThemeToggle />
+  const crumbs = useMemo(() => {
+    const items = [{ href: "/", label: "Prompt Agent" }]
+    if (path === "/") {
+      items.push({ href: "/", label: "生成" })
+      return items
+    }
+
+    const matched = routeLabels.find((item) => path === item.prefix || path.startsWith(`${item.prefix}/`))
+    if (matched) {
+      items.push({ href: matched.prefix, label: matched.label })
+    }
+
+    return items
+  }, [path])
+
+  return (
+    <header className="sticky top-0 z-40 h-12 bg-background/80 backdrop-blur-sm">
+      <div className="flex h-12 items-center gap-1 px-3.5">
+        <div className="mr-auto flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
+          <button
+            type="button"
+            onClick={onMenuClick}
+            className="inline-flex h-[26px] w-[26px] items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground md:hidden"
+            aria-label="打开导航"
+          >
+            <Menu className="h-3.5 w-3.5" />
+          </button>
+          <div className="hidden h-6 w-6 items-center justify-center rounded-md border border-border/70 bg-agent/15 md:flex">
+            <Bot className="h-3.5 w-3.5 text-agent" />
+          </div>
+          <div className="flex min-w-0 items-center gap-2 overflow-hidden">
+            {crumbs.map((crumb, index) => (
+              <div key={`${crumb.href}-${crumb.label}`} className="flex min-w-0 items-center gap-2">
+                {index > 0 && <ChevronRight className="h-3 w-3 shrink-0 opacity-50" />}
+                <span className={cn("truncate", index === crumbs.length - 1 && "font-medium text-foreground")}>
+                  {crumb.label}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
+
+        <ModelChainPicker />
+        <AlertsBell />
+        <ThemeToggle />
+        <form action={logoutAction}>
+          <button
+            type="submit"
+            className="inline-flex h-[26px] w-[26px] items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+            aria-label="退出登录"
+            title="退出登录"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+          </button>
+        </form>
       </div>
     </header>
   )
