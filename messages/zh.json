@@ -59,7 +59,7 @@
       "userMessageLabel": "用户输入",
       "userMessagePlaceholder": "模拟用户会发送给这个提示词的消息...",
       "variablesLabel": "变量",
-      "variablesHint": "JSON 对象。例：{\\\"name\\\": \\\"Alice\\\"}",
+      "variablesHint": "JSON 对象，键值对形式。例：name 为 Alice，age 为 18。",
       "checksLabel": "检查项",
       "checksHint": "JSON 数组。每项支持 contains / not_contains / equals / starts_with / ends_with / length / regex / json_path。",
       "runButton": "运行",

@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react"
-import { useTranslations, useFormatter } from "next-intl"
+import { useTranslations, useFormatter, useNow } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -19,6 +19,7 @@ export function ActivityClient({ initialActions, pageSize }: ActivityClientProps
   const t = useTranslations("activity")
   const tCommon = useTranslations("common")
   const formatter = useFormatter()
+  const now = useNow({ updateInterval: 60_000 })
   const [actions, setActions] = useState(initialActions)
   const [undoingId, setUndoingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -110,7 +111,7 @@ export function ActivityClient({ initialActions, pageSize }: ActivityClientProps
                     <Badge variant="outline">{getActorLabel(action.actor, t)}</Badge>
                     <span className="text-sm font-medium">{description}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">{formatter.relativeTime(createdAt)}</span>
+                  <span className="text-xs text-muted-foreground">{formatter.relativeTime(createdAt, now)}</span>
                 </div>
                 {targetTitle && (
                   <p className="text-xs text-muted-foreground">

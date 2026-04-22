@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Bell, BellRing, Check } from "lucide-react"
-import { useTranslations, useFormatter } from "next-intl"
+import { useTranslations, useFormatter, useNow } from "next-intl"
 
 import { Button } from "@/components/ui/button"
 import { parseJsonResponseOrThrow, readErrorResponse } from "@/lib/utils"
@@ -30,6 +30,7 @@ type FormatterFn = ReturnType<typeof useFormatter>
 export function AlertsBell() {
   const t = useTranslations("alerts")
   const formatter = useFormatter()
+  const now = useNow({ updateInterval: 60_000 })
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [alerts, setAlerts] = useState<AlertRecord[]>([])
   const [unackCount, setUnackCount] = useState(0)
@@ -159,7 +160,7 @@ export function AlertsBell() {
                         </div>
                         <p className="text-sm font-medium">{alert.message}</p>
                         {metadataLine}
-                        <p className="text-xs text-muted-foreground">{formatRelativeTime(alert.createdAt, formatter)}</p>
+                        <p className="text-xs text-muted-foreground">{formatRelativeTime(alert.createdAt, formatter, now)}</p>
                       </div>
                     </div>
                   </li>
@@ -199,8 +200,8 @@ function getAlertMetadataLine(alert: AlertRecord, t: TranslateFn, formatter: For
   )
 }
 
-function formatRelativeTime(timestamp: string, formatter: FormatterFn) {
+function formatRelativeTime(timestamp: string, formatter: FormatterFn, now: Date) {
   const date = new Date(timestamp)
   if (Number.isNaN(date.getTime())) return ""
-  return formatter.relativeTime(date)
+  return formatter.relativeTime(date, now)
 }
