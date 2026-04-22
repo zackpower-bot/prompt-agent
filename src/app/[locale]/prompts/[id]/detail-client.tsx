@@ -8,8 +8,20 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, Copy, Check, Clock, Tag, Pencil, Trash2, Archive, Save, X, ThumbsUp, ThumbsDown } from "lucide-react"
+import {
+  ArrowLeft,
+  Copy,
+  Check,
+  Clock,
+  Tag,
+  Pencil,
+  Trash2,
+  Archive,
+  Save,
+  X,
+  ThumbsUp,
+  ThumbsDown,
+} from "lucide-react"
 import { updatePrompt, deletePrompt } from "@/app/actions/prompt.actions"
 import type { PromptWithTags } from "@/app/actions/prompt.actions"
 import { createVersion } from "@/app/actions/version.actions"
@@ -62,7 +74,7 @@ export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: 
         context: "detail_copy",
       }),
     }).catch(() => {})
-  }, [prompt.content])
+  }, [prompt.content, prompt.id])
 
   useEffect(() => {
     let active = true
@@ -71,7 +83,7 @@ export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: 
         const response = await fetch(`/api/usage/entity?type=prompt&id=${prompt.id}`)
         const payload = await parseJsonResponseOrThrow<{ total?: number; lastUsedAt?: string | null }>(
           response,
-          "加载使用统计失败",
+          "加载使用统计失败"
         )
         if (!active) return
         setUsageStats({
@@ -88,9 +100,17 @@ export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: 
 
   const handleSave = useCallback(() => {
     startTransition(async () => {
-      const tags = tagsInput.split(",").map(t => t.trim()).filter(Boolean)
+      const tags = tagsInput
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean)
       const result = await updatePrompt(prompt.id, {
-        title, description, content, category, tags, status,
+        title,
+        description,
+        content,
+        category,
+        tags,
+        status,
       })
       if (result.success) {
         await createVersion(prompt.id)
@@ -101,7 +121,10 @@ export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: 
   }, [prompt.id, title, description, content, category, status, tagsInput])
 
   const handleDelete = useCallback(() => {
-    if (!confirmDelete) { setConfirmDelete(true); return }
+    if (!confirmDelete) {
+      setConfirmDelete(true)
+      return
+    }
     startTransition(async () => {
       const result = await deletePrompt(prompt.id)
       if (result.success) router.push("/prompts")
@@ -131,8 +154,11 @@ export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: 
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("zh-CN", {
-      year: "numeric", month: "long", day: "numeric",
-      hour: "2-digit", minute: "2-digit",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     })
 
   const formatRelative = (value: string) => {
@@ -147,7 +173,6 @@ export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: 
 
   return (
     <div className="container-reading">
-      <div>
       <Link
         href="/prompts"
         className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -156,139 +181,245 @@ export function PromptDetailClient({ prompt: initialPrompt, initialTestCases }: 
         返回列表
       </Link>
 
-      <div className="mb-6">
-        {editing ? (
-          <Input value={title} onChange={e => setTitle(e.target.value)} className="mb-2 text-xl font-bold" />
-        ) : (
-          <h1 className="text-2xl font-bold">{prompt.title}</h1>
-        )}
+      <div className="grid gap-8 lg:grid-cols-[240px_minmax(0,1fr)]">
+        <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+          <MetaCard
+            title="Identity"
+            rows={[
+              { label: "id", value: prompt.id.slice(0, 12) },
+              { label: "version", value: "current" },
+              { label: "scope", value: prompt.status },
+              { label: "author", value: "@local" },
+              { label: "updated", value: formatRelative(prompt.updatedAt) },
+            ]}
+          />
+          <MetaCard
+            title="Defaults"
+            rows={[
+              { label: "category", value: prompt.category },
+              { label: "model", value: prompt.model },
+              { label: "tags", value: String(prompt.tags.length) },
+              { label: "feedback", value: feedbackGiven ?? "—" },
+            ]}
+          />
+          <MetaCard
+            title="Performance · 30d"
+            rows={[
+              { label: "runs", value: String(usageStats?.total ?? 0) },
+              {
+                label: "quality",
+                value: prompt.qualityScore !== null ? `${Math.round(prompt.qualityScore * 100)}%` : "—",
+              },
+              { label: "created", value: formatRelative(prompt.createdAt) },
+              { label: "last used", value: usageStats?.lastUsedAt ? formatRelative(usageStats.lastUsedAt) : "—" },
+            ]}
+          />
+        </aside>
 
-        {editing ? (
-          <Input value={description} onChange={e => setDescription(e.target.value)} placeholder="描述..." className="mt-2" />
-        ) : prompt.description ? (
-          <p className="mt-2 text-muted-foreground">{prompt.description}</p>
-        ) : null}
+        <div className="min-w-0">
+          <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-4">
+              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                PROMPT · {prompt.category} / {prompt.status}
+              </p>
+              {editing ? (
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} className="max-w-xl text-xl font-semibold" />
+              ) : (
+                <h1 className="font-serif text-3xl font-medium tracking-[-0.02em] text-foreground">{prompt.title}</h1>
+              )}
 
-        {usageStats ? (
-          <p className="mt-2 text-sm text-muted-foreground">
-            累计使用 {usageStats.total} 次
-            {usageStats.lastUsedAt ? ` · 上次 ${formatRelative(usageStats.lastUsedAt)}` : ""}
-          </p>
-        ) : null}
+              {editing ? (
+                <Input
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="描述..."
+                  className="max-w-2xl"
+                />
+              ) : prompt.description ? (
+                <p className="max-w-[72ch] text-sm leading-7 text-muted-foreground">{prompt.description}</p>
+              ) : null}
 
-        {editing ? (
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-            <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="分类" className="w-full sm:w-32" />
-            <select value={status} onChange={e => setStatus(e.target.value)} className="rounded-md border px-3 py-2 text-sm">
-              <option value="inbox">收件箱</option>
-              <option value="production">生产</option>
-              <option value="archived">归档</option>
-            </select>
-            <Input value={tagsInput} onChange={e => setTagsInput(e.target.value)} placeholder="标签（逗号分隔）" className="flex-1" />
+              {editing ? (
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  <Input
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    placeholder="分类"
+                    className="w-full sm:w-40"
+                  />
+                  <select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    className="rounded-md border px-3 py-2 text-sm shadow-xs"
+                  >
+                    <option value="inbox">收件箱</option>
+                    <option value="production">生产</option>
+                    <option value="archived">归档</option>
+                  </select>
+                  <Input
+                    value={tagsInput}
+                    onChange={(e) => setTagsInput(e.target.value)}
+                    placeholder="标签（逗号分隔）"
+                    className="min-w-[220px] flex-1"
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant={prompt.status === "production" ? "warm" : "outline"}>
+                    {prompt.status === "inbox" ? "收件箱" : prompt.status === "production" ? "生产" : "归档"}
+                  </Badge>
+                  <Badge variant="secondary">{prompt.category}</Badge>
+                  <Badge variant="outline">{prompt.model}</Badge>
+                  {prompt.tags.map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      <Tag className="mr-1 h-2.5 w-2.5" />
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  创建于 {formatDate(prompt.createdAt)}
+                </span>
+                <span>更新于 {formatDate(prompt.updatedAt)}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {editing ? (
+                <>
+                  <Button size="sm" onClick={handleSave} disabled={isPending}>
+                    <Save className="mr-1 h-3.5 w-3.5" />
+                    {isPending ? "保存中..." : "保存"}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={cancelEdit}>
+                    <X className="mr-1 h-3.5 w-3.5" />
+                    取消
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
+                    <Pencil className="mr-1 h-3.5 w-3.5" />
+                    编辑
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleCopy}>
+                    {copied ? <Check className="mr-1 h-3.5 w-3.5" /> : <Copy className="mr-1 h-3.5 w-3.5" />}
+                    {copied ? "已复制" : "复制"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={feedbackGiven === "positive" ? "default" : "outline"}
+                    onClick={() => {
+                      setFeedbackGiven("positive")
+                      void submitFeedback(prompt.id, "positive")
+                    }}
+                    disabled={feedbackGiven !== null || isPending}
+                  >
+                    <ThumbsUp className="mr-1 h-3.5 w-3.5" />
+                    {feedbackGiven === "positive" ? "已评" : "👍"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={feedbackGiven === "negative" ? "destructive" : "outline"}
+                    onClick={() => {
+                      setFeedbackGiven("negative")
+                      void submitFeedback(prompt.id, "negative")
+                    }}
+                    disabled={feedbackGiven !== null || isPending}
+                  >
+                    <ThumbsDown className="mr-1 h-3.5 w-3.5" />
+                    {feedbackGiven === "negative" ? "已评" : "👎"}
+                  </Button>
+                  {prompt.status !== "archived" && (
+                    <Button size="sm" variant="outline" onClick={handleArchive} disabled={isPending}>
+                      <Archive className="mr-1 h-3.5 w-3.5" />
+                      归档
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant={confirmDelete ? "destructive" : "outline"}
+                    onClick={handleDelete}
+                    disabled={isPending}
+                  >
+                    <Trash2 className="mr-1 h-3.5 w-3.5" />
+                    {confirmDelete ? "确认删除" : "删除"}
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
-        ) : (
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <Badge variant="secondary">
-              {prompt.status === "inbox" ? "收件箱" : prompt.status === "production" ? "生产" : prompt.status}
-            </Badge>
-            <Badge variant="outline">{prompt.category}</Badge>
-            <Badge variant="outline">{prompt.model}</Badge>
-            {prompt.tags.map(tag => (
-              <Badge key={tag} variant="outline" className="text-xs">
-                <Tag className="mr-1 h-2.5 w-2.5" />{tag}
-              </Badge>
-            ))}
-          </div>
-        )}
 
-        <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1"><Clock className="h-3 w-3" />创建于 {formatDate(prompt.createdAt)}</span>
-          <span>更新于 {formatDate(prompt.updatedAt)}</span>
+          <Card className="mb-8">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">System</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {editing ? (
+                <Textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  className="min-h-[260px] font-mono text-sm"
+                />
+              ) : (
+                <div className="max-w-[72ch] whitespace-pre-wrap rounded-xl bg-muted/50 p-4 text-[15px] leading-[1.75] text-foreground">
+                  {prompt.content}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <section className="mb-8">
+            <h3 className="mb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Versions</h3>
+            <VersionList promptId={prompt.id} currentContent={prompt.content} />
+          </section>
+
+          <section className="mb-8">
+            <h3 className="mb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Tests</h3>
+            <TestCaseSection promptId={prompt.id} initialTestCases={initialTestCases} />
+          </section>
+
+          <section className="mb-8">
+            <h3 className="mb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Modules</h3>
+            <ModuleSuggestions promptId={prompt.id} promptContent={prompt.content} />
+          </section>
+
+          <section>
+            <h3 className="mb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              Similar scenarios
+            </h3>
+            <ScenarioSuggestions promptContent={prompt.content} />
+          </section>
         </div>
       </div>
-
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        {editing ? (
-          <>
-            <Button size="sm" onClick={handleSave} disabled={isPending}>
-              <Save className="mr-1 h-3.5 w-3.5" />{isPending ? "保存中..." : "保存"}
-            </Button>
-            <Button size="sm" variant="ghost" onClick={cancelEdit}><X className="mr-1 h-3.5 w-3.5" />取消</Button>
-          </>
-        ) : (
-          <>
-            <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
-              <Pencil className="mr-1 h-3.5 w-3.5" />编辑
-            </Button>
-            <Button size="sm" variant="outline" onClick={handleCopy}>
-              {copied ? <Check className="mr-1 h-3.5 w-3.5" /> : <Copy className="mr-1 h-3.5 w-3.5" />}
-              {copied ? "已复制" : "复制"}
-            </Button>
-            <Button
-              size="sm"
-              variant={feedbackGiven === "positive" ? "default" : "outline"}
-              onClick={() => { setFeedbackGiven("positive"); void submitFeedback(prompt.id, "positive") }}
-              disabled={feedbackGiven !== null || isPending}
-            >
-              <ThumbsUp className="mr-1 h-3.5 w-3.5" />
-              {feedbackGiven === "positive" ? "已评" : "👍"}
-            </Button>
-            <Button
-              size="sm"
-              variant={feedbackGiven === "negative" ? "destructive" : "outline"}
-              onClick={() => { setFeedbackGiven("negative"); void submitFeedback(prompt.id, "negative") }}
-              disabled={feedbackGiven !== null || isPending}
-            >
-              <ThumbsDown className="mr-1 h-3.5 w-3.5" />
-              {feedbackGiven === "negative" ? "已评" : "👎"}
-            </Button>
-            {prompt.status !== "archived" && (
-              <Button size="sm" variant="outline" onClick={handleArchive} disabled={isPending}>
-                <Archive className="mr-1 h-3.5 w-3.5" />归档
-              </Button>
-            )}
-            <Button
-              size="sm"
-              variant={confirmDelete ? "destructive" : "outline"}
-              onClick={handleDelete}
-              disabled={isPending}
-            >
-              <Trash2 className="mr-1 h-3.5 w-3.5" />
-              {confirmDelete ? "确认删除" : "删除"}
-            </Button>
-          </>
-        )}
-      </div>
-
-      <Separator className="mb-6" />
-
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium">提示词内容</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {editing ? (
-            <Textarea value={content} onChange={e => setContent(e.target.value)} className="min-h-[200px] sm:min-h-[300px] font-mono text-sm" />
-          ) : (
-            <div className="max-w-[72ch] whitespace-pre-wrap rounded-md bg-muted/50 p-4 text-[15px] leading-[1.7] text-foreground">
-              {prompt.content}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <div className="mt-6">
-        <h3 className="mb-3 text-sm font-medium">版本历史</h3>
-        <VersionList promptId={prompt.id} currentContent={prompt.content} />
-      </div>
-
-      <div className="mt-6">
-        <TestCaseSection promptId={prompt.id} initialTestCases={initialTestCases} />
-      </div>
-
-      <ModuleSuggestions promptId={prompt.id} promptContent={prompt.content} />
-      <ScenarioSuggestions promptContent={prompt.content} />
     </div>
-    </div>
+  )
+}
+
+function MetaCard({
+  title,
+  rows,
+}: {
+  title: string
+  rows: Array<{ label: string; value: string }>
+}) {
+  return (
+    <Card size="sm">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {rows.map((row) => (
+          <div key={row.label} className="flex items-center justify-between gap-3 text-sm">
+            <span className="font-mono text-[11px] text-muted-foreground">{row.label}</span>
+            <span className="text-right text-[13px] text-foreground">{row.value}</span>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
   )
 }
