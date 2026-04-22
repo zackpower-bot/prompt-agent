@@ -98,7 +98,7 @@ export default function HomeClient({ recentTasksSlot }: HomeClientProps) {
         <>
           <TaskBanner task={displayTask} status={status} onReset={handleReset} />
           <section className="min-h-0 flex-1 overflow-y-auto">
-            <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-6 py-8">
+            <div className="mx-auto flex w-full max-w-[680px] flex-col gap-4 px-5 py-5">
               {status === "running" && (
                 <RunningTicker stepIndex={Math.max(steps.length, 1)} tool={runningStep?.tool ?? null} />
               )}
@@ -110,7 +110,7 @@ export default function HomeClient({ recentTasksSlot }: HomeClientProps) {
                 onShowDuplicates={() => setDetailsOpen(true)}
               />
               {error && (
-                <div className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm leading-6 text-destructive">
+                <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm leading-6 text-destructive">
                   {error}
                 </div>
               )}
@@ -164,15 +164,15 @@ export default function HomeClient({ recentTasksSlot }: HomeClientProps) {
 
 function TaskBanner({ task, status, onReset }: { task: string; status: AgentStatus; onReset: () => void }) {
   return (
-    <div className="sticky top-0 z-10 bg-background/95 backdrop-blur">
-      <div className="mx-auto flex max-w-3xl items-start justify-between gap-4 px-6 py-4">
+    <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
+      <div className="mx-auto flex max-w-[680px] items-start justify-between gap-3 px-5 py-3">
         <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground">当前任务</p>
-          <p className="text-sm leading-6 text-foreground line-clamp-2">{task || "等待新的任务描述"}</p>
+          <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Active task</p>
+          <p className="font-serif text-[15px] leading-6 text-foreground line-clamp-2">{task || "等待新的任务描述"}</p>
         </div>
         <div className="flex items-center gap-2">
           <StatusBadge status={status} />
-          <Button variant="outline" size="sm" onClick={onReset}>
+          <Button variant="ghost" size="sm" onClick={onReset}>
             新任务
           </Button>
         </div>
@@ -183,18 +183,18 @@ function TaskBanner({ task, status, onReset }: { task: string; status: AgentStat
 
 function StatusBadge({ status }: { status: AgentStatus }) {
   const meta: Record<AgentStatus, { label: string; className: string }> = {
-    idle: { label: "待命", className: "bg-muted text-muted-foreground" },
-    running: { label: "运行中", className: "bg-agent/10 text-agent" },
-    complete: { label: "已完成", className: "bg-emerald-100/40 text-emerald-600" },
-    error: { label: "异常", className: "bg-destructive/10 text-destructive" },
+    idle: { label: "待命", className: "border-border bg-background text-muted-foreground" },
+    running: { label: "运行中", className: "border-agent/30 bg-agent/10 text-agent" },
+    complete: { label: "已完成", className: "border-emerald-500/20 bg-emerald-500/10 text-emerald-700" },
+    error: { label: "异常", className: "border-destructive/20 bg-destructive/10 text-destructive" },
   }
   const data = meta[status]
-  return <span className={`rounded-full px-3 py-1 text-xs font-medium ${data.className}`}>{data.label}</span>
+  return <span className={`rounded-full border px-3 py-1 text-xs font-medium ${data.className}`}>{data.label}</span>
 }
 
 function RunningTicker({ stepIndex, tool }: { stepIndex: number; tool: string | null }) {
   return (
-    <div className="flex items-center justify-between rounded-2xl border border-border/60 bg-muted/30 px-4 py-2 text-xs font-medium text-foreground">
+    <div className="flex items-center justify-between rounded-xl border border-border/70 bg-background px-4 py-2 text-xs font-medium text-foreground shadow-xs">
       <span className="flex items-center gap-2 text-sm text-foreground">
         <Loader2 className="h-4 w-4 animate-spin text-agent" />
         思考中... 第 {stepIndex} 步
@@ -223,7 +223,7 @@ function ComposerBar({
 }) {
   return (
     <div className="sticky bottom-0 z-20 bg-background/85 px-4 py-3 backdrop-blur-sm">
-      <div className="mx-auto w-full max-w-3xl px-2 sm:px-0">
+      <div className="mx-auto w-full max-w-[680px] px-2 sm:px-0">
         <div className="flex items-end gap-3">
           <div className="min-w-0 flex-1">
             <AgentInput status={status} onSubmit={onSubmit} onStop={onStop} initialValue={value} onChange={onChange} />

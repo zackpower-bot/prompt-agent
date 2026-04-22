@@ -25,25 +25,28 @@ export function ResultCanvas({
   const tokenLabel = result ? `${result.usage.inputTokens + result.usage.outputTokens} tokens` : "-- tokens"
 
   return (
-    <section className="flex min-h-0 flex-1 flex-col rounded-3xl border border-border/60 bg-card/40 p-6 shadow-sm">
-      <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
-        <span>由 {providerLabel} 生成</span>
-        <span className="text-muted-foreground/70">· {tokenLabel}</span>
+    <section className="flex min-h-0 flex-1 flex-col rounded-2xl border border-border bg-card/80 px-5 py-5 shadow-xs">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-3">
+        <div className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 text-[11px] font-medium uppercase tracking-[0.08em] text-foreground">
+          {isStreaming ? <span className="agent-dot-pulse" /> : null}
+          <span>{isStreaming ? "streaming" : "draft"}</span>
+        </div>
+        <span className="text-xs text-muted-foreground">{providerLabel} · {tokenLabel}</span>
       </div>
 
       {duplicates.length > 0 && (
         <button
           type="button"
           onClick={onShowDuplicates}
-          className="mt-3 inline-flex items-center rounded-full border border-agent/30 bg-agent/10 px-3 py-1 text-xs font-semibold text-agent transition hover:border-agent/60"
+          className="mb-4 inline-flex items-center rounded-full border border-agent/30 bg-agent/10 px-3 py-1 text-xs font-semibold text-agent transition hover:border-agent/60"
         >
           找到 {duplicates.length} 条相似提示词 →
         </button>
       )}
 
-      <div className="mt-4 min-h-0 flex-1 overflow-y-auto pr-1">
+      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
         {hasContent ? (
-          <article className="prose prose-lg max-w-none whitespace-pre-wrap leading-8 text-foreground dark:prose-invert">
+          <article className="max-w-none whitespace-pre-wrap text-[15px] leading-8 text-foreground">
             {text}
           </article>
         ) : (
