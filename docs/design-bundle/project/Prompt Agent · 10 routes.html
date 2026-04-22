@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Prompt Agent — 10 Routes</title>
+<link rel="stylesheet" href="colors_and_type.css"/>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+  html, body { height: 100%; background: #f0eee9; }
+  .pa-frame {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--background);
+  }
+  [data-theme="dark"].pa-frame { background: #1B1916; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="Shell.jsx"></script>
+<script type="text/babel" src="routes-a.jsx"></script>
+<script type="text/babel" src="routes-b.jsx"></script>
+<script type="text/babel" src="routes-c.jsx"></script>
+<script type="text/babel" src="routes-d.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+function Frame({ children, theme = "light" }) {
+  return <div className="pa-frame" data-theme={theme}>{children}</div>;
+}
+
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection id="core" title="Core workspace" subtitle="Generate tab — the room where work happens">
+        <DCArtboard id="home"   label="01 · Home · empty state"           width={1280} height={800}><Frame><RouteHome/></Frame></DCArtboard>
+        <DCArtboard id="active" label="02 · Active workspace · streaming" width={1280} height={800}><Frame><RouteActive/></Frame></DCArtboard>
+        <DCArtboard id="pg"     label="03 · Playground · brief / stage / console" width={1440} height={800}><Frame><RoutePlayground/></Frame></DCArtboard>
+      </DCSection>
+
+      <DCSection id="library" title="Library" subtitle="Saved prompts, versioning, editing">
+        <DCArtboard id="list"   label="04 · Prompts list · filters + rows"  width={1280} height={820}><Frame><RoutePrompts/></Frame></DCArtboard>
+        <DCArtboard id="detail" label="05 · Prompt detail · versions"       width={1280} height={880}><Frame><RoutePromptDetail/></Frame></DCArtboard>
+        <DCArtboard id="editor" label="06 · Editor · form + live preview"   width={1280} height={860}><Frame><RouteEditor/></Frame></DCArtboard>
+      </DCSection>
+
+      <DCSection id="composable" title="Composable parts" subtitle="Modules & primitives that assemble into prompts">
+        <DCArtboard id="modules" label="07 · Modules · voice / format / guardrails" width={1280} height={820}><Frame><RouteModules/></Frame></DCArtboard>
+      </DCSection>
+
+      <DCSection id="admin" title="Admin, safety, surfaces" subtitle="Access controls, auth, and the public docs voice">
+        <DCArtboard id="adm"    label="08 · Admin · access & safety"        width={1280} height={860}><Frame><RouteAdmin/></Frame></DCArtboard>
+        <DCArtboard id="login"  label="09 · Login"                          width={720}  height={640}><Frame><RouteLogin/></Frame></DCArtboard>
+        <DCArtboard id="docs"   label="10 · Docs · getting started"         width={1000} height={820}><Frame><RouteDocs/></Frame></DCArtboard>
+      </DCSection>
+
+      <DCSection id="dark" title="Dark mode · spot check" subtitle="The two highest-traffic screens in dark theme">
+        <DCArtboard id="home-d"   label="Home · dark"       width={1280} height={800}><Frame theme="dark"><RouteHome theme="dark"/></Frame></DCArtboard>
+        <DCArtboard id="active-d" label="Active · dark"     width={1280} height={800}><Frame theme="dark"><RouteActive theme="dark"/></Frame></DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

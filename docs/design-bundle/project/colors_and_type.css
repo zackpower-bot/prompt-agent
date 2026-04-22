@@ -1,0 +1,375 @@
+/* ============================================================
+   prompt-agent Design System — colors & type
+   ------------------------------------------------------------
+   Warm cream + clay orange, inherited from Anthropic Claude.
+   Mirrors src/app/globals.css from the prompt-agent repo so
+   shadcn/ui components slot in with zero overrides.
+   ============================================================ */
+
+/* ---------- Webfonts (Google Fonts, hosted) ----------------- */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+/* Fallback serif used in the live app; we ship Fraunces as the primary
+   display face per the brief but keep Lora as a secondary match. */
+@import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&display=swap");
+
+:root {
+  /* ---------- Base palette (warm, Anthropic Claude) --------- */
+  --cream-50:   #FAF9F5;   /* surface — cards, popovers */
+  --cream-100:  #F5F4ED;   /* page background */
+  --cream-200:  #EDEBE1;   /* hover row, muted surface */
+  --cream-300:  #E2DED0;   /* border, divider */
+  --cream-400:  #CFC9B6;   /* input border strong */
+
+  --clay-300:   #E3A792;   /* tint */
+  --clay-400:   #D98A6C;   /* dark-mode accent */
+  --clay-500:   #CC785C;   /* PRIMARY — Anthropic clay */
+  --clay-600:   #B35E44;   /* hover / pressed */
+  --clay-700:   #8F4A36;   /* text on cream */
+
+  --ink-900:    #1F1E1B;   /* foreground — warm brown-black */
+  --ink-700:    #3D3B35;   /* body text strong */
+  --ink-500:    #6C685D;   /* muted foreground */
+  --ink-300:    #A8A293;   /* placeholder */
+
+  --danger-500: #C44E3A;   /* destructive */
+  --success-500:#5E8B5F;   /* success */
+  --info-500:   #6B7FA0;   /* info */
+  --amber-500:  #C48A3A;   /* warning */
+
+  /* agent/thought accents (ported from repo phase-* classes) */
+  --agent-500:  #C97B4A;
+  --thought-bg: #E6E4EE;   /* oklch(0.93 0.03 260) equivalent */
+  --thought-fg: #4B4F78;
+  --action-bg:  #F0E2D6;
+  --action-fg:  #7A4B2E;
+  --obs-bg:     #ECE6CF;
+  --obs-fg:     #6B5A1F;
+
+  /* ---------- Semantic (shadcn/ui compatible) --------------- */
+  --background:         var(--cream-100);
+  --foreground:         var(--ink-900);
+  --card:               var(--cream-50);
+  --card-foreground:    var(--ink-900);
+  --popover:            var(--cream-50);
+  --popover-foreground: var(--ink-900);
+  --primary:            var(--clay-500);
+  --primary-foreground: var(--cream-50);
+  --secondary:          var(--cream-200);
+  --secondary-foreground: var(--ink-900);
+  --muted:              var(--cream-200);
+  --muted-foreground:   var(--ink-500);
+  --accent:             #EAD9C9;               /* warm beige accent */
+  --accent-foreground:  var(--clay-700);
+  --destructive:        var(--danger-500);
+  --destructive-foreground: var(--cream-50);
+  --border:             var(--cream-300);
+  --input:              var(--cream-300);
+  --ring:               rgba(204, 120, 92, 0.45);
+
+  --sidebar:            #F1EFE5;
+  --sidebar-foreground: var(--ink-700);
+  --sidebar-primary:    var(--clay-500);
+  --sidebar-primary-foreground: var(--cream-50);
+  --sidebar-accent:     var(--cream-200);
+  --sidebar-accent-foreground: var(--ink-900);
+  --sidebar-border:     var(--cream-300);
+  --sidebar-ring:       rgba(204, 120, 92, 0.45);
+
+  --agent:              var(--agent-500);
+  --agent-foreground:   var(--cream-50);
+
+  /* ---------- Radius scale (6 / 10 / 16 per brief) ---------- */
+  --radius-xs:  4px;
+  --radius-sm:  6px;   /* inputs, small buttons */
+  --radius:     10px;  /* default — buttons, chips, inputs */
+  --radius-md:  10px;
+  --radius-lg:  16px;  /* cards, sheets */
+  --radius-xl:  20px;
+  --radius-2xl: 24px;  /* result canvas, marketing hero cards */
+  --radius-full:9999px;
+
+  /* ---------- Shadows (warm, rgb(71,55,38)-based) ----------- */
+  --shadow-xs:  0 1px 0 rgba(71,55,38,0.04);
+  --shadow-sm:  0 1px 2px rgba(71,55,38,0.05), 0 1px 1px rgba(71,55,38,0.04);
+  --shadow:     0 2px 6px rgba(71,55,38,0.06), 0 1px 2px rgba(71,55,38,0.04);
+  --shadow-md:  0 6px 16px rgba(71,55,38,0.08), 0 2px 4px rgba(71,55,38,0.04);
+  --shadow-lg:  0 16px 40px rgba(71,55,38,0.10), 0 4px 10px rgba(71,55,38,0.05);
+  --shadow-xl:  0 28px 60px rgba(71,55,38,0.12);
+  --shadow-inner: inset 0 1px 2px rgba(71,55,38,0.06);
+  /* focus ring — clay with low alpha */
+  --shadow-ring: 0 0 0 3px rgba(204, 120, 92, 0.25);
+
+  /* ---------- Spacing scale (tight for workbench, roomy for marketing)
+     use these as the vocabulary; don't invent new pixel values. */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;   /* marketing section padding */
+  --space-32: 128px;
+
+  /* ---------- Type tokens ---------------------------------- */
+  --font-serif:   "Fraunces", "Lora", "Source Serif 4", Georgia, serif;
+  --font-sans:    "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --fs-xs:   11px;
+  --fs-sm:   13px;
+  --fs-base: 15px;   /* body in workbench */
+  --fs-md:   17px;
+  --fs-lg:   20px;
+  --fs-xl:   24px;
+  --fs-2xl:  32px;
+  --fs-3xl:  40px;
+  --fs-4xl:  56px;   /* marketing hero */
+
+  --lh-tight: 1.15;
+  --lh-snug:  1.35;
+  --lh-body:  1.6;
+  --lh-loose: 1.8;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:  0.06em;
+  --tracking-caps:  0.18em;  /* for mono-caps labels */
+
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semi:    600;
+  --weight-bold:    700;
+}
+
+/* ============================================================
+   Dark mode — deep warm brown-black, softer clay
+   ============================================================ */
+.dark,
+[data-theme="dark"] {
+  --background:         #1B1916;
+  --foreground:         #EDE8DB;
+  --card:               #22201C;
+  --card-foreground:    #EDE8DB;
+  --popover:            #22201C;
+  --popover-foreground: #EDE8DB;
+  --primary:            #D98A6C;
+  --primary-foreground: #1B1916;
+  --secondary:          #2A2723;
+  --secondary-foreground: #EDE8DB;
+  --muted:              #2A2723;
+  --muted-foreground:   #A9A396;
+  --accent:             #3A322B;
+  --accent-foreground:  #F1E2D2;
+  --destructive:        #E0735A;
+  --destructive-foreground: #1B1916;
+  --border:             rgba(255,255,255,0.10);
+  --input:              rgba(255,255,255,0.12);
+  --ring:               rgba(217, 138, 108, 0.55);
+
+  --sidebar:            #1E1C19;
+  --sidebar-foreground: #EDE8DB;
+  --sidebar-primary:    #D98A6C;
+  --sidebar-primary-foreground: #1B1916;
+  --sidebar-accent:     #2A2723;
+  --sidebar-accent-foreground: #EDE8DB;
+  --sidebar-border:     rgba(255,255,255,0.10);
+  --sidebar-ring:       rgba(217, 138, 108, 0.55);
+
+  --agent:              #E09471;
+  --agent-foreground:   #1B1916;
+
+  --thought-bg: #2E3050;
+  --thought-fg: #BFC6EC;
+  --action-bg:  #3A2A1E;
+  --action-fg:  #E7BFA1;
+  --obs-bg:     #3A3319;
+  --obs-fg:     #E4D27E;
+
+  --shadow-xs:  0 1px 0 rgba(0,0,0,0.3);
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.35), 0 1px 1px rgba(0,0,0,0.25);
+  --shadow:     0 2px 6px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.25);
+  --shadow-md:  0 6px 16px rgba(0,0,0,0.40), 0 2px 4px rgba(0,0,0,0.25);
+  --shadow-lg:  0 16px 40px rgba(0,0,0,0.45), 0 4px 10px rgba(0,0,0,0.30);
+  --shadow-xl:  0 28px 60px rgba(0,0,0,0.55);
+}
+
+/* ============================================================
+   Base element styles
+   ============================================================ */
+html {
+  font-family: var(--font-sans);
+  color: var(--foreground);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  color: var(--foreground);
+  background: var(--background);
+}
+
+/* ============================================================
+   Semantic type classes (mirror the intended usage)
+   ============================================================ */
+.t-display-1,
+h1.t-display {
+  font-family: var(--font-serif);
+  font-size: var(--fs-4xl);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  font-weight: var(--weight-regular);
+  color: var(--foreground);
+}
+
+.t-display-2 {
+  font-family: var(--font-serif);
+  font-size: var(--fs-3xl);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  font-weight: var(--weight-regular);
+}
+
+.t-h1, h1 {
+  font-family: var(--font-serif);
+  font-size: var(--fs-2xl);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+  font-weight: var(--weight-regular);
+}
+
+.t-h2, h2 {
+  font-family: var(--font-serif);
+  font-size: var(--fs-xl);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+  font-weight: var(--weight-regular);
+}
+
+.t-h3, h3 {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+  font-weight: var(--weight-medium);
+}
+
+.t-eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  font-weight: var(--weight-medium);
+  color: var(--muted-foreground);
+}
+
+.t-body, p {
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  color: var(--foreground);
+}
+
+.t-body-sm {
+  font-family: var(--font-sans);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--muted-foreground);
+}
+
+.t-mono, code, pre {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: var(--lh-snug);
+  letter-spacing: 0;
+}
+
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.02em;
+  color: var(--muted-foreground);
+}
+
+/* ============================================================
+   Utilities used across preview cards + UI kits
+   ============================================================ */
+.surface        { background: var(--card); }
+.bg-app         { background: var(--background); }
+.text-muted     { color: var(--muted-foreground); }
+.text-fg        { color: var(--foreground); }
+.text-primary   { color: var(--primary); }
+.text-agent     { color: var(--agent); }
+.border-brand   { border: 1px solid var(--border); }
+
+.hairline {
+  height: 1px;
+  background: var(--border);
+  width: 100%;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--muted) 70%, transparent);
+  font-size: var(--fs-xs);
+  font-family: var(--font-sans);
+  font-weight: var(--weight-medium);
+  color: var(--foreground);
+  line-height: 1.6;
+}
+
+.pill-agent {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--agent) 12%, transparent);
+  color: var(--agent);
+  font-size: var(--fs-xs);
+  font-weight: var(--weight-medium);
+}
+
+/* agent-dot — tiny signal from repo */
+.agent-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--agent);
+}
+.agent-dot-pulse { animation: agent-pulse 1.6s ease-in-out infinite; }
+@keyframes agent-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.88); }
+}
+
+/* phase pills — ReAct loop thought / action / observation */
+.phase {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.02em;
+  border: 1px solid;
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+.phase-thought     { background: var(--thought-bg); color: var(--thought-fg); border-color: color-mix(in oklab, var(--thought-fg) 25%, transparent); }
+.phase-action      { background: var(--action-bg);  color: var(--action-fg);  border-color: color-mix(in oklab, var(--action-fg) 25%, transparent); }
+.phase-observation { background: var(--obs-bg);     color: var(--obs-fg);     border-color: color-mix(in oklab, var(--obs-fg) 25%, transparent); }
