@@ -190,49 +190,56 @@ export function ModulesClient({
 
   return (
     <div className="container-reading">
-      <div className="sticky top-0 z-10 mb-6 bg-background/80 py-3 backdrop-blur">
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="搜索模块..."
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Button size="sm" onClick={() => setCreating(true)} disabled={creating}>
-              <Plus className="mr-1 h-4 w-4" />
-              新建模块
-            </Button>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="mr-2 text-sm text-muted-foreground">{total} 个模块</p>
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <div className="space-y-1">
+          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            {total} modules · composable parts
+          </p>
+          <h1 className="font-serif text-[28px] font-medium tracking-[-0.02em] text-foreground">模块</h1>
+          <p className="text-sm text-muted-foreground">
+            可复用的角色、输出格式、约束与守护规则。整理成模块后，组装 prompt 会更快。
+          </p>
+        </div>
+        <Button size="sm" onClick={() => setCreating(true)} disabled={creating}>
+          <Plus className="mr-1 h-4 w-4" />
+          新建模块
+        </Button>
+      </div>
+
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative w-full max-w-[320px] flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="搜索模块..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={typeFilter === "all" ? "default" : "secondary"}
+            size="sm"
+            onClick={() => setTypeFilter("all")}
+          >
+            全部
+          </Button>
+          {MODULE_TYPES.map((type) => (
             <Button
-              variant={typeFilter === "all" ? "default" : "secondary"}
+              key={type.value}
+              variant={typeFilter === type.value ? "default" : "secondary"}
               size="sm"
-              onClick={() => setTypeFilter("all")}
+              onClick={() => setTypeFilter(type.value)}
             >
-              全部
+              {type.label}
             </Button>
-            {MODULE_TYPES.map((type) => (
-              <Button
-                key={type.value}
-                variant={typeFilter === type.value ? "default" : "secondary"}
-                size="sm"
-                onClick={() => setTypeFilter(type.value)}
-              >
-                {type.label}
-              </Button>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
 
       {creating && (
-        <Card className="mb-4">
-          <CardContent className="flex flex-col gap-3 pt-4">
+        <Card className="mb-6">
+          <CardContent className="grid gap-3 pt-5 lg:grid-cols-[1fr_160px_180px]">
             <Input
               placeholder="模块标题"
               value={newTitle}
@@ -241,7 +248,7 @@ export function ModulesClient({
             <select
               value={newType}
               onChange={(event) => setNewType(event.target.value)}
-              className="w-full rounded-md border px-3 py-2 text-sm"
+              className="w-full rounded-md border px-3 py-2 text-sm shadow-xs"
             >
               {MODULE_TYPES.map((type) => (
                 <option key={type.value} value={type.value}>
@@ -254,9 +261,9 @@ export function ModulesClient({
               placeholder="模块内容..."
               value={newContent}
               onChange={(event) => setNewContent(event.target.value)}
-              className="min-h-[120px] font-mono text-sm"
+              className="min-h-[140px] lg:col-span-3 font-mono text-sm"
             />
-            <div className="flex gap-2">
+            <div className="flex gap-2 lg:col-span-3">
               <Button size="sm" onClick={handleCreate} disabled={isPending}>
                 <Save className="mr-1 h-3 w-3" />
                 保存
@@ -270,17 +277,17 @@ export function ModulesClient({
         </Card>
       )}
 
-      <ul className="space-y-1">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {modules.map((module) => (
-          <li key={module.id} className="list-row">
-            <div className="min-w-0 flex-1">
+          <Card key={module.id} className={editingId === module.id ? "border-primary/40" : ""}>
+            <CardContent className="space-y-4 pt-5">
               {editingId === module.id ? (
                 <div className="space-y-3">
                   <Input value={editTitle} onChange={(event) => setEditTitle(event.target.value)} />
                   <select
                     value={editType}
                     onChange={(event) => setEditType(event.target.value)}
-                    className="rounded-md border px-3 py-1.5 text-sm"
+                    className="rounded-md border px-3 py-2 text-sm shadow-xs"
                   >
                     {MODULE_TYPES.map((type) => (
                       <option key={type.value} value={type.value}>
@@ -292,25 +299,30 @@ export function ModulesClient({
                   <Textarea
                     value={editContent}
                     onChange={(event) => setEditContent(event.target.value)}
-                    className="min-h-[100px] font-mono text-sm"
+                    className="min-h-[140px] font-mono text-sm"
                   />
                 </div>
               ) : (
                 <>
-                  <h3 className="font-serif text-base">{module.title}</h3>
-                  <p className="mt-1 line-clamp-2 whitespace-pre-wrap text-sm text-muted-foreground">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-serif text-lg">{module.title}</h3>
+                      <p className="mt-1 text-xs font-mono text-muted-foreground">
+                        {MODULE_TYPES.find((type) => type.value === module.type)?.label ?? module.type}
+                      </p>
+                    </div>
+                    <Badge variant="secondary">{module.tags[0] ?? "module"}</Badge>
+                  </div>
+                  <p className="line-clamp-5 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
                     {module.content}
                   </p>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <Badge variant="outline" className="mono-label">
-                      {MODULE_TYPES.find((type) => type.value === module.type)?.label ?? module.type}
-                    </Badge>
+                  <div className="flex flex-wrap items-center gap-2">
                     {module.slot && (
                       <Badge variant="warm" className="text-[10px]">
                         {SLOT_LABELS[module.slot as Slot]}
                       </Badge>
                     )}
-                    {module.tags.map((tag) => (
+                    {module.tags.slice(0, 2).map((tag) => (
                       <Badge key={tag} variant="outline" className="text-[10px]">
                         {tag}
                       </Badge>
@@ -318,9 +330,9 @@ export function ModulesClient({
                   </div>
                 </>
               )}
-            </div>
-            <div className="flex shrink-0 items-start gap-3">
-              <div className="flex flex-col items-end gap-2">
+
+              <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+                <span>{formatDate(module.updatedAt)}</span>
                 {editingId === module.id ? (
                   <div className="flex items-center gap-1">
                     <Button
@@ -342,33 +354,30 @@ export function ModulesClient({
                     </Button>
                   </div>
                 ) : (
-                  <>
-                    <time className="text-xs text-muted-foreground">{formatDate(module.updatedAt)}</time>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 w-8 p-0"
-                        onClick={() => startEdit(module)}
-                      >
-                        <Pencil className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 w-7 p-0 text-destructive"
-                        onClick={() => handleDelete(module.id)}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0"
+                      onClick={() => startEdit(module)}
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0 text-destructive"
+                      onClick={() => handleDelete(module.id)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
                 )}
               </div>
-            </div>
-          </li>
+            </CardContent>
+          </Card>
         ))}
-      </ul>
+      </div>
 
       {modules.length > 0 && hasMore && (
         <div className="mt-4 flex justify-center">
