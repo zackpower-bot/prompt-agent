@@ -36,7 +36,11 @@ export async function getTestCasesByPrompt(
   }
 }
 
-export const listTestCases = getTestCasesByPrompt
+export async function listTestCases(
+  promptId: string
+): Promise<{ success: true; data: TestCaseDTO[] } | { success: false; error: string }> {
+  return getTestCasesByPrompt(promptId)
+}
 
 export async function getTestCaseById(
   id: string
