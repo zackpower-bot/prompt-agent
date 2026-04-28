@@ -1,0 +1,53 @@
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        env:
+          DATABASE_URL: file:./ci-build.db
+          ADMIN_PASSWORD: ci-admin-password
+          MEMBER_PASSWORD: ci-member-password
+          MINIMAX_API_KEY: ci-minimax-key
+          NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: npm run build
+
+      - name: Verify Prisma migrations on fresh SQLite
+        env:
+          DATABASE_URL: file:./ci-migrate.db
+        run: |
+          npx prisma migrate deploy --config prisma.config.ts
+          npx prisma migrate status --config prisma.config.ts
+
+      - name: Docker Compose build
+        run: docker compose --profile ops build app schema

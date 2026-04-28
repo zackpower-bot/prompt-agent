@@ -22,6 +22,8 @@ if [[ ! -f ".env" ]]; then
   exit 1
 fi
 
+PROMPT_AGENT_BACKUP_KIND=preupdate "${REPO_ROOT}/deploy/backup.sh"
+
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   if ! git diff --quiet || ! git diff --cached --quiet; then
     echo "Working tree has uncommitted changes. Aborting deployment update." >&2

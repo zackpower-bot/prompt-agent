@@ -1,0 +1,52 @@
+name: Deploy to VPS
+
+on:
+  push:
+    tags: ['prompt-agent-v*']
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref to deploy (default: master HEAD)'
+        required: false
+        default: 'master'
+
+concurrency:
+  group: deploy-prompt-agent-prod
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://agent.selflocation.top
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+      - name: Add VPS to known_hosts
+        run: ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Run deploy/update.sh on VPS
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            'cd /srv/prompt-agent && ./deploy/update.sh'
+
+      - name: Health check
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS --max-time 5 https://agent.selflocation.top/api/health | grep -q '"ok":true'; then
+              echo "Health check passed on attempt $i"
+              exit 0
+            fi
+            echo "Health attempt $i/30 not ready, retrying in 5s..."
+            sleep 5
+          done
+          echo "Health check failed after 30 attempts (~150s)"
+          exit 1
